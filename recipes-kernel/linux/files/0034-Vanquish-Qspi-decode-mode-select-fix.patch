@@ -1,0 +1,24 @@
+From d21e0d0e23c9908cf828744aef286dba8979f960 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Fri, 31 Mar 2017 16:06:41 -0700
+Subject: [PATCH 34/34] Vanquish Qspi decode mode select fix
+
+---
+ arch/arm/boot/dts/Vanquish_soc.dts | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/boot/dts/Vanquish_soc.dts b/arch/arm/boot/dts/Vanquish_soc.dts
+index 0180e11..a6ad6fe 100644
+--- a/arch/arm/boot/dts/Vanquish_soc.dts
++++ b/arch/arm/boot/dts/Vanquish_soc.dts
+@@ -144,6 +144,7 @@
+ 		cdns,tsd2d-ns = <50>;
+ 		cdns,tchsh-ns = <4>;
+ 		cdns,tslch-ns = <4>;
++        cdns,is-decoded-cs = <0>;
+ 
+                 part0: partition@0 {
+                         label = "Flash 0 Raw Data";	/* appended from boardinfo */
+-- 
+1.8.4.5
+

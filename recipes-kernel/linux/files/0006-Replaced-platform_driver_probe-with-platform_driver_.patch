@@ -1,0 +1,38 @@
+From 550cd293001b43ff2d13991f396be3c704af1532 Mon Sep 17 00:00:00 2001
+From: Frank Mori Hess <fmh6jj@gmail.com>
+Date: Sat, 16 Jul 2016 15:23:41 -0400
+Subject: [PATCH 6/6] Replaced platform_driver_probe with
+ platform_driver_register, to support deferred probes.
+
+---
+ drivers/gpib/fluke_custom/fluke_gpib.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/gpib/fluke_custom/fluke_gpib.c b/drivers/gpib/fluke_custom/fluke_gpib.c
+index 4901a8b..800d9ea 100644
+--- a/drivers/gpib/fluke_custom/fluke_gpib.c
++++ b/drivers/gpib/fluke_custom/fluke_gpib.c
+@@ -965,16 +965,17 @@ static struct platform_driver fluke_gpib_platform_driver = {
+ 		.name = "fluke_gpib",
+ 		.owner = THIS_MODULE,
+ 		.of_match_table = fluke_gpib_of_match,
+-	}
++	},
++	.probe = &fluke_gpib_probe
+ };
+ 
+ static int __init fluke_init_module( void )
+ {
+ 	int result;
+ 	
+-	result = platform_driver_probe(&fluke_gpib_platform_driver, &fluke_gpib_probe);
++	result = platform_driver_register(&fluke_gpib_platform_driver);
+ 	if (result) {
+-		printk("fluke_gpib: platform_driver_probe failed!\n");
++		printk("fluke_gpib: platform_register_driver failed!\n");
+ 		return result;
+ 	}
+ 	
+-- 
+2.1.4
+

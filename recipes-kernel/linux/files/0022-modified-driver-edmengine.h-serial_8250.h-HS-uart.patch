@@ -1,0 +1,37 @@
+From 7aa26ff35500603dacdfba104dacfd58b457309a Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Mon, 21 Nov 2016 13:42:58 -0800
+Subject: [PATCH 22/22] modified driver edmengine.h serial_8250.h, HS uart
+
+---
+ include/linux/dmaengine.h   | 1 +
+ include/linux/serial_8250.h | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/include/linux/dmaengine.h b/include/linux/dmaengine.h
+index ad41975..df9a84f 100644
+--- a/include/linux/dmaengine.h
++++ b/include/linux/dmaengine.h
+@@ -182,6 +182,7 @@ enum dma_ctrl_flags {
+ 	DMA_PREP_PQ_DISABLE_Q = (1 << 3),
+ 	DMA_PREP_CONTINUE = (1 << 4),
+ 	DMA_PREP_FENCE = (1 << 5),
++	DMA_SINGLE_TRANSFER_REQ = (1 << 6),
+ };
+ 
+ /**
+diff --git a/include/linux/serial_8250.h b/include/linux/serial_8250.h
+index 78097e7..b7e3c6f 100644
+--- a/include/linux/serial_8250.h
++++ b/include/linux/serial_8250.h
+@@ -116,6 +116,7 @@ struct uart_8250_port {
+ 	unsigned char		msr_saved_flags;
+ 
+ 	struct uart_8250_dma	*dma;
++	unsigned int fast_uart	:1;
+ 	const struct uart_8250_ops *ops;
+ 
+ 	/* 8250 specific callbacks */
+-- 
+1.8.4.5
+

@@ -1,0 +1,38 @@
+From 7a2e2707947ae16cacba1a111c5275801e8cbfbd Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 27 Jun 2017 15:17:54 -0700
+Subject: [PATCH 68/68] Nighthawk device tree syntax fix.26
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index 6dcf8dd..383def5 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -24,8 +24,6 @@
+ 		serial0 = "&uart0";
+ 		serial1 = "&uart1";
+ 		serial2 = "&uart2";
+-		ethernet0 = "&gmac1";
+-		ethernet1 = "&gmac0";
+ 		spi0 = "&spi0";
+ 	}; //end aliases
+ 
+@@ -69,11 +67,11 @@
+     txc-skew-ps = <3000>;
+     rxdv-skew-ps = <0>;
+     rxc-skew-ps = <3000>;
+-    status = "okay";
+     max-frame-size = <3800>;
+     tx-fifo-depth = <4096>;	/* embeddedsw.dts.params.tx-fifo-depth type NUMBER */
+ 	rx-fifo-depth = <4096>;	/* embeddedsw.dts.params.rx-fifo-depth type NUMBER */
+     altr,emac-splitter = <&hps_emac_interface_splitter_0>;	/* appended from boardinfo */
++    status = "okay";
+ };
+ 
+ &gmac1 {
+-- 
+1.8.4.5
+

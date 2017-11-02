@@ -1,0 +1,28 @@
+From 07031a493f04e923cd071f3286b8dca6fa21d372 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Mon, 26 Jun 2017 15:46:47 -0700
+Subject: [PATCH 61/61] Nighthawk device tree syntax fix.19
+
+---
+ arch/arm/boot/dts/Nighthawk_soc_overlay.dts | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc_overlay.dts b/arch/arm/boot/dts/Nighthawk_soc_overlay.dts
+index 645809a..7de823c 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc_overlay.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc_overlay.dts
+@@ -249,11 +249,6 @@
+                 reg = <0x00050000 0x00000008>;
+                 clocks = < &clk_0 >;
+             }; //end splitter@0x100050000 (hps_emac_interface_splitter_0)
+-
+-            &hps_emac_interface_splitter_0 {
+-                status = "okay";
+-            };
+-
+         };
+     };
+ }; //end /
+-- 
+1.8.4.5
+

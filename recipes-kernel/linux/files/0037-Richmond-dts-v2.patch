@@ -1,0 +1,27 @@
+From 029d1347aedf036afb9958d784246d8dee91804a Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 4 Oct 2016 14:29:47 -0700
+Subject: [PATCH 37/47] Richmond dts v2
+
+---
+ arch/arm/boot/dts/Richmond_005.dts | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Richmond_005.dts b/arch/arm/boot/dts/Richmond_005.dts
+index 7f9ff83..54e8ae2 100644
+--- a/arch/arm/boot/dts/Richmond_005.dts
++++ b/arch/arm/boot/dts/Richmond_005.dts
+@@ -9,10 +9,6 @@
+ 	model = "Altera SOCFPGA Cyclone V";	/* appended from boardinfo */
+ 	compatible = "altr,socfpga-cyclone5", "altr,socfpga";	/* appended from boardinfo */
+ 
+-	aliases {
+-		ethernet0 = "/sopc/ethernet@0xff702000";
+-	}; //end aliases
+-
+ 	chosen {
+ 		bootargs = "earlyprintk";
+ 		stdout-path = "serial0:115200n8";
+-- 
+1.8.4.5
+

@@ -1,0 +1,42 @@
+From b9919a9ac15d9a311af3e09ae0ac170fc2362f7b Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Fri, 21 Oct 2016 14:41:14 -0700
+Subject: [PATCH 4/4] Driver modification dmaengine to fix get_slave_ch
+
+---
+ drivers/dma/dmaengine.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/dma/dmaengine.c b/drivers/dma/dmaengine.c
+index 3ddfd1f..d2154f5 100644
+--- a/drivers/dma/dmaengine.c
++++ b/drivers/dma/dmaengine.c
+@@ -547,16 +547,23 @@ struct dma_chan *dma_get_slave_channel(struct dma_chan *chan)
+ 	mutex_lock(&dma_list_mutex);
+ 
+ 	if (chan->client_count == 0) {
++		struct dma_device *device = chan->device;
++
++		dma_cap_set(DMA_PRIVATE, device->cap_mask);
++		device->privatecnt++;
+ 		err = dma_chan_get(chan);
+-		if (err)
++		if (err) {
+ 			pr_debug("%s: failed to get %s: (%d)\n",
+ 				__func__, dma_chan_name(chan), err);
++			chan = NULL;
++			if (--device->privatecnt == 0)
++				dma_cap_clear(DMA_PRIVATE, device->cap_mask);
++		}
+ 	} else
+ 		chan = NULL;
+ 
+ 	mutex_unlock(&dma_list_mutex);
+ 
+-
+ 	return chan;
+ }
+ EXPORT_SYMBOL_GPL(dma_get_slave_channel);
+-- 
+1.8.4.5
+

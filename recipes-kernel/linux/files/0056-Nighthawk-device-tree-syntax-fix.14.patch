@@ -1,0 +1,58 @@
+From bc130fc2c7963520d094a094c1d1e70805b6e348 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Mon, 26 Jun 2017 14:31:48 -0700
+Subject: [PATCH 56/56] Nighthawk device tree syntax fix.14
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts         | 7 -------
+ arch/arm/boot/dts/Nighthawk_soc_overlay.dts | 7 +++++++
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index 0c03b05..8bc0532 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -48,7 +48,6 @@
+ 		}; //end Nighthawk_FPGA_IO_HPS_CLK (Nighthawk_FPGA_IO_HPS_CLK)
+ 
+ 	}; //end clocks
+-
+ };
+ 
+ &gmac0 {
+@@ -68,14 +67,8 @@
+     tx-fifo-depth = <4096>;	/* embeddedsw.dts.params.tx-fifo-depth type NUMBER */
+ 	rx-fifo-depth = <4096>;	/* embeddedsw.dts.params.rx-fifo-depth type NUMBER */
+     altr,emac-splitter = <&hps_emac_interface_splitter_0>;	/* appended from boardinfo */
+-    status = "okay";
+ };
+ 
+-hps_emac_interface_splitter_0: splitter@0x100050000 {
+-    compatible = "altr,splitter-15.1", "altr,emac-splitter-1.0";
+-    reg = <0x00050000 0x00000008>;
+-    clocks = < &clk_0 >;
+-}; //end splitter@0x100050000 (hps_emac_interface_splitter_0)
+ 
+ &gmac1 {
+     status = "okay";
+diff --git a/arch/arm/boot/dts/Nighthawk_soc_overlay.dts b/arch/arm/boot/dts/Nighthawk_soc_overlay.dts
+index 0fe3dba..2861620 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc_overlay.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc_overlay.dts
+@@ -243,6 +243,13 @@
+                 reg = < 0x0004f000 0x00000020 >;
+                 clocks = < &Nighthawk_FPGA_IO_pll_0 2 >;
+             }; //end unknown@0x10004f000 (Nighthawk_FPGA_IO_AUDIO_IF_0)
++
++            hps_emac_interface_splitter_0: splitter@0x100050000 {
++                compatible = "altr,splitter-15.1", "altr,emac-splitter-1.0";
++                reg = <0x00050000 0x00000008>;
++                clocks = < &clk_0 >;
++                status = "okay";
++            }; //end splitter@0x100050000 (hps_emac_interface_splitter_0)
+         };
+     };
+ }; //end /
+-- 
+1.8.4.5
+

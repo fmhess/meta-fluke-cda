@@ -1,0 +1,34 @@
+From efed7a1d6db10adda495c6a9a198eadbad3c6f07 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Fri, 3 Mar 2017 15:31:43 -0800
+Subject: [PATCH 27/27] Triclamp_DTS reduce qspi flash clocks to 50MHZ
+
+---
+ arch/arm/boot/dts/Triclamp_soc.dts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Triclamp_soc.dts b/arch/arm/boot/dts/Triclamp_soc.dts
+index 52a6f14..f630e61 100644
+--- a/arch/arm/boot/dts/Triclamp_soc.dts
++++ b/arch/arm/boot/dts/Triclamp_soc.dts
+@@ -104,7 +104,7 @@
+ 		#size-cells = <1>;
+ 		compatible = "n25q512a";
+ 		reg = <0>;      /* chip select */
+-		spi-max-frequency = <100000000>;
++		spi-max-frequency = <50000000>;
+ 
+ 		cdns,page-size = <256>;
+ 		cdns,block-size = <16>;
+@@ -141,7 +141,7 @@
+ 		#size-cells = <1>;
+ 		compatible = "n25q00";
+ 		reg = <1>;      /* chip select */
+-		spi-max-frequency = <100000000>;
++		spi-max-frequency = <50000000>;
+ 
+ 		cdns,page-size = <256>;
+ 		cdns,block-size = <16>;
+-- 
+1.8.4.5
+

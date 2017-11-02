@@ -1,0 +1,25 @@
+From bc2ef45655ca90a4fb3b4e45160c9ef70f547df3 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Mon, 19 Jun 2017 14:36:44 -0700
+Subject: [PATCH 39/39] Nighthawk device tree syntax fix.-2
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index 5f1c5c5..3168372 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -91,7 +91,7 @@
+ 
+ &mmc0 {
+     status = "disabled";
+-}
++};
+ 
+ 
+ &i2c0 {
+-- 
+1.8.4.5
+

@@ -1,0 +1,31 @@
+From 8bfda3c77921c7fea9d6b1b27bcd0e2e986786eb Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Thu, 31 Aug 2017 14:06:46 -0700
+Subject: [PATCH 80/80] Vanquish dts added PMU support 1 core only
+
+---
+ arch/arm/boot/dts/Vanquish_soc.dts | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm/boot/dts/Vanquish_soc.dts b/arch/arm/boot/dts/Vanquish_soc.dts
+index 746ab75..a6a290d 100644
+--- a/arch/arm/boot/dts/Vanquish_soc.dts
++++ b/arch/arm/boot/dts/Vanquish_soc.dts
+@@ -62,6 +62,14 @@
+ 		
+ };
+ 
++pmu: pmu@ff111000 {
++    compatible = "arm,cortex-a9-pmu";
++    interrupt-parent = <&intc>;
++    interrupts = <0 176 4>;
++    interrupt-affinity = <&cpu0>;
++    reg = <0xff111000 0x1000>;
++};
++
+ &gmac1 {
+ 	status = "okay";
+ 	phy-mode = "rgmii";
+-- 
+1.8.4.5
+

@@ -1,0 +1,63 @@
+From d2d3cff982f459e54246cf0c3c57730635820d1d Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 7 Mar 2017 15:44:20 -0800
+Subject: [PATCH 28/28] debug code for spi-nor.c
+
+---
+ drivers/mtd/spi-nor/spi-nor.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/mtd/spi-nor/spi-nor.c b/drivers/mtd/spi-nor/spi-nor.c
+index c8c77f6..9dbffcd 100644
+--- a/drivers/mtd/spi-nor/spi-nor.c
++++ b/drivers/mtd/spi-nor/spi-nor.c
+@@ -1106,18 +1106,25 @@ int spi_nor_scan(struct spi_nor *nor, const char *name, enum read_mode mode)
+ 
+ 	if (np) {
+ 		/* If we were instantiated by DT, use it */
+-		if (of_property_read_bool(np, "m25p,fast-read"))
++		if (of_property_read_bool(np, "m25p,fast-read")) {
++            printk("\nOF_PROPERTY_MATCH matched m25p. Setting flash_read = SPI_NOR_FAST\n");
+ 			nor->flash_read = SPI_NOR_FAST;
+-		else
++        }
++		else {
++            printk("\nOF_PROPERTY_MATCH matched m25p. Setting flash_read = SPI_NOR_NORMAL\n");
+ 			nor->flash_read = SPI_NOR_NORMAL;
++        }
+ 	} else {
+ 		/* If we weren't instantiated by DT, default to fast-read */
++        printk("\nOF_PROPERTY_MATCH failed. Setting flash_read = SPI_NOR_FAST\n");
+ 		nor->flash_read = SPI_NOR_FAST;
+ 	}
+ 
+ 	/* Some devices cannot do fast-read, no matter what DT tells us */
+-	if (info->flags & SPI_NOR_NO_FR)
++	if (info->flags & SPI_NOR_NO_FR) {
++        printk("\nCANT DO FAST READS. Setting flash_read = SPI_NOR_NORMAL\n");
+ 		nor->flash_read = SPI_NOR_NORMAL;
++    }
+ 
+ 	/* Quad/Dual-read mode takes precedence over fast/normal */
+ 	if (mode == SPI_NOR_QUAD && info->flags & SPI_NOR_QUAD_READ) {
+@@ -1127,7 +1134,9 @@ int spi_nor_scan(struct spi_nor *nor, const char *name, enum read_mode mode)
+ 			return ret;
+ 		}
+ 		nor->flash_read = SPI_NOR_QUAD;
++        printk("\nSetting flash_read = SPI_NOR_QUAD\n");
+ 	} else if (mode == SPI_NOR_DUAL && info->flags & SPI_NOR_DUAL_READ) {
++        printk("\nSetting flash_read = SPI_NOR_DUAL\n");
+ 		nor->flash_read = SPI_NOR_DUAL;
+ 	}
+ 
+@@ -1147,6 +1156,7 @@ int spi_nor_scan(struct spi_nor *nor, const char *name, enum read_mode mode)
+ 		break;
+ 	default:
+ 		dev_err(dev, "No Read opcode defined\n");
++        printk("\nSetting flash_read = DEVICE ERROR\n");
+ 		return -EINVAL;
+ 	}
+ 
+-- 
+1.8.4.5
+

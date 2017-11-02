@@ -1,0 +1,27 @@
+From a46e54b1cc9f88b40d880a241b7374341acf13fd Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Fri, 28 Oct 2016 16:02:14 -0700
+Subject: [PATCH 18/18] gpio debug patch do not include with release
+
+---
+ drivers/gpio/gpio-fluke.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/gpio/gpio-fluke.c b/drivers/gpio/gpio-fluke.c
+index bec7794..88c80f2 100644
+--- a/drivers/gpio/gpio-fluke.c
++++ b/drivers/gpio/gpio-fluke.c
+@@ -202,8 +202,10 @@ static ssize_t hw_write (struct file *filp, const char __user *buf, size_t count
+     else {
+         direction = (fgpiop->direction & 0x100) ? 0xff : fgpiop->direction; 
+         iowrite32(direction, (int*)(fgpiop->mapbase + 4)); // try to make everything writeable
++        printk (KERN_INFO "fgpio: write function direction bits = %x\n", direction);
+         for (i = 0; i < count; i++) {
+             data = tbuf[i] & fgpiop->bits & direction;
++            printk (KERN_INFO "fgpio: write byte %x of %x, addr = %x, data = %x\n", (i + 1), count, (int)fgpiop->mapbase, data);
+             iowrite32(data, (int*)fgpiop->mapbase);
+         }
+         retval = count;
+-- 
+1.8.4.5
+

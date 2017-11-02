@@ -1,0 +1,26 @@
+From f9834aa398e5111d533cd996413bfbe637e3541c Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 19 Jul 2016 09:36:49 -0700
+Subject: [PATCH 5/5] temporary hack to pl330 to fix gpib ch alloc
+
+---
+ drivers/dma/pl330.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/dma/pl330.c b/drivers/dma/pl330.c
+index 3dabc52..a9d3b10 100644
+--- a/drivers/dma/pl330.c
++++ b/drivers/dma/pl330.c
+@@ -2777,7 +2777,8 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
+ 	int i, ret, irq;
+ 	int num_chan;
+ 
+-	pdat = dev_get_platdata(&adev->dev);
++	/*AJD pdat = dev_get_platdata(&adev->dev); */
++    pdat = NULL;
+ 
+ 	ret = dma_set_mask_and_coherent(&adev->dev, DMA_BIT_MASK(32));
+ 	if (ret)
+-- 
+1.8.4.5
+

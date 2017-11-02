@@ -1,0 +1,35 @@
+From 1650d0c568657673fc4600b393a9b5e242d43bcb Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 11 Jul 2017 09:07:00 -0700
+Subject: [PATCH 76/76] Nighthawk device tree syntax fix.33
+
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+index 232fba0..0cf66c6 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+@@ -116,14 +116,16 @@ static int socfpga_dwmac_parse_data(struct socfpga_dwmac *dwmac, struct device *
+ 		return -EINVAL;
+ 	}
+ 
+-	np_splitter = of_parse_phandle(np, "altr,emac-splitter", 0);
++	np_splitter = of_parse_phandle(np, "altr,emac-splitter1.0", 0);
+ 	if (np_splitter) {
+-        printk("np_splitter call is ok\n");
++        printk("FOUND a splitter!\n");
+ 		if (of_address_to_resource(np_splitter, 0, &res_splitter)) {
+ 			dev_info(dev, "Missing emac splitter address\n");
+ 			return -EINVAL;
+ 		}
+ 
++        printk("Splitter base/start address = %x\n", res_splitter.start);
++
+ 		dwmac->splitter_base = devm_ioremap_resource(dev, &res_splitter);
+ 		if (IS_ERR(dwmac->splitter_base)) {
+ 			dev_info(dev, "Failed to mapping emac splitter\n");
+-- 
+1.8.4.5
+

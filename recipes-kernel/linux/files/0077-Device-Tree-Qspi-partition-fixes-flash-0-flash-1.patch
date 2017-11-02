@@ -1,0 +1,50 @@
+From c7b7fd84f1d5168519f7961bcd4a0b516524e13d Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Thu, 13 Jul 2017 07:58:34 -0700
+Subject: [PATCH 77/77] Device Tree Qspi partition fixes flash 0 & flash 1
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index ae0bf4f..63cbb93 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -187,18 +187,18 @@
+         }; //end partition@0 (part0)
+ 
+         part1: partition@800000 {
+-                    label = "Flash 1 jffs2 Filesystem"; /* appended from boardinfo */
+-                    reg = < 0x00800000 0x03000000 >;    /* appended from boardinfo */
++                    label = "FPGA/RBF Image "; /* appended from boardinfo */
++                    reg = < 0x00800000 0x00600000 >;    /* appended from boardinfo */
+         }; //end partition@800000 (part1)
+ 
+-        part2: partition@3800000 {
++        part2: partition@0E00000 {
+                     label = "FPGA Image";   /* appended from boardinfo */
+-                    reg = < 0x03800000 0x00600000 >;    /* appended from boardinfo */
++                    reg = < 0x0E00000 0x00200000 >;    /* appended from boardinfo */
+         }; //end partition@3800000 (part2)
+ 
+         part3: partition@3e00000 {
+-                    label = "Splash Screen Image";  /* appended from boardinfo */
+-                    reg = < 0x03E00000 0x00200000 >;    /* appended from boardinfo */
++                    label = "Flash 0 FS partition";  /* appended from boardinfo */
++                    reg = < 0x01000000 0x07000000 >;    /* appended from boardinfo */
+         }; //end partition@3e00000 (part3)
+     };
+ 
+@@ -218,7 +218,7 @@
+         cdns,tslch-ns = <4>;
+ 
+         part4: partition@0 {
+-                    label = "Flash 1 Raw Data"; /* appended from boardinfo */
++                    label = "Flash 1 Root FS"; /* appended from boardinfo */
+                     reg = < 0x00000000 0x07000000 >;    /* appended from boardinfo */
+         }; //end partition@0 (part4)
+     }; //end n25q00@1 (flash1)
+-- 
+1.8.4.5
+

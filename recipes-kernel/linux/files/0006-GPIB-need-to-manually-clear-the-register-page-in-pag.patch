@@ -1,0 +1,34 @@
+From 64c2d6b237fb75056eef05fba372c352cec22228 Mon Sep 17 00:00:00 2001
+From: Frank Mori Hess <fmh6jj@gmail.com>
+Date: Fri, 13 Oct 2017 09:45:09 -0700
+Subject: [PATCH 6/6] GPIB: need to manually clear the register page in paged
+ write.
+
+---
+ drivers/gpib/fluke_custom/fluke_gpib.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/gpib/fluke_custom/fluke_gpib.h b/drivers/gpib/fluke_custom/fluke_gpib.h
+index f9c1858..6c4636d 100644
+--- a/drivers/gpib/fluke_custom/fluke_gpib.h
++++ b/drivers/gpib/fluke_custom/fluke_gpib.h
+@@ -110,6 +110,7 @@ static inline uint8_t fluke_paged_read_byte(fluke_private_t *e_priv,
+ 	spin_lock_irqsave(&nec_priv->register_page_lock, flags);
+ 	fluke_write_byte_nolock(nec_priv, cb7210_page_in_bits(page), AUXMR);
+ 	udelay(1);
++	/* chip auto clears the page after a read */
+ 	retval = fluke_read_byte_nolock(nec_priv, register_num);
+ 	spin_unlock_irqrestore(&nec_priv->register_page_lock, flags);
+ 	return retval;
+@@ -124,6 +125,8 @@ static inline void fluke_paged_write_byte(fluke_private_t *e_priv,
+ 	fluke_write_byte_nolock(nec_priv, cb7210_page_in_bits(page), AUXMR);
+ 	udelay(1);
+ 	fluke_write_byte_nolock(nec_priv, data, register_num);
++	fluke_write_byte_nolock(nec_priv, cb7210_page_in_bits(0), AUXMR);
++	udelay(1);
+ 	spin_unlock_irqrestore(&nec_priv->register_page_lock, flags);
+ }
+ 
+-- 
+2.7.4
+

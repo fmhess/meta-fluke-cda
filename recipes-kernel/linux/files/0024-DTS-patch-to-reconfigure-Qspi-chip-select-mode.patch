@@ -1,0 +1,24 @@
+From 7140365f62b42608752fe231b94f1a1cf2268850 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 28 Feb 2017 16:33:57 -0800
+Subject: [PATCH 24/24] DTS patch to reconfigure Qspi chip select mode
+
+---
+ arch/arm/boot/dts/Triclamp_soc.dts | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/boot/dts/Triclamp_soc.dts b/arch/arm/boot/dts/Triclamp_soc.dts
+index 4fe580d..52a6f14 100644
+--- a/arch/arm/boot/dts/Triclamp_soc.dts
++++ b/arch/arm/boot/dts/Triclamp_soc.dts
+@@ -113,6 +113,7 @@
+ 		cdns,tsd2d-ns = <50>;
+ 		cdns,tchsh-ns = <4>;
+ 		cdns,tslch-ns = <4>;
++        cdns,is-decoded-cs = <0>;
+ 
+ 		part0: partition@0 {
+ 			label = "Flash 0 Raw Data"; /* appended from boardinfo */
+-- 
+1.8.4.5
+

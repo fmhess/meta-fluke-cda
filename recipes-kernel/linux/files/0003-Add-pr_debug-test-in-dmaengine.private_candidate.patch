@@ -1,0 +1,24 @@
+From 38f5b606ed850fab03729d5aabd30835b9191eb7 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Mon, 18 Jul 2016 16:46:37 -0700
+Subject: [PATCH 3/3] Add pr_debug test in dmaengine.private_candidate
+
+---
+ drivers/dma/dmaengine.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/dma/dmaengine.c b/drivers/dma/dmaengine.c
+index cfb474f..698e35b 100644
+--- a/drivers/dma/dmaengine.c
++++ b/drivers/dma/dmaengine.c
+@@ -513,6 +513,7 @@ static struct dma_chan *private_candidate(const dma_cap_mask_t *mask,
+ 	/* devices with multiple channels need special handling as we need to
+ 	 * ensure that all channels are either private or public.
+ 	 */
++	pr_debug("private_candidate: DMA_PRIVATE = %x\n", DMA_PRIVATE);
+ 	if (dev->chancnt > 1 && !dma_has_cap(DMA_PRIVATE, dev->cap_mask))
+ 		list_for_each_entry(chan, &dev->channels, device_node) {
+ 			/* some channels are already publicly allocated */
+-- 
+1.8.4.5
+

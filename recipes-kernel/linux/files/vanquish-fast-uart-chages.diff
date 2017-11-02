@@ -1,0 +1,486 @@
+diff --git a/drivers/dma/pl330.c b/drivers/dma/pl330.c
+old mode 100644
+new mode 100755
+index 3dabc52..aa45282
+--- a/drivers/dma/pl330.c
++++ b/drivers/dma/pl330.c
+@@ -519,6 +519,7 @@ struct dma_pl330_desc {
+ 
+ struct _xfer_spec {
+ 	u32 ccr;
++	enum dma_ctrl_flags flags;		//Joseph : To control the instructions
+ 	struct dma_pl330_desc *desc;
+ };
+ 
+@@ -1143,10 +1144,17 @@ static inline int _ldst_devtomem(unsigned dry_run, u8 buf[],
+ 	int off = 0;
+ 
+ 	while (cyc--) {
+-		off += _emit_WFP(dry_run, &buf[off], SINGLE, pxs->desc->peri);
+-		off += _emit_LDP(dry_run, &buf[off], SINGLE, pxs->desc->peri);
+-		off += _emit_ST(dry_run, &buf[off], ALWAYS);
+-		off += _emit_FLUSHP(dry_run, &buf[off], pxs->desc->peri);
++		// Joseph: Comenting out for transferring whole 80 bytes with one request
++		if (pxs->flags & DMA_SINGLE_TRANSFER_REQ) {
++			off += _emit_LD(dry_run, &buf[off], ALWAYS);
++			off += _emit_ST(dry_run, &buf[off], ALWAYS);
++		} else {
++			off += _emit_WFP(dry_run, &buf[off], SINGLE, pxs->desc->peri);
++			off += _emit_LDP(dry_run, &buf[off], SINGLE, pxs->desc->peri);
++			off += _emit_ST(dry_run, &buf[off], ALWAYS);
++			off += _emit_FLUSHP(dry_run, &buf[off], pxs->desc->peri);
++		}
++		
+ 	}
+ 
+ 	return off;
+@@ -1291,15 +1299,34 @@ static inline int _setup_xfer(unsigned dry_run, u8 buf[],
+ {
+ 	struct pl330_xfer *x = &pxs->desc->px;
+ 	int off = 0;
++	unsigned long bursts;
+ 
+ 	/* DMAMOV SAR, x->src_addr */
+ 	off += _emit_MOV(dry_run, &buf[off], SAR, x->src_addr);
+ 	/* DMAMOV DAR, x->dst_addr */
+ 	off += _emit_MOV(dry_run, &buf[off], DAR, x->dst_addr);
+ 
++	// Joseph: Decrementing one so that the request will be required once per transfer
++	if (pxs->flags & DMA_SINGLE_TRANSFER_REQ) {
++		if(dry_run == 0)	{
++			bursts = BYTE_TO_BURST(x->bytes, pxs->ccr);
++			if (bursts)
++				bursts--;
++
++			x->bytes = BURST_TO_BYTE(bursts, pxs->ccr);
++		}
++	}
++	
+ 	/* Setup Loop(s) */
+ 	off += _setup_loops(dry_run, &buf[off], pxs);
+ 
++	//Joseph: Final instruction set for providing the ACK after transfering the complete data
++	if (pxs->flags & DMA_SINGLE_TRANSFER_REQ) {
++		off += _emit_LDP(dry_run, &buf[off], ALWAYS, pxs->desc->peri);
++		off += _emit_ST(dry_run, &buf[off], ALWAYS);
++		off += _emit_FLUSHP(dry_run, &buf[off], pxs->desc->peri);
++	}
++	
+ 	return off;
+ }
+ 
+@@ -1417,6 +1444,7 @@ static int pl330_submit_req(struct pl330_thread *thrd,
+ 
+ 	xs.ccr = ccr;
+ 	xs.desc = desc;
++	xs.flags = desc->txd.flags;
+ 
+ 	/* First dry run to check if req is acceptable */
+ 	ret = _setup_req(1, thrd, idx, &xs);
+diff --git a/drivers/tty/serial/8250/8250.h b/drivers/tty/serial/8250/8250.h
+old mode 100644
+new mode 100755
+index c43f74c..2ebc6cf
+--- a/drivers/tty/serial/8250/8250.h
++++ b/drivers/tty/serial/8250/8250.h
+@@ -179,6 +179,8 @@ extern int serial8250_tx_dma(struct uart_8250_port *);
+ extern int serial8250_rx_dma(struct uart_8250_port *, unsigned int iir);
+ extern int serial8250_request_dma(struct uart_8250_port *);
+ extern void serial8250_release_dma(struct uart_8250_port *);
++extern int read_fifo_level(struct uart_port *);
++extern unsigned int read_watermark(struct uart_port *);
+ #else
+ static inline int serial8250_tx_dma(struct uart_8250_port *p)
+ {
+diff --git a/drivers/tty/serial/8250/8250_core.c b/drivers/tty/serial/8250/8250_core.c
+old mode 100644
+new mode 100755
+index b4fd8de..95ac776
+--- a/drivers/tty/serial/8250/8250_core.c
++++ b/drivers/tty/serial/8250/8250_core.c
+@@ -46,6 +46,7 @@
+ #include <asm/irq.h>
+ 
+ #include "8250.h"
++#include "ioctl_8250_fast_uart.h"
+ 
+ /*
+  * Configuration:
+@@ -97,6 +98,13 @@ static unsigned int skip_txen_test; /* force skip of txen test at init time */
+  * files have been cleaned.
+  */
+ #define CONFIG_HUB6 1
++//FAST UART Registers locations
++#define UART_FIFO_LSB          	0x20
++#define UART_FIFO_MSB          	0x24
++#define UART_WATERMARK_LSB     	0x28
++#define UART_WATERMARK_MSB     	0x2C
++#define UART_TIMEOUT_LSB		0x30
++#define UART_TIMEOUT_MSB		0x34
+ 
+ #include <asm/serial.h>
+ /*
+@@ -482,6 +490,69 @@ static void io_serial_out(struct uart_port *p, int offset, int value)
+ 	outb(value, p->iobase + offset);
+ }
+ 
++unsigned int read_watermark(struct uart_port *port)
++{
++	unsigned int watermark_level = 0;
++	watermark_level = readl(port->membase + UART_WATERMARK_MSB);
++	watermark_level = (watermark_level & 0x1F) << 8;
++	watermark_level |= readl(port->membase + UART_WATERMARK_LSB);
++	return watermark_level;
++}
++EXPORT_SYMBOL(read_watermark);
++
++static unsigned int read_timeout(struct uart_port *port)
++{
++	unsigned int timeout = 0;
++	timeout = readl(port->membase + UART_TIMEOUT_MSB);
++	timeout = (timeout & 0xFF) << 8;
++	timeout |= readl(port->membase + UART_TIMEOUT_LSB);
++	return timeout;
++}
++
++int read_fifo_level(struct uart_port *port)
++{
++	int fifo_level = 0;
++	fifo_level = readl(port->membase + UART_FIFO_MSB);
++	fifo_level = (fifo_level & 0x1F) << 8;
++	fifo_level |= readl(port->membase + UART_FIFO_LSB);
++	return fifo_level;
++}
++EXPORT_SYMBOL(read_fifo_level);
++
++static int write_timeout(struct uart_port *port, int timeout)
++{
++	if(timeout <= 0)
++		return -1;
++	writel((timeout & 0xFF00) >> 8, port->membase + UART_TIMEOUT_MSB);
++	writel(timeout & 0xFF, port->membase + UART_TIMEOUT_LSB);
++	return 0;
++}
++
++static int write_watermark(struct uart_port *port, unsigned long watermark_level)
++{
++	if(watermark_level > 0x2000)
++		return -1;
++	writel((watermark_level & 0xFF00) >> 8, port->membase + UART_WATERMARK_MSB);
++	writel(watermark_level & 0xFF, port->membase + UART_WATERMARK_LSB);
++	return 0;
++}
++
++static int fast_uart_ioctl(struct uart_port *port, unsigned int reg, unsigned long value)
++{
++	switch(reg) {
++	case READ_UART_WATERMARK:
++		return read_watermark(port);
++	case WRITE_UART_WATERMARK:
++		return write_watermark(port, value);
++	case READ_UART_TIMEOUT:
++		return read_timeout(port);
++	case WRITE_UART_TIMEOUT:
++		return write_timeout(port, value);
++	default:
++		return -ENOIOCTLCMD;
++	}
++}
++
+ static int serial8250_default_handle_irq(struct uart_port *port);
+ static int exar_handle_irq(struct uart_port *port);
+ 
+@@ -1088,28 +1159,36 @@ static void autoconfig_16550a(struct uart_8250_port *up)
+ 	 */
+ 	iersave = serial_in(up, UART_IER);
+ 	serial_out(up, UART_IER, iersave & ~UART_IER_UUE);
+-	if (!(serial_in(up, UART_IER) & UART_IER_UUE)) {
+-		/*
+-		 * OK it's in a known zero state, try writing and reading
+-		 * without disturbing the current state of the other bits.
+-		 */
+-		serial_out(up, UART_IER, iersave | UART_IER_UUE);
+-		if (serial_in(up, UART_IER) & UART_IER_UUE) {
++
++	/* Joseph :For the Fast UART this need to be bi-passed.
++	 * Other UARTS don't need this in Vanquish.
++	 */
++
++	if(up->fast_uart != 1)
++	{
++		if (!(serial_in(up, UART_IER) & UART_IER_UUE)) {
++			/*
++			 * OK it's in a known zero state, try writing and reading
++			 * without disturbing the current state of the other bits.
++ 			 */
++			serial_out(up, UART_IER, iersave | UART_IER_UUE);
++			if (serial_in(up, UART_IER) & UART_IER_UUE) {
++				/*
++				 * It's an Xscale.
++				 * We'll leave the UART_IER_UUE bit set to 1 (enabled).
++				 */
++				DEBUG_AUTOCONF("Xscale ");
++				up->port.type = PORT_XSCALE;
++				up->capabilities |= UART_CAP_UUE | UART_CAP_RTOIE;
++				return;
++			}
++		} else {
+ 			/*
+-			 * It's an Xscale.
+-			 * We'll leave the UART_IER_UUE bit set to 1 (enabled).
++			 * If we got here we couldn't force the IER_UUE bit to 0.
++			 * Log it and continue.
+ 			 */
+-			DEBUG_AUTOCONF("Xscale ");
+-			up->port.type = PORT_XSCALE;
+-			up->capabilities |= UART_CAP_UUE | UART_CAP_RTOIE;
+-			return;
++			DEBUG_AUTOCONF("Couldn't force IER_UUE to 0 ");
+ 		}
+-	} else {
+-		/*
+-		 * If we got here we couldn't force the IER_UUE bit to 0.
+-		 * Log it and continue.
+-		 */
+-		DEBUG_AUTOCONF("Couldn't force IER_UUE to 0 ");
+ 	}
+ 	serial_out(up, UART_IER, iersave);
+ 
+@@ -1124,14 +1203,16 @@ static void autoconfig_16550a(struct uart_8250_port *up)
+ 
+ 		return;
+ 	}
+-
+-	/*
+-	 * We distinguish between 16550A and U6 16550A by counting
+-	 * how many bytes are in the FIFO.
+-	 */
+-	if (up->port.type == PORT_16550A && size_fifo(up) == 64) {
+-		up->port.type = PORT_U6_16550A;
+-		up->capabilities |= UART_CAP_AFE;
++	if(up->fast_uart != 1) // FIFO size for fast UART is fixed.
++	{
++		/*
++		 * We distinguish between 16550A and U6 16550A by counting
++		 * how many bytes are in the FIFO.
++		 */
++		if (up->port.type == PORT_16550A && size_fifo(up) == 64) {
++			up->port.type = PORT_U6_16550A;
++			up->capabilities |= UART_CAP_AFE;
++		}
+ 	}
+ }
+ 
+@@ -1218,15 +1299,19 @@ static void autoconfig(struct uart_8250_port *up)
+ 	 * manufacturer would be stupid enough to design a board
+ 	 * that conflicts with COM 1-4 --- we hope!
+ 	 */
+-	if (!(port->flags & UPF_SKIP_TEST)) {
+-		serial_out(up, UART_MCR, UART_MCR_LOOP | 0x0A);
+-		status1 = serial_in(up, UART_MSR) & 0xF0;
+-		serial_out(up, UART_MCR, save_mcr);
+-		if (status1 != 0x90) {
+-			spin_unlock_irqrestore(&port->lock, flags);
+-			DEBUG_AUTOCONF("LOOP test failed (%02x) ",
+-				       status1);
+-			goto out;
++	// Joseph: This Check has to be ignored for Fast UART as MCR register is not implemented
++	if(up->fast_uart != 1)
++	{
++		if (!(port->flags & UPF_SKIP_TEST)) {
++			serial_out(up, UART_MCR, UART_MCR_LOOP | 0x0A);
++			status1 = serial_in(up, UART_MSR) & 0xF0;
++			serial_out(up, UART_MCR, save_mcr);
++			if (status1 != 0x90) {
++				spin_unlock_irqrestore(&port->lock, flags);
++				DEBUG_AUTOCONF("LOOP test failed (%02x) ",
++						   status1);
++				goto out;
++			}
+ 		}
+ 	}
+ 
+@@ -2551,7 +2636,8 @@ static void serial8250_set_divisor(struct uart_port *port, unsigned int baud,
+ 	else
+ 		serial_port_out(port, UART_LCR, up->lcr | UART_LCR_DLAB);
+ 
+-	serial_dl_write(up, quot);
++	if(up->fast_uart != 1)
++		serial_dl_write(up, quot);
+ 
+ 	/* XR17V35x UARTs have an extra fractional divisor register (DLD) */
+ 	if (up->port.type == PORT_XR17V35X)
+@@ -3094,8 +3180,8 @@ serial8250_type(struct uart_port *port)
+ 	return uart_config[type].name;
+ }
+ 
+-static const struct uart_ops serial8250_pops = {
+-	.tx_empty	= serial8250_tx_empty,
++static struct uart_ops serial8250_pops = {		//Joseph : const property removed to provide ioctl function
++	.tx_empty	= serial8250_tx_empty,		// for FAST UART
+ 	.set_mctrl	= serial8250_set_mctrl,
+ 	.get_mctrl	= serial8250_get_mctrl,
+ 	.stop_tx	= serial8250_stop_tx,
+@@ -3865,7 +3951,15 @@ int serial8250_register_8250_port(struct uart_8250_port *up)
+ 		uart->port.unthrottle	= up->port.unthrottle;
+ 		uart->port.rs485_config	= up->port.rs485_config;
+ 		uart->port.rs485	= up->port.rs485;
+-		uart->dma		= up->dma;
++		uart->fast_uart		= up->fast_uart;		//Joseph: Added for Fast UART
++		if(up->fast_uart) {
++			serial8250_pops.ioctl = fast_uart_ioctl;
++			uart->dma		= up->dma;
++		}
++		else
++		{
++			uart->dma		= NULL;					//Joseph: All the other UARTs should not use DMAs
++		}
+ 
+ 		/* Take tx_loadsz from fifosize if it wasn't set separately */
+ 		if (uart->port.fifosize && !uart->tx_loadsz)
+diff --git a/drivers/tty/serial/8250/8250_dma.c b/drivers/tty/serial/8250/8250_dma.c
+old mode 100644
+new mode 100755
+index e508939..ed58d40
+--- a/drivers/tty/serial/8250/8250_dma.c
++++ b/drivers/tty/serial/8250/8250_dma.c
+@@ -14,6 +14,7 @@
+ #include <linux/dma-mapping.h>
+ 
+ #include "8250.h"
++static unsigned char recieve_interrupt_enable = 5;
+ 
+ static void __dma_tx_complete(void *param)
+ {
+@@ -65,7 +66,11 @@ static void __dma_rx_complete(void *param)
+ 	tty_insert_flip_string(tty_port, dma->rx_buf, count);
+ 	p->port.icount.rx += count;
+ 
+-	tty_flip_buffer_push(tty_port);
++	tty_flip_buffer_push(tty_port);	
++	
++	/*Joseph: Enable the interrupts after the completion of copying*/
++	p->ier |= recieve_interrupt_enable;
++	serial_out(p, UART_IER, p->ier);
+ }
+ 
+ int serial8250_tx_dma(struct uart_8250_port *p)
+@@ -117,6 +122,13 @@ int serial8250_rx_dma(struct uart_8250_port *p, unsigned int iir)
+ {
+ 	struct uart_8250_dma		*dma = p->dma;
+ 	struct dma_async_tx_descriptor	*desc;
++	
++	/*Disable all interrupts if Watermark/Timeout interrupt is recieved*/
++	p->ier &= (~recieve_interrupt_enable);
++	serial_out(p, UART_IER, p->ier);
++	
++	/* Joseph : Read the FIFO level and set the packet size according to that. */
++	dma->rx_size = read_fifo_level(&(p->port));
+ 
+ 	switch (iir & 0x3f) {
+ 	case UART_IIR_RLSI:
+@@ -131,8 +143,11 @@ int serial8250_rx_dma(struct uart_8250_port *p, unsigned int iir)
+ 			dmaengine_pause(dma->rxchan);
+ 			__dma_rx_complete(p);
+ 			dmaengine_terminate_all(dma->rxchan);
++			/* Joseph : Timeout error will be occured when there is some data in register.
++			 *  But if the dma is not in progress, we want the DMA to be used for data transfer.
++			 */
++			return -ETIMEDOUT;
+ 		}
+-		return -ETIMEDOUT;
+ 	default:
+ 		break;
+ 	}
+@@ -142,7 +157,7 @@ int serial8250_rx_dma(struct uart_8250_port *p, unsigned int iir)
+ 
+ 	desc = dmaengine_prep_slave_single(dma->rxchan, dma->rx_addr,
+ 					   dma->rx_size, DMA_DEV_TO_MEM,
+-					   DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
++					   DMA_PREP_INTERRUPT | DMA_CTRL_ACK | DMA_SINGLE_TRANSFER_REQ);
+ 	if (!desc)
+ 		return -EBUSY;
+ 
+@@ -164,15 +179,19 @@ int serial8250_request_dma(struct uart_8250_port *p)
+ {
+ 	struct uart_8250_dma	*dma = p->dma;
+ 	dma_cap_mask_t		mask;
++	
++	printk(KERN_INFO "*** FAST UART with DMA v0.2.00  compiled at : 11:00, 3 Oct 2016 ***\n");
+ 
+ 	/* Default slave configuration parameters */
+ 	dma->rxconf.direction		= DMA_DEV_TO_MEM;
+ 	dma->rxconf.src_addr_width	= DMA_SLAVE_BUSWIDTH_1_BYTE;
+ 	dma->rxconf.src_addr		= p->port.mapbase + UART_RX;
++	dma->rxconf.src_maxburst 	= 1;
+ 
+ 	dma->txconf.direction		= DMA_MEM_TO_DEV;
+ 	dma->txconf.dst_addr_width	= DMA_SLAVE_BUSWIDTH_1_BYTE;
+ 	dma->txconf.dst_addr		= p->port.mapbase + UART_TX;
++	dma->txconf.dst_maxburst 	= 1;
+ 
+ 	dma_cap_zero(mask);
+ 	dma_cap_set(DMA_SLAVE, mask);
+@@ -237,8 +256,12 @@ void serial8250_release_dma(struct uart_8250_port *p)
+ 
+ 	/* Release RX resources */
+ 	dmaengine_terminate_all(dma->rxchan);
+-	dma_free_coherent(dma->rxchan->device->dev, dma->rx_size, dma->rx_buf,
+-			  dma->rx_addr);
++	/* Joseph : dma->rx_buf has been replaced with PAGE_SIZE as the number of bytes allocated
++	 * by dma initially in the request DMA function is PAGE_SIZE while the dma->rx_buf size
++	 * varies according the fifo-size level.
++	 */
++	dma_free_coherent(dma->rxchan->device->dev, PAGE_SIZE, dma->rx_buf,
++ 			  dma->rx_addr);
+ 	dma_release_channel(dma->rxchan);
+ 	dma->rxchan = NULL;
+ 
+diff --git a/drivers/tty/serial/8250/8250_dw.c b/drivers/tty/serial/8250/8250_dw.c
+old mode 100644
+new mode 100755
+index 176f18f..1a12ee3
+--- a/drivers/tty/serial/8250/8250_dw.c
++++ b/drivers/tty/serial/8250/8250_dw.c
+@@ -334,6 +334,13 @@ static int dw8250_probe_of(struct uart_port *p,
+ 	if (has_ucv)
+ 		dw8250_setup_port(up);
+ 
++	if(read_watermark(p) > 0) {
++		up->dma = &data->dma;
++		p->fifosize = 2048;		/* Set as per FPGA FIFO-Size = 2K */
++		up->fast_uart = 1;
++	}
++	else
++		up->fast_uart = 0;
+ 	/* if we have a valid fifosize, try hooking up DMA here */
+ 	if (p->fifosize) {
+ 		up->dma = &data->dma;
+diff --git a/include/linux/dmaengine.h b/include/linux/dmaengine.h
+old mode 100644
+new mode 100755
+index ad41975..df9a84f
+--- a/include/linux/dmaengine.h
++++ b/include/linux/dmaengine.h
+@@ -182,6 +182,7 @@ enum dma_ctrl_flags {
+ 	DMA_PREP_PQ_DISABLE_Q = (1 << 3),
+ 	DMA_PREP_CONTINUE = (1 << 4),
+ 	DMA_PREP_FENCE = (1 << 5),
++	DMA_SINGLE_TRANSFER_REQ = (1 << 6),
+ };
+ 
+ /**
+diff --git a/include/linux/serial_8250.h b/include/linux/serial_8250.h
+old mode 100644
+new mode 100755
+index 78097e7..b7e3c6f
+--- a/include/linux/serial_8250.h
++++ b/include/linux/serial_8250.h
+@@ -116,6 +116,7 @@ struct uart_8250_port {
+ 	unsigned char		msr_saved_flags;
+ 
+ 	struct uart_8250_dma	*dma;
++	unsigned int fast_uart	:1;
+ 	const struct uart_8250_ops *ops;
+ 
+ 	/* 8250 specific callbacks */

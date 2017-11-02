@@ -1,0 +1,24 @@
+From 7ac4894f4d8c48bf48f9fb14b30373dfbdabc806 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Fri, 16 Sep 2016 10:28:48 -0700
+Subject: [PATCH 26/26] added m25p fast-read to dts for 512 part
+
+---
+ arch/arm/boot/dts/Vanquish_soc.dts | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/boot/dts/Vanquish_soc.dts b/arch/arm/boot/dts/Vanquish_soc.dts
+index d11212d..c7fb54b 100644
+--- a/arch/arm/boot/dts/Vanquish_soc.dts
++++ b/arch/arm/boot/dts/Vanquish_soc.dts
+@@ -134,6 +134,7 @@
+ 		compatible = "n25q512a";
+ 		reg = <0>;      /* chip select */
+ 		spi-max-frequency = <100000000>;
++		m25p,fast-read;
+ 
+ 		cdns,page-size = <256>;
+ 		cdns,block-size = <16>;
+-- 
+1.8.4.5
+

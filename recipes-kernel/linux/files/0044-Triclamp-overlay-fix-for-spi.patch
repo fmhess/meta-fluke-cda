@@ -1,0 +1,25 @@
+From 51da1faa930d2248eb0d583c153c009d9d7f8ba1 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 11 Oct 2016 15:38:29 -0700
+Subject: [PATCH 44/44] Triclamp overlay fix for spi
+
+---
+ arch/arm/boot/dts/Triclamp_soc_overlay.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/Triclamp_soc_overlay.dts b/arch/arm/boot/dts/Triclamp_soc_overlay.dts
+index e3f337d..854142f 100644
+--- a/arch/arm/boot/dts/Triclamp_soc_overlay.dts
++++ b/arch/arm/boot/dts/Triclamp_soc_overlay.dts
+@@ -223,7 +223,7 @@
+ 				#size-cells = < 0 >;	/* appended from boardinfo */
+ 				num-chipselect = < 4 >;	/* appended from boardinfo */
+ 
+-				eeprom1: eeprom@1 {
++				eeprom1: eeprom@0 {
+ 					compatible = "at,at25";	/* appended from boardinfo */
+ 					reg = < 0 >;	/* appended from boardinfo */
+ 					spi-max-frequency = < 5000000 >;	/* appended from boardinfo */
+-- 
+1.8.4.5
+

@@ -1,0 +1,57 @@
+From a9e5424836b75913a2ca94f0144f7391ac9bd3b7 Mon Sep 17 00:00:00 2001
+From: Frank Mori Hess <fmh6jj@gmail.com>
+Date: Tue, 19 Jul 2016 14:52:25 -0400
+Subject: [PATCH 7/7] Backported fix to make dma_get_slave_channel properly
+ increment privatecnt.
+
+---
+ drivers/dma/dmaengine.c                | 11 +++++++++--
+ drivers/gpib/fluke_custom/fluke_gpib.c |  2 +-
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/dma/dmaengine.c b/drivers/dma/dmaengine.c
+index 3ddfd1f..d2154f5 100644
+--- a/drivers/dma/dmaengine.c
++++ b/drivers/dma/dmaengine.c
+@@ -547,16 +547,23 @@ struct dma_chan *dma_get_slave_channel(struct dma_chan *chan)
+ 	mutex_lock(&dma_list_mutex);
+ 
+ 	if (chan->client_count == 0) {
++		struct dma_device *device = chan->device;
++
++		dma_cap_set(DMA_PRIVATE, device->cap_mask);
++		device->privatecnt++;
+ 		err = dma_chan_get(chan);
+-		if (err)
++		if (err) {
+ 			pr_debug("%s: failed to get %s: (%d)\n",
+ 				__func__, dma_chan_name(chan), err);
++			chan = NULL;
++			if (--device->privatecnt == 0)
++				dma_cap_clear(DMA_PRIVATE, device->cap_mask);
++		}
+ 	} else
+ 		chan = NULL;
+ 
+ 	mutex_unlock(&dma_list_mutex);
+ 
+-
+ 	return chan;
+ }
+ EXPORT_SYMBOL_GPL(dma_get_slave_channel);
+diff --git a/drivers/gpib/fluke_custom/fluke_gpib.c b/drivers/gpib/fluke_custom/fluke_gpib.c
+index 800d9ea..01286c1 100644
+--- a/drivers/gpib/fluke_custom/fluke_gpib.c
++++ b/drivers/gpib/fluke_custom/fluke_gpib.c
+@@ -975,7 +975,7 @@ static int __init fluke_init_module( void )
+ 	
+ 	result = platform_driver_register(&fluke_gpib_platform_driver);
+ 	if (result) {
+-		printk("fluke_gpib: platform_register_driver failed!\n");
++		printk("fluke_gpib: platform_driver_register failed!\n");
+ 		return result;
+ 	}
+ 	
+-- 
+2.1.4
+

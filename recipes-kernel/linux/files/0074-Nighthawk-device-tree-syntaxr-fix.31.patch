@@ -1,0 +1,55 @@
+From 953d8056a0f3873d7cce294f5ff9403f280936df Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Mon, 10 Jul 2017 15:19:04 -0700
+Subject: [PATCH 74/74] Nighthawk device tree syntaxr fix.31
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts                 | 4 ++--
+ drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 2 ++
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index ea1270e..c5b88bf 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -68,7 +68,7 @@
+ };
+ 
+ &gmac0 {
+-    phy-mode = "rgmii";
++    phy-mode = "rgmii-id";
+     snps,phy-addr = < 0xFFFFFFFF >;
+     phy-addr = < 0xFFFFFFFF >;
+ 
+@@ -89,7 +89,7 @@
+ 
+ &gmac1 {
+     status = "okay";
+-    phy-mode = "rgmii";
++    phy-mode = "rgmii-id";
+     snps,phy-addr = < 0xFFFFFFFF >;
+     phy-addr = < 0xFFFFFFFF >;
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+index cb4b226..232fba0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+@@ -118,6 +118,7 @@ static int socfpga_dwmac_parse_data(struct socfpga_dwmac *dwmac, struct device *
+ 
+ 	np_splitter = of_parse_phandle(np, "altr,emac-splitter", 0);
+ 	if (np_splitter) {
++        printk("np_splitter call is ok\n");
+ 		if (of_address_to_resource(np_splitter, 0, &res_splitter)) {
+ 			dev_info(dev, "Missing emac splitter address\n");
+ 			return -EINVAL;
+@@ -126,6 +127,7 @@ static int socfpga_dwmac_parse_data(struct socfpga_dwmac *dwmac, struct device *
+ 		dwmac->splitter_base = devm_ioremap_resource(dev, &res_splitter);
+ 		if (IS_ERR(dwmac->splitter_base)) {
+ 			dev_info(dev, "Failed to mapping emac splitter\n");
++            printk("Bad splitter base address is %ld\n", dwmac->splitter_base);
+ 			return PTR_ERR(dwmac->splitter_base);
+ 		}
+ 	}
+-- 
+1.8.4.5
+

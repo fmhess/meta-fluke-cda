@@ -1,0 +1,24 @@
+From ca532cbb1945f57c7eb0df788a8a071bf214b2f5 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Fri, 3 Mar 2017 14:45:37 -0800
+Subject: [PATCH 26/26] Debugging nor flash ctrl cadence-quadspi.c 1
+
+---
+ drivers/mtd/spi-nor/cadence-quadspi.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/mtd/spi-nor/cadence-quadspi.c b/drivers/mtd/spi-nor/cadence-quadspi.c
+index 89e5421..6af1ec1 100644
+--- a/drivers/mtd/spi-nor/cadence-quadspi.c
++++ b/drivers/mtd/spi-nor/cadence-quadspi.c
+@@ -1231,6 +1231,7 @@ static int cqspi_probe(struct platform_device *pdev)
+ 			dev_err(dev, "couldn't determine chip select\n");
+ 			return -ENXIO;
+ 		}
++printk("Get flash device data chip selesct = %d\n", cs);
+ 		if (cs >= CQSPI_MAX_CHIPSELECT) {
+ 			dev_err(dev, "chip select %d out of range\n", cs);
+ 			return -ENXIO;
+-- 
+1.8.4.5
+

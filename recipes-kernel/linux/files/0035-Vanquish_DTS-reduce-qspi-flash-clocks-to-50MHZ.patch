@@ -1,0 +1,121 @@
+From 33b5f42eae6fff28072e6665fbb2f937afe5c68f Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 4 Apr 2017 09:10:59 -0700
+Subject: [PATCH 35/35] Vanquish_DTS-reduce-qspi-flash-clocks-to-50MHZ
+
+---
+ arch/arm/boot/dts/Vanquish_soc.dts | 83 +++++++++++++++++++-------------------
+ 1 file changed, 42 insertions(+), 41 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Vanquish_soc.dts b/arch/arm/boot/dts/Vanquish_soc.dts
+index a6ad6fe..746ab75 100644
+--- a/arch/arm/boot/dts/Vanquish_soc.dts
++++ b/arch/arm/boot/dts/Vanquish_soc.dts
+@@ -129,50 +129,51 @@
+ };
+ 
+ &qspi {
+-	status = "okay";
+-	flash0: n25q00@0 {
+-		#address-cells = <1>;
+-		#size-cells = <1>;
+-		compatible = "n25q00";
+-		reg = <0>;      /* chip select */
+-		spi-max-frequency = <100000000>;
+ 
+-		cdns,page-size = <256>;
+-		cdns,block-size = <16>;
+-		cdns,read-delay = <4>;
+-		cdns,tshsl-ns = <50>;
+-		cdns,tsd2d-ns = <50>;
+-		cdns,tchsh-ns = <4>;
+-		cdns,tslch-ns = <4>;
++    status = "okay";
++    flash0: n25q512a@0 {
++        #address-cells = <1>;
++        #size-cells = <1>;
++        compatible = "n25q512a";
++        reg = <0>;      /* chip select */
++        spi-max-frequency = <50000000>;
++
++        cdns,page-size = <256>;
++        cdns,block-size = <16>;
++        cdns,read-delay = <4>;
++        cdns,tshsl-ns = <50>;
++        cdns,tsd2d-ns = <50>;
++        cdns,tchsh-ns = <4>;
++        cdns,tslch-ns = <4>;
+         cdns,is-decoded-cs = <0>;
+ 
+-                part0: partition@0 {
+-                        label = "Flash 0 Raw Data";	/* appended from boardinfo */
+-                        reg = < 0x00000000 0x00800000 >;	/* appended from boardinfo */
+-                }; //end partition@0 (part0)
+-
+-                part1: partition@800000 {
+-                        label = "Flash 1 jffs2 Filesystem";	/* appended from boardinfo */
+-                        reg = < 0x00800000 0x03000000 >;	/* appended from boardinfo */
+-                }; //end partition@800000 (part1)
+-
+-                part2: partition@3800000 {
+-                        label = "FPGA Image";	/* appended from boardinfo */
+-                        reg = < 0x03800000 0x00600000 >;	/* appended from boardinfo */
+-                }; //end partition@3800000 (part2)
+-
+-                part3: partition@3e00000 {
+-                        label = "Splash Screen Image";	/* appended from boardinfo */
+-                        reg = < 0x03E00000 0x00200000 >;	/* appended from boardinfo */
+-                }; //end partition@3e00000 (part3)
+-        };
++        part0: partition@0 {
++            label = "Flash 0 Raw Data";	/* appended from boardinfo */
++            reg = < 0x00000000 0x00800000 >;	/* appended from boardinfo */
++        }; //end partition@0 (part0)
++
++        part1: partition@800000 {
++            label = "Flash 1 jffs2 Filesystem";	/* appended from boardinfo */
++            reg = < 0x00800000 0x03000000 >;	/* appended from boardinfo */
++        }; //end partition@800000 (part1)
++
++        part2: partition@3800000 {
++            label = "FPGA Image";	/* appended from boardinfo */
++            reg = < 0x03800000 0x00600000 >;	/* appended from boardinfo */
++        }; //end partition@3800000 (part2)
++
++        part3: partition@3e00000 {
++            label = "Splash Screen Image";	/* appended from boardinfo */
++            reg = < 0x03E00000 0x00200000 >;	/* appended from boardinfo */
++        }; //end partition@3e00000 (part3)
++    };
+ 
+-        flash1: n25q00@1 {
++    flash1: n25q00@1 {
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+ 		compatible = "n25q00";
+ 		reg = <1>;      /* chip select */
+-		spi-max-frequency = <100000000>;
++		spi-max-frequency = <50000000>;
+ 
+ 		cdns,page-size = <256>;
+ 		cdns,block-size = <16>;
+@@ -182,11 +183,11 @@
+ 		cdns,tchsh-ns = <4>;
+ 		cdns,tslch-ns = <4>;
+ 
+-                part4: partition@0 {
+-                        label = "Flash 1 Raw Data";	/* appended from boardinfo */
+-                        reg = < 0x00000000 0x07000000 >;	/* appended from boardinfo */
+-                }; //end partition@0 (part4)
+-        }; //end n25q00@1 (flash1)		
++        part4: partition@0 {
++            label = "Flash 1 Raw Data";	/* appended from boardinfo */
++            reg = < 0x00000000 0x07000000 >;	/* appended from boardinfo */
++        }; //end partition@0 (part4)
++    }; //end n25q00@1 (flash1)		
+ 
+ };
+ 
+-- 
+1.8.4.5
+

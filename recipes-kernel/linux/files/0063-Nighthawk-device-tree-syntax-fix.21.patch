@@ -1,0 +1,80 @@
+From ea44dabb2df6433964b093f38ec02e71cc2c67de Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 27 Jun 2017 09:29:35 -0700
+Subject: [PATCH 63/63] Nighthawk device tree syntax fix.21
+
+---
+ arch/arm/boot/dts/Nighthawk_soc_overlay.dts | 57 +++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc_overlay.dts b/arch/arm/boot/dts/Nighthawk_soc_overlay.dts
+index 4218c87..60cac59 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc_overlay.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc_overlay.dts
+@@ -42,6 +42,63 @@
+                 mem-word-width = < 128 >;	/* MEM_PORT_WIDTH type NUMBER */
+             }; //end vip@0x100044000 (Nighthawk_FPGA_IO_alt_vip_vfr_0)
+     
++            Nighthawk_FPGA_IO_cadmus_gx: serial@0x10004d000 {
++                compatible = "altr,altera_16550_uart-15.1", "altr,16550-FIFO128", "ns16550a";
++                reg = < 0x0004d000 0x00000200 >;
++                interrupt-parent = < &intc >;
++                interrupts = < 0 45 4 >;
++                clocks = < &Nighthawk_FPGA_IO_HPS_CLK >;
++                clock-frequency = < 60000000 >;	/* embeddedsw.dts.params.clock-frequency type NUMBER */
++                fifo-size = < 128 >;	/* embeddedsw.dts.params.fifo-size type NUMBER */
++                reg-io-width = < 4 >;	/* embeddedsw.dts.params.reg-io-width type NUMBER */
++                reg-shift = < 2 >;	/* embeddedsw.dts.params.reg-shift type NUMBER */
++            }; //end serial@0x10004d000 (Nighthawk_FPGA_IO_cadmus_gx)
++
++            Nighthawk_FPGA_IO_Knob_encoder_0: unknown@0x100049f80 {
++                compatible = "unknown,unknown-1.0";
++                reg = < 0x00049f80 0x00000004 >;
++                interrupt-parent = < &intc >;
++                interrupts = < 0 56 4 >;
++                clocks = < &Nighthawk_FPGA_IO_HPS_CLK >;
++            }; //end unknown@0x100049f80 (Nighthawk_FPGA_IO_Knob_encoder_0)
++    
++            Nighthawk_FPGA_IO_sysid: sysid@0x100049540 {
++                compatible = "altr,sysid-15.1", "altr,sysid-1.0";
++                reg = < 0x00049540 0x00000008 >;
++                clocks = < &Nighthawk_FPGA_IO_HPS_CLK >;
++                id = < 1469100036 >;	/* embeddedsw.dts.params.id type NUMBER */
++                timestamp = < 1493922193 >;	/* embeddedsw.dts.params.timestamp type NUMBER */
++            }; //end sysid@0x100049540 (Nighthawk_FPGA_IO_sysid)
++
++            Nighthawk_FPGA_IO_fgpib_0: fgpib@0x100049800 {
++                compatible = "flk,fgpib-4.0";
++                reg = < 0x00049800 0x00000020
++                        0x00049840 0x00000004
++                        0x00049880 0x00000004 >;
++                reg-names = "s0", "s1", "s2";
++                interrupt-parent = < &intc >;
++                interrupts = < 0 57 4 >;
++                clocks = < &Nighthawk_FPGA_IO_HPS_CLK >;
++            }; //end fgpib@0x100049800 (Nighthawk_FPGA_IO_fgpib_0)
++
++            Nighthawk_FPGA_IO_Port_A: gpio@0x100049a00 {
++                compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
++                reg = < 0x00049a00 0x00000020 >;
++                interrupt-parent = < &intc >;
++                interrupts = < 0 59 1 >;
++                clocks = < &Nighthawk_FPGA_IO_HPS_CLK >;
++                altr,interrupt-type = < 1 >;	/* embeddedsw.dts.params.altr,interrupt-type type NUMBER */
++                edge_type = < 0 >;	/* embeddedsw.dts.params.edge_type type NUMBER */
++                level_trigger = < 0 >;	/* embeddedsw.dts.params.level_trigger type NUMBER */
++                resetvalue = < 50 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++                #gpio-cells = < 2 >;
++                gpio-controller;
++                activebits = < 0x0000007f >;	/* appended from boardinfo */
++                directionbits = < 0x00000001 >;	/* appended from boardinfo */
++                bidirbits = < 0x00000000 >;	/* appended from boardinfo */
++                flk,interrupt_type = < 1 >;	/* appended from boardinfo */
++            }; //end gpio@0x100049a00 (Nighthawk_FPGA_IO_Port_A)
++
+         };
+     };
+ }; //end /
+-- 
+1.8.4.5
+

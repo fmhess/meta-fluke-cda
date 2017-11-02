@@ -1,0 +1,26 @@
+From d89c3f71eb81696b38c87bbcb5b58e728592d6cb Mon Sep 17 00:00:00 2001
+From: Frank Mori Hess <fmh6jj@gmail.com>
+Date: Fri, 15 Jul 2016 13:28:06 -0400
+Subject: [PATCH 3/5] Added gpib to drivers/Makefile.
+
+---
+ drivers/Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/Makefile b/drivers/Makefile
+index 3cf37ee..0a77e56 100644
+--- a/drivers/Makefile
++++ b/drivers/Makefile
+@@ -20,6 +20,9 @@ obj-$(CONFIG_RAPIDIO)		+= rapidio/
+ obj-y				+= video/
+ obj-y				+= idle/
+ 
++#gpib support
++obj-$(CONFIG_GPIB)     += gpib/
++
+ # IPMI must come before ACPI in order to provide IPMI opregion support
+ obj-$(CONFIG_IPMI_HANDLER)	+= char/ipmi/
+ 
+-- 
+2.1.4
+

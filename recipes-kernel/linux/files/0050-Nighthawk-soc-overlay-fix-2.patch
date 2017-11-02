@@ -1,0 +1,109 @@
+From 2002f5dc6e5893c361b61ee4ae2070889e33c6a3 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Mon, 26 Jun 2017 08:40:32 -0700
+Subject: [PATCH 50/50] Nighthawk soc overlay fix 2
+
+---
+ arch/arm/boot/dts/Nighthawk_soc_overlay.dts | 76 ++---------------------------
+ 1 file changed, 5 insertions(+), 71 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc_overlay.dts b/arch/arm/boot/dts/Nighthawk_soc_overlay.dts
+index cfac44d..366cf5d 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc_overlay.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc_overlay.dts
+@@ -8,14 +8,14 @@
+ / {
+     fragment@0 {
+         target-path = "/soc/base-fpga-region";
+-        #address-cells = <1>;
+-        #size-cells = <1>;
++        #address-cells = < 1 >;
++        #size-cells = < 1 >;
+ 
+         __overlay__ {
+-            #address-cells = <1>;
+-            #size-cells = <1>;
++            #address-cells = < 1 >;
++            #size-cells = < 1 >;
+             ranges = <0 0xff200000 0x00200000>;
+-            fpga-bridges = <&fpga_bridge0>;
++            fpga-bridges = < &fpga_bridge0 >;
+     
+             external-fpga-config;
+      
+@@ -26,72 +26,6 @@
+                 interrupts = < 0 42 4 >;
+                 clocks = < &clk_0 >;
+             }; //end serial@0x100020000 (jtag_uart)
+-    
+-		    Nighthawk_FPGA_IO_alt_vip_vfr_0: vip@0x100044000 {
+-                compatible = "ALTR,vip-frame-reader-14.0", "ALTR,vip-frame-reader-9.1";
+-                reg = < 0x00044000 0x00000080 >;
+-                interrupt-parent = < &intc >;
+-                interrupts = < 0 43 4 >;
+-                clocks = < &Nighthawk_FPGA_IO_HPS_CLK &Nighthawk_FPGA_IO_HPS_CLK >;
+-                clock-names = "clock_reset", "clock_master";
+-                max-width = < 800 >;	/* MAX_IMAGE_WIDTH type NUMBER */
+-                max-height = < 480 >;	/* MAX_IMAGE_HEIGHT type NUMBER */
+-                bits-per-color = < 8 >;	/* BITS_PER_PIXEL_PER_COLOR_PLANE type NUMBER */
+-                colors-per-beat = < 4 >;	/* NUMBER_OF_CHANNELS_IN_PARALLEL type NUMBER */
+-                beats-per-pixel = < 1 >;	/* NUMBER_OF_CHANNELS_IN_SEQUENCE type NUMBER */
+-                mem-word-width = < 128 >;	/* MEM_PORT_WIDTH type NUMBER */
+-            }; //end vip@0x100044000 (Nighthawk_FPGA_IO_alt_vip_vfr_0)
+-    
+-            Nighthawk_FPGA_IO_sysid: sysid@0x100049540 {
+-                compatible = "altr,sysid-15.1", "altr,sysid-1.0";
+-                reg = < 0x00049540 0x00000008 >;
+-                clocks = < &Nighthawk_FPGA_IO_HPS_CLK >;
+-                id = < 1469100036 >;	/* embeddedsw.dts.params.id type NUMBER */
+-                timestamp = < 1493922193 >;	/* embeddedsw.dts.params.timestamp type NUMBER */
+-            }; //end sysid@0x100049540 (Nighthawk_FPGA_IO_sysid)
+-
+-            Nighthawk_FPGA_IO_fgpib_0: fgpib@0x100049800 {
+-                compatible = "flk,fgpib-4.0";
+-                reg = < 0x00049800 0x00000020
+-                        0x00049840 0x00000004
+-                        0x00049880 0x00000004 >;
+-                reg-names = "s0", "s1", "s2";
+-                interrupt-parent = < &intc >;
+-                interrupts = < 0 57 4 >;
+-                clocks = < &Nighthawk_FPGA_IO_HPS_CLK >;
+-            }; //end fgpib@0x100049800 (Nighthawk_FPGA_IO_fgpib_0)
+-
+-            Nighthawk_FPGA_IO_Port_A: gpio@0x100049a00 {
+-                compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
+-                reg = < 0x00049a00 0x00000020 >;
+-                interrupt-parent = < &intc >;
+-                interrupts = < 0 59 1 >;
+-                clocks = < &Nighthawk_FPGA_IO_HPS_CLK >;
+-                altr,interrupt-type = < 1 >;	/* embeddedsw.dts.params.altr,interrupt-type type NUMBER */
+-                edge_type = < 0 >;	/* embeddedsw.dts.params.edge_type type NUMBER */
+-                level_trigger = < 0 >;	/* embeddedsw.dts.params.level_trigger type NUMBER */
+-                resetvalue = < 50 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+-                #gpio-cells = < 2 >;
+-                gpio-controller;
+-                activebits = < 0x0000007f >;	/* appended from boardinfo */
+-                directionbits = < 0x00000001 >;	/* appended from boardinfo */
+-                bidirbits = < 0x00000000 >;	/* appended from boardinfo */
+-                flk,interrupt_type = < 1 >;	/* appended from boardinfo */
+-            }; //end gpio@0x100049a00 (Nighthawk_FPGA_IO_Port_A)
+-
+-
+-            Nighthawk_FPGA_IO_led_pio: gpio@0x100049180 {
+-                compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
+-                reg = < 0x00049180 0x00000020 >;
+-                clocks = < &Nighthawk_FPGA_IO_HPS_CLK >;
+-                resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+-                #gpio-cells = < 2 >;
+-                gpio-controller;
+-                activebits = < 0x00000001 >;	/* appended from boardinfo */
+-                directionbits = < 0x00000001 >;	/* appended from boardinfo */
+-                bidirbits = < 0x00000000 >;	/* appended from boardinfo */
+-            }; //end gpio@0x100049180 (Nighthawk_FPGA_IO_led_pio)
+-
+         };
+     };
+ }; //end /
+-- 
+1.8.4.5
+

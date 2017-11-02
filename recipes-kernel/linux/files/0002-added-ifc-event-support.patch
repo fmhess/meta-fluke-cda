@@ -1,0 +1,117 @@
+From eb68f9faa5b5be9e9a14c15c170bbb42544ad94c Mon Sep 17 00:00:00 2001
+From: Frank Mori Hess <fmh6jj@gmail.com>
+Date: Wed, 11 Oct 2017 13:56:09 -0700
+Subject: [PATCH 2/4] added ifc event support
+
+---
+ drivers/gpib/fluke_custom/fluke_gpib.c | 25 ++++++++++++++++++-------
+ drivers/gpib/fluke_custom/fluke_gpib.h | 17 ++++++++++++++++-
+ 2 files changed, 34 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/gpib/fluke_custom/fluke_gpib.c b/drivers/gpib/fluke_custom/fluke_gpib.c
+index 01286c1..3f97a7d 100644
+--- a/drivers/gpib/fluke_custom/fluke_gpib.c
++++ b/drivers/gpib/fluke_custom/fluke_gpib.c
+@@ -279,7 +279,7 @@ static int fluke_dma_write(gpib_board_t *board,
+ 	if(tx_desc == NULL)
+ 	{
+ 		printk("fluke_gpib: failed to allocate dma transmit descriptor\n");
+-		retval = -EIO;
++		retval = -ENOMEM;
+ 		goto cleanup;
+ 	}
+ 	tx_desc->callback = fluke_dma_callback;
+@@ -320,11 +320,9 @@ static int fluke_dma_write(gpib_board_t *board,
+ 	// make sure fluke_dma_callback got called
+ 	if(test_bit(DMA_WRITE_IN_PROGRESS_BN, &nec_priv->state))
+ 	{
+-		fluke_dma_callback(board);
++		fluke_dma_callbacard);
+ 	}
+ 
+-	if(retval)
+-		write_byte(nec_priv, AUX_NBAF, AUXMR);	
+ 	*bytes_written = readl(e_priv->write_transfer_counter) & write_transfer_counter_mask;
+ 	if(*bytes_written > length) BUG();
+ 	/*	printk("length=%i, *bytes_written=%i, residue=%i, retval=%i\n",
+@@ -648,14 +646,24 @@ gpib_interface_t fluke_interface =
+ 
+ irqreturn_t fluke_gpib_internal_interrupt(gpib_board_t *board)
+ {
+-	int status1, status2;
++	int status0, status1, status2;
+ 	fluke_private_t *priv = board->private_data;
+ 	nec7210_private_t *nec_priv = &priv->nec7210_priv;
+-	int retval;
++	int retval = IRQ_NONE;
++
++	status0 = fluke_paged_read_byte(e_priv, ISR0_IMR0, ISR0_IMR0_PAGE);
+ 	status1 = read_byte( nec_priv, ISR1 );
+ 	status2 = read_byte( nec_priv, ISR2 );
+-	retval = nec7210_interrupt_have_status(board, nec_priv, status1, status2);
+ 
++	if(status0 & FLUKE_IFCI_BIT)
++	{
++		push_gpib_event( board, EventIFC );
++		wake_up_interruptible( &board->wait );
++		retval = IRQ_HANDLED;
++	}
++	
++	if( nec7210_interrupt_have_status(board, nec_priv, status1, status2) == IRQ_HANDLED)
++		retval = IRQ_HANDLED;
+ /* 
+ 	if((status1 & nec_priv->reg_bits[IMR1]) ||
+ 		(status2 & (nec_priv->reg_bits[IMR2] & IMR2_ENABLE_INTR_MASK)))
+@@ -776,6 +784,8 @@ int fluke_init(fluke_private_t *e_priv, gpib_board_t *board, int handshake_mode)
+ 		printk("fluke_gpib: failed to allocate pseudo_irq\n");
+ 		return -EINVAL;
+ 	}
++	
++	fluke_paged_write_byte(e_priv, FLUKE_IFCIE_BIT, ISR0_IMR0, ISR0_IMR0_PAGE);
+ 	return 0;
+ }
+ 
+@@ -924,6 +934,7 @@ void fluke_detach(gpib_board_t *board)
+ 
+ 		if(nec_priv->iobase)
+ 		{
++			fluke_paged_write_byte(e_priv, 0, ISR0_IMR0, ISR0_IMR0_PAGE);
+ 			nec7210_board_reset(nec_priv, board);
+ 		}
+ 		if(e_priv->irq)
+diff --git a/drivers/gpib/fluke_custom/fluke_gpib.h b/drivers/gpib/fluke_custom/fluke_gpib.h
+index 72d0582..7ad20ec 100644
+--- a/drivers/gpib/fluke_custom/fluke_gpib.h
++++ b/drivers/gpib/fluke_custom/fluke_gpib.h
+@@ -42,12 +42,27 @@ typedef struct
+ // cb7210 specific registers and bits
+ enum cb7210_regs
+ {
++	ISR0_IMR0 = 0x6,
+ 	BUS_STATUS = 0x7,
+ };
+ enum cb7210_page_in
+ {
+-	BUS_STATUS_PAGE = 1,
++	ISR0_IMR0_PAGE = 1,
++	BUS_STATUS_PAGE = 1
+ };
++
++/* IMR0 -- Interrupt Mode Register 0 */
++enum imr0_bits
++{
++	FLUKE_IFCIE_BIT = 0x8,	/* interface clear interrupt */
++};
++
++/* ISR0 -- Interrupt Status Register 0 */
++enum isr0_bits
++{
++	FLUKE_IFCI_BIT = 0x8,	/* interface clear interrupt */
++};
++
+ // we customized the cb7210 vhdl to give the "data in" status
+ // on the unused bit 7 of the address0 register.
+ enum cb7210_address0
+-- 
+2.7.4
+

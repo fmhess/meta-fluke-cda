@@ -1,0 +1,59 @@
+From 0d20a081a209600b2483ae78a05bc513ba65e5c8 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Wed, 21 Sep 2016 11:35:24 -0700
+Subject: [PATCH 29/29] working on keyboard
+
+---
+ drivers/input/keyboard/fluke_keypad.c | 27 +++++++++++++++++++++------
+ 1 file changed, 21 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/input/keyboard/fluke_keypad.c b/drivers/input/keyboard/fluke_keypad.c
+index 2f50001..94c5ee4 100644
+--- a/drivers/input/keyboard/fluke_keypad.c
++++ b/drivers/input/keyboard/fluke_keypad.c
+@@ -307,21 +307,36 @@ static int fluke_keypad_remove(struct device *dev)
+ 	return 0;
+ }
+ 
+-static struct device_driver fluke_keypad_driver = {
+-	.name = "fluke_keypad",
+-	.bus = &platform_bus_type,
++static const struct of_device_id fluke_gpib_of_match[] = {
++    { .compatible = "flk,fgpib-4.0"},
++    { {0} }
++};
++MODULE_DEVICE_TABLE(of, fluke_gpib_of_match);
++
++static struct platform_driver fluke_keypad_driver = {
++    .driver = {
++	    .name = "fluke_keypad",
++        .owner = THIS_MODULE,
++        .of_match_table = fluke_keypad_of_match,
++    },
+ 	.probe = fluke_keypad_probe,
+-	.remove = fluke_keypad_remove,
+ };
+ 
+ static int fluke_keypad_init(void)
+ {
+-	return driver_register(&fluke_keypad_driver);
++    int result;
++	result = platform_driver_register(&fluke_keypad_driver);
++    if (result) {
++        printk("fluke_gpib: platform_driver_register failed!\n");
++        return result;
++    }
++    printK("fluke_keypad\n");
++    return 0;
+ }
+ 
+ static void fluke_keypad_exit(void)
+ {
+-	return driver_unregister(&fluke_keypad_driver);
++	platform_driver_unregister(&fluke_keypad_driver);
+ }
+ 
+ module_init(fluke_keypad_init);
+-- 
+1.8.4.5
+

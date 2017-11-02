@@ -1,0 +1,15 @@
+diff --git a/drivers/gpib/fluke_custom/fluke_gpib.c
+b/drivers/gpib/fluke_custom/fluke_gpib.c
+index 800d9ea..0fa0965 100644
+--- a/drivers/gpib/fluke_custom/fluke_gpib.c
++++ b/drivers/gpib/fluke_custom/fluke_gpib.c
+@@ -784,6 +784,7 @@ int fluke_init(fluke_private_t *e_priv,
+gpib_board_t *board, int handshake_mode)
+  /* the gpib controller. */
+ static bool gpib_dma_channel_filter(struct dma_chan *chan, void *filter_param)
+ {
++       printk("gpib_dma_channel_filter: filtering %s id=%d\n",
+dma_chan_name(chan), chan->chan_id);
+        // select the channel which is wired to the gpib chip
+        return chan->chan_id == 0;
+ }

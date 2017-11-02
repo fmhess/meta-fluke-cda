@@ -1,0 +1,47 @@
+From d92db9faccd29ed8adaf5f2cb96808bc43393c24 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 13 Sep 2016 12:51:39 -0700
+Subject: [PATCH 19/19] Remove uart1 test
+
+---
+ arch/arm/boot/dts/Triclamp_soc.dts | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Triclamp_soc.dts b/arch/arm/boot/dts/Triclamp_soc.dts
+index fbd5a76..a71afa9 100644
+--- a/arch/arm/boot/dts/Triclamp_soc.dts
++++ b/arch/arm/boot/dts/Triclamp_soc.dts
+@@ -33,7 +33,7 @@
+ 
+ 	aliases {
+ 		serial0 = &uart0;
+-		serial1 = &uart1;
++#		serial1 = &uart1;
+ 		ethernet0 = &gmac1;
+ 	}; //end aliases
+ 
+@@ -152,7 +152,7 @@
+ 
+ &qspi {
+ 	status = "okay";
+-	flash0: n25q00@0 {
++	flash0: n25q512a@0 {
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+ 		compatible = "n25q512a";
+@@ -216,9 +216,9 @@
+ 	status = "okay";
+ };
+ 
+-&uart1 {
+-	status = "okay";
+-};
++#&uart1 {
++#	status = "okay";
++#};
+ 
+ &usb0 {
+ 	status = "okay";
+-- 
+1.8.4.5
+

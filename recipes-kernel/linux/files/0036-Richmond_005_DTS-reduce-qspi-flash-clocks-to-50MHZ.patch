@@ -1,0 +1,49 @@
+From 79ff79e2c0fcc8c3caad7e7e6ba09c15f86938c1 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Thu, 6 Apr 2017 15:15:42 -0700
+Subject: [PATCH 36/36] Richmond_005_DTS-reduce-qspi-flash-clocks-to-50MHZ
+
+---
+ arch/arm/boot/dts/Richmond_005.dts | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Richmond_005.dts b/arch/arm/boot/dts/Richmond_005.dts
+index f192eeb..5a38943 100644
+--- a/arch/arm/boot/dts/Richmond_005.dts
++++ b/arch/arm/boot/dts/Richmond_005.dts
+@@ -118,12 +118,12 @@
+ 
+ &qspi {
+ 	status = "okay";
+-	flash0: n25q00@0 {
++	flash0: n25q512a@0 {
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+-		compatible = "n25q00";
++		compatible = "n25q512a";
+ 		reg = <0>;      /* chip select */
+-		spi-max-frequency = <100000000>;
++		spi-max-frequency = <50000000>;
+ 
+ 		cdns,page-size = <256>;
+ 		cdns,block-size = <16>;
+@@ -132,6 +132,7 @@
+ 		cdns,tsd2d-ns = <50>;
+ 		cdns,tchsh-ns = <4>;
+ 		cdns,tslch-ns = <4>;
++        cdns,is-decoded-cs = <0>;
+ 
+ 		part0: partition@0 {
+ 					label = "Flash 0 Raw Data";	/* appended from boardinfo */
+@@ -159,7 +160,7 @@
+ 		#size-cells = <1>;
+ 		compatible = "n25q00";
+ 		reg = <1>;      /* chip select */
+-		spi-max-frequency = <100000000>;
++		spi-max-frequency = <50000000>;
+ 
+ 		cdns,page-size = <256>;
+ 		cdns,block-size = <16>;
+-- 
+1.8.4.5
+

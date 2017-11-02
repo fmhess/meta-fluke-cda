@@ -1,0 +1,29 @@
+From aac691e8dfb49523f12ce66373a5ad00b8b82a8c Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Mon, 19 Jun 2017 15:35:09 -0700
+Subject: [PATCH 42/42] Nighthawk device tree syntax fix.-5
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index 858942a..90a181f 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -48,6 +48,12 @@
+ 		}; //end Nighthawk_FPGA_IO_HPS_CLK (Nighthawk_FPGA_IO_HPS_CLK)
+ 
+ 	}; //end clocks
++
++    hps_emac_interface_splitter_0: splitter@0x100050000 {
++        compatible = "altr,splitter-15.1", "altr,emac-splitter-1.0";
++        reg = <0x00050000 0x00000008>;
++        clocks = <&h2f_user0_clock>;
++    }; //end splitter@0x100050000 (hps_emac_interface_splitter_0)
+ };
+ 
+ &gmac0 {
+-- 
+1.8.4.5
+

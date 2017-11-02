@@ -1,0 +1,31 @@
+From 12956d08d189d903b23330c584f02bf7a0e6c02b Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Thu, 22 Sep 2016 09:34:11 -0700
+Subject: [PATCH 31/31] changed fkeypad num resources debug
+
+---
+ drivers/input/keyboard/fluke_keypad.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/input/keyboard/fluke_keypad.c b/drivers/input/keyboard/fluke_keypad.c
+index f987166..5dad391 100644
+--- a/drivers/input/keyboard/fluke_keypad.c
++++ b/drivers/input/keyboard/fluke_keypad.c
+@@ -202,10 +202,12 @@ static int fluke_keypad_probe(struct device *dev)
+ 	/* Get platform device structure */
+ 	struct platform_device *pdev = container_of(dev, struct platform_device, dev);
+ 
++	printk("fluke_keypad%d: base: 0x%08ux irq: %d\n",
++
+ 	/* Double check resources for sanity */
+ 	if (pdev->num_resources != 2) {
+-		printk(KERN_CRIT "fluke_keypad%d: wrong number of resources for device.\n",
+-				pdev->id);
++		printk(KERN_CRIT "fluke_keypad%d: wrong number of resources for device, got %d.\n",
++				pdev->id, pdev->num_resources);
+ 		ret = -ENODEV;
+ 		goto fail;
+ 	}
+-- 
+1.8.4.5
+

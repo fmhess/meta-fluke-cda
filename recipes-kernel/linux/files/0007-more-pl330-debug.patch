@@ -1,0 +1,27 @@
+From a8219680038a4fcbaf9de8c45d5d87f96b5c6dc5 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 19 Jul 2016 10:47:42 -0700
+Subject: [PATCH 07/47] more pl330 debug
+
+---
+ drivers/dma/pl330.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/dma/pl330.c b/drivers/dma/pl330.c
+index b602ed2..fc7b8e0 100644
+--- a/drivers/dma/pl330.c
++++ b/drivers/dma/pl330.c
+@@ -2867,8 +2867,10 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
+ 	}
+ 
+ 	if (pdat) {
++        printk("\npl330:probe.. pdat is not NULL  dma_cap_sets\n");
+ 		pd->cap_mask = pdat->cap_mask;
+ 	} else {
++        printk("\npl330:probe.. pdat is NULL dma_cap_sets\n");
+ 		dma_cap_set(DMA_MEMCPY, pd->cap_mask);
+ 		if (pcfg->num_peri) {
+             printk("\npl330:probe.. calling dma_cap_sets\n");
+-- 
+1.8.4.5
+

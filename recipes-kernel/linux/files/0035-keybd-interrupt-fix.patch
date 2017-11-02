@@ -1,0 +1,26 @@
+From 42f8a279b66c2b33a006e0b2a28e34c01478733e Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Thu, 22 Sep 2016 13:32:54 -0700
+Subject: [PATCH 35/47] keybd interrupt fix
+
+---
+ drivers/input/keyboard/fluke_keypad.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/input/keyboard/fluke_keypad.c b/drivers/input/keyboard/fluke_keypad.c
+index 76845f6..d7fc74f 100644
+--- a/drivers/input/keyboard/fluke_keypad.c
++++ b/drivers/input/keyboard/fluke_keypad.c
+@@ -287,6 +287,9 @@ static int fluke_keypad_probe(struct platform_device *pdev)
+     irq = irq_of_parse_and_map(pdev->dev.of_node, 0);
+     // printk("FLUKE KEYPAD PROBE: irq_of_parse_and_map returned irq number %d\n", irq);
+ 
++#if !defined(IRQF_DISABLED)
++#define IRQF_DISABLED 0x00
++#endif
+     rc = request_irq(irq, (irq_handler_t)fluke_keypad_handler, IRQF_DISABLED, "fkeypd", fkpd_device);
+     // rc = request_irq(irq, (irq_handler_t)fluke_keypad_handler, 0, "fkeypd", NULL);
+     if (rc) {
+-- 
+1.8.4.5
+

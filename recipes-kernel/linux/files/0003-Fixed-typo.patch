@@ -1,0 +1,25 @@
+From e279b20d893e39b0409307079c7f60a504aeff4e Mon Sep 17 00:00:00 2001
+From: Frank Mori Hess <fmh6jj@gmail.com>
+Date: Wed, 11 Oct 2017 14:17:42 -0700
+Subject: [PATCH 3/4] Fixed typo.
+
+---
+ drivers/gpib/fluke_custom/fluke_gpib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpib/fluke_custom/fluke_gpib.c b/drivers/gpib/fluke_custom/fluke_gpib.c
+index 3f97a7d..b09c3bb 100644
+--- a/drivers/gpib/fluke_custom/fluke_gpib.c
++++ b/drivers/gpib/fluke_custom/fluke_gpib.c
+@@ -320,7 +320,7 @@ static int fluke_dma_write(gpib_board_t *board,
+ 	// make sure fluke_dma_callback got called
+ 	if(test_bit(DMA_WRITE_IN_PROGRESS_BN, &nec_priv->state))
+ 	{
+-		fluke_dma_callbacard);
++		fluke_dma_callback(board);
+ 	}
+ 
+ 	*bytes_written = readl(e_priv->write_transfer_counter) & write_transfer_counter_mask;
+-- 
+2.7.4
+

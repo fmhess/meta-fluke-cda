@@ -1,0 +1,43 @@
+From f5c6037146086f63f9989742dc81be3361dbf654 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 5 Sep 2017 13:45:05 -0700
+Subject: [PATCH 81/81] Vanquish dts fix for pmu error 1
+
+---
+ arch/arm/boot/dts/Vanquish_soc.dts | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Vanquish_soc.dts b/arch/arm/boot/dts/Vanquish_soc.dts
+index a6a290d..3ab1260 100644
+--- a/arch/arm/boot/dts/Vanquish_soc.dts
++++ b/arch/arm/boot/dts/Vanquish_soc.dts
+@@ -58,17 +58,18 @@
+ 			clock-output-names = "Vanquish_FPGA_IO_HPS_CLK-clk";
+ 		}; //end Vanquish_FPGA_IO_HPS_CLK (Vanquish_FPGA_IO_HPS_CLK)
+ 
+-        };      
++    };      
++
++    pmu {
++        compatible = "arm,cortex-a9-pmu";
++        interrupt-parent = <&intc>;
++        interrupts = <0 176 4>;
++        interrupt-affinity = <&cpu0>;
++        reg = <0xff111000 0x1000>;
++    };
+ 		
+ };
+ 
+-pmu: pmu@ff111000 {
+-    compatible = "arm,cortex-a9-pmu";
+-    interrupt-parent = <&intc>;
+-    interrupts = <0 176 4>;
+-    interrupt-affinity = <&cpu0>;
+-    reg = <0xff111000 0x1000>;
+-};
+ 
+ &gmac1 {
+ 	status = "okay";
+-- 
+1.8.4.5
+

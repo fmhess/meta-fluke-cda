@@ -1,0 +1,75 @@
+From f672c03cc548dcb4d9951642bcd90b9de82a4897 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Wed, 5 Oct 2016 14:27:33 -0700
+Subject: [PATCH 43/43] Triclamp DTS remove hps spi controllers
+
+---
+ arch/arm/boot/dts/Triclamp_soc.dts | 52 --------------------------------------
+ 1 file changed, 52 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Triclamp_soc.dts b/arch/arm/boot/dts/Triclamp_soc.dts
+index 3df9fa6..95a35d4 100644
+--- a/arch/arm/boot/dts/Triclamp_soc.dts
++++ b/arch/arm/boot/dts/Triclamp_soc.dts
+@@ -97,58 +97,6 @@
+ 		reg = <0x51>;
+ 	};
+ };
+-
+-&spi0 {
+-	#address-cells = < 1 >;
+-	#size-cells = < 0 >;
+-	bus-num = < 0 >;
+-	num-chipselect = < 4 >;
+-	status = "okay";
+-
+-	spidev@0 {
+-		compatible = "spidev";
+-		reg = < 0 >;
+-		spi-max-frequency = < 100000000 >;
+-		enable-dma = < 1 >;
+-	};
+-};
+-
+-&spi1 {
+-	#address-cells = < 1 >;
+-	#size-cells = < 0 >;
+-	bus-num = < 0 >;
+-	num-chipselect = < 4 >;
+-	status = "okay";
+-
+-	eeprom@1 {
+-		compatible = "at,at25";
+-		reg = < 0 >;
+-		spi-max-frequency = < 5000000 >;
+-		enable-dma = < 1 >;
+-	};
+-
+-	spidev@1 {
+-		compatible = "spidev";
+-		reg = < 1 >;
+-		spi-max-frequency = < 2000000 >;
+-		enable-dma = < 1 >;
+-	};
+-
+-	spidev@2 {
+-		compatible = "spidev";
+-		reg = < 2 >;
+-		spi-max-frequency = < 4000000 >;
+-		enable-dma = < 1 >;
+-	};
+-
+-	spidev@3 {
+-		compatible = "spidev";
+-		reg = < 3 >;
+-		spi-max-frequency = < 4000000 >;
+-		enable-dma = < 1 >;
+-	};
+-};
+-
+ &qspi {
+ 	status = "okay";
+ 	flash0: n25q512a@0 {
+-- 
+1.8.4.5
+

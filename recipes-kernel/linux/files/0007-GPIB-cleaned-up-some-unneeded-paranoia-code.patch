@@ -1,0 +1,25 @@
+From 6e782ffbfa012bb1a22b44bbeb629ab828faa26e Mon Sep 17 00:00:00 2001
+From: Frank Mori Hess <fmh6jj@gmail.com>
+Date: Fri, 13 Oct 2017 14:43:03 -0700
+Subject: [PATCH 7/8] GPIB: cleaned up some unneeded paranoia code.
+
+---
+ drivers/gpib/fluke_custom/fluke_gpib.h | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/drivers/gpib/fluke_custom/fluke_gpib.h b/drivers/gpib/fluke_custom/fluke_gpib.h
+index 6c4636d..ff5ec83 100644
+--- a/drivers/gpib/fluke_custom/fluke_gpib.h
++++ b/drivers/gpib/fluke_custom/fluke_gpib.h
+@@ -125,8 +125,6 @@ static inline void fluke_paged_write_byte(fluke_private_t *e_priv,
+ 	fluke_write_byte_nolock(nec_priv, cb7210_page_in_bits(page), AUXMR);
+ 	udelay(1);
+ 	fluke_write_byte_nolock(nec_priv, data, register_num);
+-	fluke_write_byte_nolock(nec_priv, cb7210_page_in_bits(0), AUXMR);
+-	udelay(1);
+ 	spin_unlock_irqrestore(&nec_priv->register_page_lock, flags);
+ }
+ 
+-- 
+2.7.4
+

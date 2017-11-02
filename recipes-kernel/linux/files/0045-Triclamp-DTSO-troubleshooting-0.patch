@@ -1,0 +1,50 @@
+From 53ac4cb97d3c8d48329d753ba050e509a1a75215 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Wed, 12 Oct 2016 09:29:24 -0700
+Subject: [PATCH 45/45] Triclamp DTSO troubleshooting 0
+
+---
+ arch/arm/boot/dts/Triclamp_soc_overlay.dts | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Triclamp_soc_overlay.dts b/arch/arm/boot/dts/Triclamp_soc_overlay.dts
+index 854142f..2a2cee2 100644
+--- a/arch/arm/boot/dts/Triclamp_soc_overlay.dts
++++ b/arch/arm/boot/dts/Triclamp_soc_overlay.dts
+@@ -223,7 +223,7 @@
+ 				#size-cells = < 0 >;	/* appended from boardinfo */
+ 				num-chipselect = < 4 >;	/* appended from boardinfo */
+ 
+-				eeprom1: eeprom@0 {
++				eeprom@1 {
+ 					compatible = "at,at25";	/* appended from boardinfo */
+ 					reg = < 0 >;	/* appended from boardinfo */
+ 					spi-max-frequency = < 5000000 >;	/* appended from boardinfo */
+@@ -233,21 +233,21 @@
+ 					enable-dma = < 1 >;	/* appended from boardinfo */
+ 				}; //end eeprom@1 (eeprom1)
+ 
+-				spidev1: spidev@1 {
++				spidev@1 {
+ 					compatible = "spidev", "LTC2412";	/* appended from boardinfo */
+ 					reg = < 1 >;	/* appended from boardinfo */
+ 					spi-max-frequency = < 2000000 >;	/* appended from boardinfo */
+ 					enable-dma = < 1 >;	/* appended from boardinfo */
+ 				}; //end spidev@1 (spidev1)
+ 
+-				spidev2: spidev@2 {
++				spidev@2 {
+ 					compatible = "spidev", "LTC2484";	/* appended from boardinfo */
+ 					reg = < 2 >;	/* appended from boardinfo */
+ 					spi-max-frequency = < 4000000 >;	/* appended from boardinfo */
+ 					enable-dma = < 1 >;	/* appended from boardinfo */
+ 				}; //end spidev@2 (spidev2)
+ 
+-				spidev3: spidev@3 {
++				spidev@3 {
+ 					compatible = "spidev", "LTC2484";	/* appended from boardinfo */
+ 					reg = < 3 >;	/* appended from boardinfo */
+ 					spi-max-frequency = < 4000000 >;	/* appended from boardinfo */
+-- 
+1.8.4.5
+

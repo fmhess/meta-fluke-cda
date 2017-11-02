@@ -1,0 +1,25 @@
+From b9404b48014e31bce24142e88599197be58a3482 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Wed, 14 Sep 2016 10:49:02 -0700
+Subject: [PATCH 22/22] Increase JFFS2 size to 0x80000000
+
+---
+ arch/arm/boot/dts/Triclamp_soc.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/Triclamp_soc.dts b/arch/arm/boot/dts/Triclamp_soc.dts
+index 3df9fa6..c0b6dfd 100644
+--- a/arch/arm/boot/dts/Triclamp_soc.dts
++++ b/arch/arm/boot/dts/Triclamp_soc.dts
+@@ -205,7 +205,7 @@
+ 
+ 		part4: partition@0 {
+ 			label = "Flash 1 Raw Data"; /* appended from boardinfo */
+-			reg = < 0x00000000 0x07000000 >;    /* appended from boardinfo */
++			reg = < 0x00000000 0x08000000 >;    /* appended from boardinfo */
+ 		}; //end partition@0 (part4)
+ 	}; //end n25q00@1 (flash1)
+ 
+-- 
+1.8.4.5
+

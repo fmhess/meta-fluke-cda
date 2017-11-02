@@ -1,0 +1,24 @@
+From e6790844428bb19f95ba75bcdcaaaab33917ec05 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 4 Oct 2016 14:37:32 -0700
+Subject: [PATCH 38/38] Richmond dts with include line
+
+---
+ arch/arm/boot/dts/Richmond_005.dts | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/boot/dts/Richmond_005.dts b/arch/arm/boot/dts/Richmond_005.dts
+index 54e8ae2..7981c35 100644
+--- a/arch/arm/boot/dts/Richmond_005.dts
++++ b/arch/arm/boot/dts/Richmond_005.dts
+@@ -4,6 +4,7 @@
+  * in cooperation with the nios2 community <nios2-dev@lists.rocketboards.org>
+  */
+ /dts-v1/;
++#include "socfpga_cyclone5.dtsi"
+ 
+ / {
+ 	model = "Altera SOCFPGA Cyclone V";	/* appended from boardinfo */
+-- 
+1.8.4.5
+

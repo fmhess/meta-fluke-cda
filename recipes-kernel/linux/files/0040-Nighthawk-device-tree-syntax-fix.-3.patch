@@ -1,0 +1,54 @@
+From e20c7f4baff8544985f94f11be124fe464cb3e15 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Mon, 19 Jun 2017 14:51:03 -0700
+Subject: [PATCH 40/40] Nighthawk device tree syntax fix.-3
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index 3168372..487d9e1 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -98,28 +98,29 @@
+     status = "ok";
+     speed-mode = <0>;
+ 
+-    mac_eeprom: {
++    mac_eeprom@50 {
+         compatible = "atmel,24mac402";
+         reg = <0x00000050>;
+         pagesize = <16>;	/* appended from boardinfo */
+     }; //end atmel,24mac402@0x50 (mac_eeprom)
+ 
+-    eeprom: {
++    eeprom@51 {
+         compatible = "atmel,24c32";
+         reg = <0x00000051>;
+         pagesize = <32>;	/* appended from boardinfo */
+     }; //end atmel,24c32@0x51 (eeprom)
+ }; //end i2c@0xffc04000 (hps_0_i2c0)
+ 
+-&i2c1: i2c@0xffc05000 {
+-    status = "ok";
++&i2c1 {
++    status = "okay";
+     speed-mode = <0>;
+ 
+-    rtc: rtc,pcf8563@0x51 {
++    rtc@51 {
+         compatible = "rtc,pcf8563";
+-        reg = <0x00000051>;
+-    }; //end rtc,pcf8563@0x51 (rtc)
+-}; //end i2c@0xffc05000 (hps_0_i2c1)
++        reg = <0x51>;
++    };
++};
++
+ 
+ &spi0 {
+     #address-cells = < 1 >;  
+-- 
+1.8.4.5
+

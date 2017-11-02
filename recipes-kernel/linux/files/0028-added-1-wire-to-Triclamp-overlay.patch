@@ -1,0 +1,35 @@
+From 8f0bb5b9c2c8c05ae2425404e0e974630c9cbfab Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 20 Sep 2016 10:18:58 -0700
+Subject: [PATCH 28/28] added 1-wire to Triclamp overlay
+
+---
+ arch/arm/boot/dts/Triclamp_soc_overlay.dts | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/arch/arm/boot/dts/Triclamp_soc_overlay.dts b/arch/arm/boot/dts/Triclamp_soc_overlay.dts
+index deaae0e..e3f337d 100644
+--- a/arch/arm/boot/dts/Triclamp_soc_overlay.dts
++++ b/arch/arm/boot/dts/Triclamp_soc_overlay.dts
+@@ -337,6 +337,18 @@
+ 				#gpio-cells = < 2 >;
+ 				gpio-controller;
+ 			}; //end gpio@0x10004A860 (Tri_Clamp_FPGA_IO_P_Board_Readout_Time)
++
++			onewire: onewire@0 {
++				compatible = "w1-gpio"; /* appended from boardinfo */
++				status = "okay";    /* appended from boardinfo */
++				gpios = < &Tri_Clamp_FPGA_IO_P_Board_Infocon 0 1 >; /* appended from boardinfo */
++			}; //end onewire@0 (onewire)
++
++			onewire1: onewire@1 {
++				compatible = "w1-gpio"; /* appended from boardinfo */
++				status = "okay";    /* appended from boardinfo */
++				gpios = < &Tri_Clamp_FPGA_IO_P_Board_Readout_Time 0 1 >;    /* appended from boardinfo */
++			}; //end onewire@1 (onewire1)
+ 		};
+ 	};
+ };
+-- 
+1.8.4.5
+

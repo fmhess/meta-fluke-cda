@@ -1,0 +1,32 @@
+From b0867f9b6e6fd5ed6784fbeb60050c6bc5c58baf Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Wed, 8 Mar 2017 14:22:10 -0800
+Subject: [PATCH 31/31] added m25, Fast Read to both memory structures
+
+---
+ arch/arm/boot/dts/Triclamp_soc.dts | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm/boot/dts/Triclamp_soc.dts b/arch/arm/boot/dts/Triclamp_soc.dts
+index f630e61..c618379 100644
+--- a/arch/arm/boot/dts/Triclamp_soc.dts
++++ b/arch/arm/boot/dts/Triclamp_soc.dts
+@@ -105,6 +105,7 @@
+ 		compatible = "n25q512a";
+ 		reg = <0>;      /* chip select */
+ 		spi-max-frequency = <50000000>;
++        m25p,fast-read;
+ 
+ 		cdns,page-size = <256>;
+ 		cdns,block-size = <16>;
+@@ -142,6 +143,7 @@
+ 		compatible = "n25q00";
+ 		reg = <1>;      /* chip select */
+ 		spi-max-frequency = <50000000>;
++        m25p,fast-read;
+ 
+ 		cdns,page-size = <256>;
+ 		cdns,block-size = <16>;
+-- 
+1.8.4.5
+

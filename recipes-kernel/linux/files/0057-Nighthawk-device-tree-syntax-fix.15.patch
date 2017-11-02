@@ -1,0 +1,27 @@
+From 8e0f8a0b6b23b5fcd1ce704a378c67a29a975140 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Mon, 26 Jun 2017 14:40:54 -0700
+Subject: [PATCH 57/57] Nighthawk device tree syntax fix.15
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index 8bc0532..8c4dfee 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -50,6 +50,10 @@
+ 	}; //end clocks
+ };
+ 
++&hps_emac_interface_splitter_0 {
++    status=disabled;
++};
++
+ &gmac0 {
+     phy-mode = "rgmii";
+     snps,phy-addr = < 0xFFFFFFFF >;
+-- 
+1.8.4.5
+

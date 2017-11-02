@@ -1,0 +1,32 @@
+From e7ca25b8e6576e6df49b8bab7bdeb2c5afdb3183 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Fri, 23 Jun 2017 08:15:43 -0700
+Subject: [PATCH 47/47] Nighthawk device tree syntax fix.-10
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index a64369e..bb698bb 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -70,7 +70,6 @@
+ };
+ 
+ &gmac0 {
+-    status = "okay";
+     phy-mode = "rgmii";
+     snps,phy-addr = < 0xFFFFFFFF >;
+     phy-addr = < 0xFFFFFFFF >;
+@@ -87,6 +86,7 @@
+     tx-fifo-depth = <4096>;	/* embeddedsw.dts.params.tx-fifo-depth type NUMBER */
+ 	rx-fifo-depth = <4096>;	/* embeddedsw.dts.params.rx-fifo-depth type NUMBER */
+     altr,emac-splitter = <&hps_emac_interface_splitter_0>;	/* appended from boardinfo */
++    status = "okay";
+ };
+ 
+ &gmac1 {
+-- 
+1.8.4.5
+

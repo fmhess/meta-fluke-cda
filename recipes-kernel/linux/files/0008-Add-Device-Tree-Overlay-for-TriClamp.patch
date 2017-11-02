@@ -1,0 +1,373 @@
+From cf94e20c75ed51efb38ceb9c6fbd6d05d59078c8 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Mon, 24 Oct 2016 09:38:44 -0700
+Subject: [PATCH 8/8] Add Device Tree Overlay for TriClamp
+
+---
+ arch/arm/boot/dts/Triclamp_soc_overlay.dts | 354 +++++++++++++++++++++++++++++
+ 1 file changed, 354 insertions(+)
+ create mode 100644 arch/arm/boot/dts/Triclamp_soc_overlay.dts
+
+diff --git a/arch/arm/boot/dts/Triclamp_soc_overlay.dts b/arch/arm/boot/dts/Triclamp_soc_overlay.dts
+new file mode 100644
+index 0000000..2a2cee2
+--- /dev/null
++++ b/arch/arm/boot/dts/Triclamp_soc_overlay.dts
+@@ -0,0 +1,354 @@
++/*
++ * Copyright Altera Corporation (C) 2015. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms and conditions of the GNU General Public License,
++ * version 2, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++ /dts-v1/ /plugin/;
++/ {
++
++	fragment@0 {
++		target-path = "/soc/base-fpga-region";	
++		#address-cells = < 1 >;
++		#size-cells = < 0 >;
++
++		__overlay__ {
++			#address-cells = <1>;
++            #size-cells = <1>;
++            ranges = <0 0xff200000 0x00200000>;
++            fpga-bridges = <&fpga_bridge0>;
++
++            external-fpga-config;
++
++			jtag_uart: serial@0x100020000 {
++				compatible = "altr,juart-14.0", "altr,juart-1.0";
++				reg = < 0x00000001 0x00020000 0x00000008 >;
++				interrupt-parent = < &intc >;
++				interrupts = < 0 42 4 >;
++				clocks = < &clk_0 >;
++			}; //end serial@0x100020000 (jtag_uart)
++
++			Tri_Clamp_FPGA_IO_Port_A: gpio@0x100049A00 {
++				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
++				reg = < 0x00049A00 0x00000020 >;
++				interrupt-parent = < &intc >;
++				interrupts = < 0 59 1 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				edge_type = < 0 >;	/* embeddedsw.dts.params.edge_type type NUMBER */
++				level_trigger = < 0 >;	/* embeddedsw.dts.params.level_trigger type NUMBER */
++				resetvalue = < 66 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++				#gpio-cells = < 2 >;
++				gpio-controller;
++				activebits = < 0x0000007F >;	/* appended from boardinfo */
++				directionbits = < 0x00000001 >;	/* appended from boardinfo */
++				bidirbits = < 0x00000000 >;	/* appended from boardinfo */
++				flk,interrupt_type = < 1 >;	/* appended from boardinfo */
++			}; //end gpio@0x100049A00 (Tri_Clamp_FPGA_IO_Port_A)
++
++			Tri_Clamp_FPGA_IO_led_pio: gpio@0x100049180 {
++				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
++				reg = < 0x00049180 0x00000020 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++				#gpio-cells = < 2 >;
++				gpio-controller;
++				activebits = < 0x00000003 >;	/* appended from boardinfo */
++				directionbits = < 0x00000003 >;	/* appended from boardinfo */
++				bidirbits = < 0x00000000 >;	/* appended from boardinfo */
++			}; //end gpio@0x100049180 (Tri_Clamp_FPGA_IO_led_pio)
++
++			Tri_Clamp_FPGA_IO_LCD_PWM_DAC: gpio@0x100049CC0 {
++				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
++				reg = < 0x00049CC0 0x00000020 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				resetvalue = < 127 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++				#gpio-cells = < 2 >;
++				gpio-controller;
++				activebits = < 0x000000FF >;	/* appended from boardinfo */
++				directionbits = < 0x000000FF >;	/* appended from boardinfo */
++				bidirbits = < 0x00000000 >;	/* appended from boardinfo */
++			}; //end gpio@0x100049CC0 (Tri_Clamp_FPGA_IO_LCD_PWM_DAC)
++
++			Tri_Clamp_FPGA_IO_Beeper_Counter: unknown@0x100049B00 {
++				compatible = "altr,cntr-1.0";	/* appended from boardinfo */
++				reg = < 0x00049B00 0x00000020 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++			}; //end unknown@0x100049B00 (Tri_Clamp_FPGA_IO_Beeper_Counter)
++
++			Tri_Clamp_FPGA_IO_Beeper_Enable: gpio@0x100049B40 {
++				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
++				reg = < 0x00049B40 0x00000020 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++				#gpio-cells = < 2 >;
++				gpio-controller;
++				activebits = < 0x00000001 >;	/* appended from boardinfo */
++				directionbits = < 0x00000001 >;	/* appended from boardinfo */
++				bidirbits = < 0x00000000 >;	/* appended from boardinfo */
++			}; //end gpio@0x100049B40 (Tri_Clamp_FPGA_IO_Beeper_Enable)
++
++			Tri_Clamp_FPGA_IO_LCD_PWM_FREQ: gpio@0x100049EC0 {
++				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
++				reg = < 0x00049EC0 0x00000020 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				resetvalue = < 181 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++				#gpio-cells = < 2 >;
++				gpio-controller;
++				activebits = < 0x000000FF >;	/* appended from boardinfo */
++				directionbits = < 0x000000FF >;	/* appended from boardinfo */
++				bidirbits = < 0x00000000 >;	/* appended from boardinfo */
++			}; //end gpio@0x100049EC0 (Tri_Clamp_FPGA_IO_LCD_PWM_FREQ)
++
++			Tri_Clamp_FPGA_IO_LP_LED_RED: gpio@0x10004A200 {
++				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
++				reg = < 0x0004A200 0x00000010 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++				#gpio-cells = < 2 >;
++				gpio-controller;
++				activebits = < 0x000000FF >;	/* appended from boardinfo */
++				directionbits = < 0x000000FF >;	/* appended from boardinfo */
++				bidirbits = < 0x00000000 >;	/* appended from boardinfo */
++			}; //end gpio@0x10004A200 (Tri_Clamp_FPGA_IO_LP_LED_RED)
++
++			Tri_Clamp_FPGA_IO_LP_LED_GREEN: gpio@0x10004A240 {
++				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
++				reg = < 0x0004A240 0x00000010 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++				#gpio-cells = < 2 >;
++				gpio-controller;
++				activebits = < 0x000000FF >;	/* appended from boardinfo */
++				directionbits = < 0x000000FF >;	/* appended from boardinfo */
++				bidirbits = < 0x00000000 >;	/* appended from boardinfo */
++			}; //end gpio@0x10004A240 (Tri_Clamp_FPGA_IO_LP_LED_GREEN)
++
++			Tri_Clamp_FPGA_IO_LP_LED_BLUE: gpio@0x10004A280 {
++				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
++				reg = < 0x0004A280 0x00000010 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++				#gpio-cells = < 2 >;
++				gpio-controller;
++				activebits = < 0x000000FF >;	/* appended from boardinfo */
++				directionbits = < 0x000000FF >;	/* appended from boardinfo */
++				bidirbits = < 0x00000000 >;	/* appended from boardinfo */
++			}; //end gpio@0x10004A280 (Tri_Clamp_FPGA_IO_LP_LED_BLUE)
++
++			Tri_Clamp_FPGA_IO_KP_LED: gpio@0x10004A2C0 {
++				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
++				reg = < 0x0004A2C0 0x00000010 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++				#gpio-cells = < 2 >;
++				gpio-controller;
++				activebits = < 0x0000000F >;	/* appended from boardinfo */
++				directionbits = < 0x0000000F >;	/* appended from boardinfo */
++				bidirbits = < 0x00000000 >;	/* appended from boardinfo */
++			}; //end gpio@0x10004A2C0 (Tri_Clamp_FPGA_IO_KP_LED)
++
++			Tri_Clamp_FPGA_IO_P_Board_Readout_W: gpio@0x10004A300 {
++				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
++				reg = < 0x0004A300 0x00000020 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++				#gpio-cells = < 2 >;
++				gpio-controller;
++				activebits = < 0x0000003F >;	/* appended from boardinfo */
++				directionbits = < 0x0000001E >;	/* appended from boardinfo */
++				bidirbits = < 0x00000000 >;	/* appended from boardinfo */
++			}; //end gpio@0x10004A300 (Tri_Clamp_FPGA_IO_P_Board_Readout_W)
++
++			Tri_Clamp_FPGA_IO_sysid: sysid@0x100049540 {
++				compatible = "altr,sysid-14.0", "altr,sysid-1.0";
++				reg = < 0x00049540 0x00000008 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				id = < 1896456194 >;	/* embeddedsw.dts.params.id type NUMBER */
++				timestamp = < 1450472879 >;	/* embeddedsw.dts.params.timestamp type NUMBER */
++			}; //end sysid@0x100049540 (Tri_Clamp_FPGA_IO_sysid)
++
++			Tri_Clamp_FPGA_IO_alt_vip_vfr_0: vip@0x100044000 {
++				compatible = "ALTR,vip-frame-reader-14.0", "ALTR,vip-frame-reader-9.1";
++				reg = < 0x00044000 0x00000080 >;
++				interrupt-parent = < &intc >;
++				interrupts = < 0 43 4 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				clock-names = "clock_reset", "clock_master";
++				max-width = < 480 >;	/* MAX_IMAGE_WIDTH type NUMBER */
++				max-height = < 272 >;	/* MAX_IMAGE_HEIGHT type NUMBER */
++				bits-per-color = < 8 >;	/* BITS_PER_PIXEL_PER_COLOR_PLANE type NUMBER */
++				colors-per-beat = < 4 >;	/* NUMBER_OF_CHANNELS_IN_PARALLEL type NUMBER */
++				beats-per-pixel = < 1 >;	/* NUMBER_OF_CHANNELS_IN_SEQUENCE type NUMBER */
++				mem-word-width = < 128 >;	/* MEM_PORT_WIDTH type NUMBER */
++			}; //end vip@0x100044000 (Tri_Clamp_FPGA_IO_alt_vip_vfr_0)
++
++			Tri_Clamp_FPGA_IO_rs232: serial@0x10004A000 {
++				compatible = "snps,dw-apb-uart-14.0", "snps,dw-apb-uart";	/* appended from boardinfo */
++				reg = < 0x0004A000 0x00000200 >;
++				interrupt-parent = < &intc >;
++				interrupts = < 0 46 4 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				auto-flow-control = < 1 >;	/* embeddedsw.dts.params.auto-flow-control type NUMBER */
++				clock-frequency = < 60000000 >;	/* embeddedsw.dts.params.clock-frequency type NUMBER */
++				fifo-size = < 128 >;	/* embeddedsw.dts.params.fifo-size type NUMBER */
++				reg-io-width = < 4 >;	/* embeddedsw.dts.params.reg-io-width type NUMBER */
++				reg-shift = < 2 >;	/* embeddedsw.dts.params.reg-shift type NUMBER */
++			}; //end serial@0x10004A000 (Tri_Clamp_FPGA_IO_rs232)
++
++			Tri_Clamp_FPGA_IO_spi_0: spi@0x100049200 {
++				compatible = "altr,spi-14.0", "altr,spi-1.0";
++				reg = < 0x00049200 0x00000020 >;
++				interrupt-parent = < &intc >;
++				interrupts = < 0 64 4 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++			}; //end spi@0x100049200 (Tri_Clamp_FPGA_IO_spi_0)
++
++			Tri_Clamp_FPGA_IO_spi_1: spi@0x10004A340 {
++				compatible = "altr,spi-14.0", "altr,spi-1.0";
++				reg = < 0x0004A340 0x00000020 >;
++				interrupt-parent = < &intc >;
++				interrupts = < 0 56 4 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				#address-cells = < 1 >;	/* appended from boardinfo */
++				#size-cells = < 0 >;	/* appended from boardinfo */
++				num-chipselect = < 4 >;	/* appended from boardinfo */
++
++				eeprom@1 {
++					compatible = "at,at25";	/* appended from boardinfo */
++					reg = < 0 >;	/* appended from boardinfo */
++					spi-max-frequency = < 5000000 >;	/* appended from boardinfo */
++					pagesize = < 64 >;	/* appended from boardinfo */
++					size = < 32768 >;	/* appended from boardinfo */
++					address-width = < 16 >;	/* appended from boardinfo */
++					enable-dma = < 1 >;	/* appended from boardinfo */
++				}; //end eeprom@1 (eeprom1)
++
++				spidev@1 {
++					compatible = "spidev", "LTC2412";	/* appended from boardinfo */
++					reg = < 1 >;	/* appended from boardinfo */
++					spi-max-frequency = < 2000000 >;	/* appended from boardinfo */
++					enable-dma = < 1 >;	/* appended from boardinfo */
++				}; //end spidev@1 (spidev1)
++
++				spidev@2 {
++					compatible = "spidev", "LTC2484";	/* appended from boardinfo */
++					reg = < 2 >;	/* appended from boardinfo */
++					spi-max-frequency = < 4000000 >;	/* appended from boardinfo */
++					enable-dma = < 1 >;	/* appended from boardinfo */
++				}; //end spidev@2 (spidev2)
++
++				spidev@3 {
++					compatible = "spidev", "LTC2484";	/* appended from boardinfo */
++					reg = < 3 >;	/* appended from boardinfo */
++					spi-max-frequency = < 4000000 >;	/* appended from boardinfo */
++					enable-dma = < 1 >;	/* appended from boardinfo */
++				}; //end spidev@3 (spidev3)
++			}; //end spi@0x10004A340 (Tri_Clamp_FPGA_IO_spi_1)
++
++			Tri_Clamp_FPGA_IO_CAN_ID: gpio@0x10004A3C0 {
++				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
++				reg = < 0x0004A3C0 0x00000010 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++				#gpio-cells = < 2 >;
++				gpio-controller;
++				activebits = < 0x00000007 >;	/* appended from boardinfo */
++				directionbits = < 0x00000000 >;	/* appended from boardinfo */
++				bidirbits = < 0x00000000 >;	/* appended from boardinfo */
++			}; //end gpio@0x10004A3C0 (Tri_Clamp_FPGA_IO_CAN_ID)
++
++			Tri_Clamp_FPGA_IO_fpga_reset: gpio@0x10004A600 {
++				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
++				reg = < 0x0004A600 0x00000010 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++				#gpio-cells = < 2 >;
++				gpio-controller;
++				activebits = < 0x00000001 >;	/* appended from boardinfo */
++				directionbits = < 0x00000001 >;	/* appended from boardinfo */
++				bidirbits = < 0x00000000 >;	/* appended from boardinfo */
++			}; //end gpio@0x10004A600 (Tri_Clamp_FPGA_IO_fpga_reset)
++
++			Tri_Clamp_FPGA_IO_fkeypad_0: fkeypad@0x10004A380 {
++				compatible = "flk,fkeypad-1.0";
++				reg = < 0x0004A380 0x00000008 >;
++				interrupt-parent = < &intc >;
++				interrupts = < 0 58 4 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++			}; //end fkeypad@0x10004A380 (Tri_Clamp_FPGA_IO_fkeypad_0)
++
++			Tri_Clamp_FPGA_IO_vfb_180_0: unknown@0x10004A700 {
++				compatible = "unknown,unknown-14.0";
++				reg = < 0x0004A700 0x00000080 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				clock-names = "avs_clock", "clk";
++			}; //end unknown@0x10004A700 (Tri_Clamp_FPGA_IO_vfb_180_0)
++
++			Tri_Clamp_FPGA_IO_Backplane_GPIO: gpio@0x10004A800 {
++				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
++				reg = < 0x0004A800 0x00000020 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++				#gpio-cells = < 2 >;
++				gpio-controller;
++				activebits = < 0x00000007 >;	/* appended from boardinfo */
++				directionbits = < 0x00000006 >;	/* appended from boardinfo */
++				bidirbits = < 0x00000000 >;	/* appended from boardinfo */
++			}; //end gpio@0x10004A800 (Tri_Clamp_FPGA_IO_Backplane_GPIO)
++
++			Tri_Clamp_FPGA_IO_P_Board_Infocon: gpio@0x10004A820 {
++				compatible = "altr,pio-14.0", "altr,pio-1.0";
++				reg = < 0x0004A820 0x00000020 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				altr,gpio-bank-width = < 1 >;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
++				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++				#gpio-cells = < 2 >;
++				gpio-controller;
++			}; //end gpio@0x10004A820 (Tri_Clamp_FPGA_IO_P_Board_Infocon)
++
++			Tri_Clamp_FPGA_IO_P_Board_Readout_R: gpio@0x10004A840 {
++				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
++				reg = < 0x0004A840 0x00000010 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++				#gpio-cells = < 2 >;
++				gpio-controller;
++				activebits = < 0x00000001 >;	/* appended from boardinfo */
++				directionbits = < 0x00000000 >;	/* appended from boardinfo */
++				bidirbits = < 0x00000000 >;	/* appended from boardinfo */
++			}; //end gpio@0x10004A840 (Tri_Clamp_FPGA_IO_P_Board_Readout_R)
++
++			Tri_Clamp_FPGA_IO_P_Board_Readout_Time: gpio@0x10004A860 {
++				compatible = "altr,pio-14.0", "altr,pio-1.0";
++				reg = < 0x0004A860 0x00000020 >;
++				clocks = < &Tri_Clamp_FPGA_IO_HPS_CLK >;
++				altr,gpio-bank-width = < 1 >;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
++				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++				#gpio-cells = < 2 >;
++				gpio-controller;
++			}; //end gpio@0x10004A860 (Tri_Clamp_FPGA_IO_P_Board_Readout_Time)
++
++			onewire: onewire@0 {
++				compatible = "w1-gpio"; /* appended from boardinfo */
++				status = "okay";    /* appended from boardinfo */
++				gpios = < &Tri_Clamp_FPGA_IO_P_Board_Infocon 0 1 >; /* appended from boardinfo */
++			}; //end onewire@0 (onewire)
++
++			onewire1: onewire@1 {
++				compatible = "w1-gpio"; /* appended from boardinfo */
++				status = "okay";    /* appended from boardinfo */
++				gpios = < &Tri_Clamp_FPGA_IO_P_Board_Readout_Time 0 1 >;    /* appended from boardinfo */
++			}; //end onewire@1 (onewire1)
++		};
++	};
++};
+-- 
+1.8.4.5
+

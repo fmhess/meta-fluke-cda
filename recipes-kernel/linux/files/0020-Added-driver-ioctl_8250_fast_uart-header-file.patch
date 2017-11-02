@@ -1,0 +1,57 @@
+From 4d248a6e82d1414922d6672b7a9013e1e4807311 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Mon, 21 Nov 2016 10:24:54 -0800
+Subject: [PATCH 20/20] Added driver ioctl_8250_fast_uart header file
+
+---
+ drivers/tty/serial/8250/ioctl_8250_fast_uart.h | 37 ++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
+ create mode 100644 drivers/tty/serial/8250/ioctl_8250_fast_uart.h
+
+diff --git a/drivers/tty/serial/8250/ioctl_8250_fast_uart.h b/drivers/tty/serial/8250/ioctl_8250_fast_uart.h
+new file mode 100644
+index 0000000..2277a46
+--- /dev/null
++++ b/drivers/tty/serial/8250/ioctl_8250_fast_uart.h
+@@ -0,0 +1,37 @@
++/*
++ *  ioctl_8250_fast_uart.h -- This driver supports the Fluke custom FAST UART
++ *       
++ *  Copyright (C) 2016 Joseph Joshy
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++ 
++ 
++#ifndef IOCTL_8250_FAST_UART_H
++#define IOCTL_8250_FAST_UART_H
++
++#include <asm/ioctl.h>
++#include <linux/types.h>
++
++#define FAST_UART_CODE 170
++
++enum fast_uart_ioctl
++{
++	READ_UART_WATERMARK = _IOWR( FAST_UART_CODE, 1, int ),
++	WRITE_UART_WATERMARK = _IOWR( FAST_UART_CODE, 2, int ),
++	READ_UART_TIMEOUT = _IOWR( FAST_UART_CODE, 3, int ),
++	WRITE_UART_TIMEOUT = _IOWR( FAST_UART_CODE, 4, int )
++};
++
++#endif /* IOCTL_8250_FAST_UART_H */
+\ No newline at end of file
+-- 
+1.8.4.5
+

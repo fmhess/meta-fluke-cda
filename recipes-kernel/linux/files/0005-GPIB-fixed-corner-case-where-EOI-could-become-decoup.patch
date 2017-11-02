@@ -1,0 +1,168 @@
+From cb2b33205f31c4e547e6e19932234b2eab5951bc Mon Sep 17 00:00:00 2001
+From: Frank Mori Hess <fmh6jj@gmail.com>
+Date: Fri, 13 Oct 2017 08:36:33 -0700
+Subject: [PATCH 5/5] GPIB: fixed corner case where EOI could become decoupled
+ from the data byte it is associated with during 1 byte writes.
+
+---
+ drivers/gpib/fluke_custom/fluke_gpib.c | 65 +++++++++++++++++++++++++++++++++-
+ drivers/gpib/fluke_custom/fluke_gpib.h | 15 ++++++--
+ drivers/gpib/nec7210/write.c           |  7 ++++
+ 3 files changed, 84 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/gpib/fluke_custom/fluke_gpib.c b/drivers/gpib/fluke_custom/fluke_gpib.c
+index f4c8e27..291b16d 100644
+--- a/drivers/gpib/fluke_custom/fluke_gpib.c
++++ b/drivers/gpib/fluke_custom/fluke_gpib.c
+@@ -229,6 +229,56 @@ static int wait_for_idle(gpib_board_t *board, short wake_on_listener_idle,
+ 	return retval;
+ }
+ 
++/* Check if the SH state machine is in SGNS.  We check twice since there is a very small chance 
++ * we could be blowing through SGNS from SIDS to SDYS if there is already a
++ * byte available in the handshake state machine.  We are interested
++ * in the case where the handshake is stuck in SGNS due to no byte being
++ * available to the chip (and thus we can be confident a dma transfer will
++ * result in at least one byte making it into the chip).  This matters
++ * because we want to be confident before sending a "send eoi" auxillary
++ * command that we will be able to also put the associated data byte
++ * in the chip before any potential timeout.
++*/
++static int source_handshake_is_sgns(fluke_private_t *e_priv)
++{
++	int i;
++	
++	for(i = 0; i < 2; ++i)
++	{
++		if((fluke_paged_read_byte(e_priv, STATE1_REG, STATE1_PAGE) & SOURCE_HANDSHAKE_MASK) != SOURCE_HANDSHAKE_SGNS_BITS)
++		{
++			return 0;
++		}
++	}
++	return 1;
++}
++
++/* Wait until the gpib chip is ready to accept a data out byte.
++ * If the chip is SGNS it is probably waiting for a a byte to
++ * be written to it.
++ */
++static int wait_for_data_out_ready(gpib_board_t *board)
++{
++	fluke_private_t *e_priv = board->private_data;
++	nec7210_private_t *nec_priv = &e_priv->nec7210_priv;
++	int retval = 0;
++// 	printk("%s: enter\n", __FUNCTION__);
++
++	if(wait_event_interruptible(board->wait,
++		source_handshake_is_sgns(e_priv) ||
++		test_bit(DEV_CLEAR_BN, &nec_priv->state) ||
++		test_bit(TIMO_NUM, &board->status)))
++	{
++		retval = -ERESTARTSYS;
++	}
++	if(test_bit(TIMO_NUM, &board->status))
++		retval = -ETIMEDOUT;
++	if(test_and_clear_bit(DEV_CLEAR_BN, &nec_priv->state))
++		retval = -EINTR;
++// 	printk("%s: exit, retval=%i\n", __FUNCTION__, retval);
++	return retval;
++}
++
+ static void fluke_dma_callback(void *arg)
+ {
+ 	gpib_board_t *board = arg;
+@@ -375,6 +425,15 @@ static int fluke_accel_write(gpib_board_t *board,
+ 		size_t num_bytes;
+ 		// 		printk("%s: handling last byte\n", __FUNCTION__);
+ 		if(remainder != 1) BUG();
++		
++		/* wait until we are sure we will be able to write the data byte
++		 * into the chip before we send AUX_SEOI.  This prevents a timeout
++		 * scenerio where we send AUX_SEOI but then timeout without getting
++		 * any bytes into the gpib chip.  This will result in the first byte
++		 * of the next write having a spurious EOI set on the first byte. */
++		retval = wait_for_data_out_ready(board);
++		if(retval < 0) return retval;
++		
+ 		write_byte(nec_priv, AUX_SEOI, AUXMR);
+ 		retval = fluke_dma_write(board, buffer, remainder, &num_bytes);
+ 		*bytes_written += num_bytes;
+@@ -658,7 +717,6 @@ irqreturn_t fluke_gpib_internal_interrupt(gpib_board_t *board)
+ 	if(status0 & FLUKE_IFCI_BIT)
+ 	{
+ 		push_gpib_event( board, EventIFC );
+-		wake_up_interruptible( &board->wait );
+ 		retval = IRQ_HANDLED;
+ 	}
+ 	
+@@ -672,6 +730,11 @@ irqreturn_t fluke_gpib_internal_interrupt(gpib_board_t *board)
+ 	}
+ */
+ 
++	if( retval == IRQ_HANDLED )
++	{
++		wake_up_interruptible( &board->wait );
++	}
++    
+ 	return retval;
+ }
+ 
+diff --git a/drivers/gpib/fluke_custom/fluke_gpib.h b/drivers/gpib/fluke_custom/fluke_gpib.h
+index 7ad20ec..f9c1858 100644
+--- a/drivers/gpib/fluke_custom/fluke_gpib.h
++++ b/drivers/gpib/fluke_custom/fluke_gpib.h
+@@ -42,13 +42,15 @@ typedef struct
+ // cb7210 specific registers and bits
+ enum cb7210_regs
+ {
++	STATE1_REG = 0x4,
+ 	ISR0_IMR0 = 0x6,
+-	BUS_STATUS = 0x7,
++	BUS_STATUS = 0x7
+ };
+ enum cb7210_page_in
+ {
+ 	ISR0_IMR0_PAGE = 1,
+-	BUS_STATUS_PAGE = 1
++	BUS_STATUS_PAGE = 1,
++	STATE1_PAGE = 1
+ };
+ 
+ /* IMR0 -- Interrupt Mode Register 0 */
+@@ -63,6 +65,15 @@ enum isr0_bits
+ 	FLUKE_IFCI_BIT = 0x8,	/* interface clear interrupt */
+ };
+ 
++enum state1_bits
++{
++	SOURCE_HANDSHAKE_SIDS_BITS = 0x0, /* source idle state */
++	SOURCE_HANDSHAKE_SGNS_BITS = 0x1, /* source generate state */
++	SOURCE_HANDSHAKE_SDYS_BITS = 0x2, /* source delay state */
++	SOURCE_HANDSHAKE_STRS_BITS = 0x5, /* source transfer state */
++	SOURCE_HANDSHAKE_MASK = 0x7
++};
++
+ // we customized the cb7210 vhdl to give the "data in" status
+ // on the unused bit 7 of the address0 register.
+ enum cb7210_address0
+diff --git a/drivers/gpib/nec7210/write.c b/drivers/gpib/nec7210/write.c
+index 948665b..3156abf 100644
+--- a/drivers/gpib/nec7210/write.c
++++ b/drivers/gpib/nec7210/write.c
+@@ -208,6 +208,13 @@ int nec7210_write(gpib_board_t *board, nec7210_private_t *priv, uint8_t *buffer,
+ 	if(send_eoi)
+ 	{
+ 		size_t num_bytes;
++
++		/* We need to wait to make sure we will immediately be able to write the data byte
++		* into the chip before sending the associated AUX_SEOI command.  This is really
++		* only needed for length==1 since otherwise the earlier calls to pio_write
++		* will have dont the wait already.  */
++		retval = pio_write_wait(board, priv, 0, 0, priv->type == NEC7210);
++		if(retval < 0) return retval;
+ 		/*send EOI */
+ 		write_byte(priv, AUX_SEOI, AUXMR);
+ 
+-- 
+2.7.4
+

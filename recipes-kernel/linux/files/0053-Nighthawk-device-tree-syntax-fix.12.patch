@@ -1,0 +1,56 @@
+From d3e958469a30e6b9598e5c3953e75dc9c61e1427 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Mon, 26 Jun 2017 10:49:20 -0700
+Subject: [PATCH 53/53] Nighthawk device tree syntax fix.12
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index d819ac2..cbb0295 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -25,6 +25,7 @@
+ 		serial1 = "&uart1";
+ 		serial2 = "&uart2";
+ 		ethernet0 = "&gmac1";
++		ethernet1 = "&gmac0";
+ 		spi0 = "&spi0";
+ 	}; //end aliases
+ 
+@@ -48,6 +49,31 @@
+ 
+ 	}; //end clocks
+ 
++    hps_emac_interface_splitter_0: splitter@0x100050000 {
++        compatible = "altr,splitter-15.1", "altr,emac-splitter-1.0";
++        reg = <0x00050000 0x00000008>;
++        clocks = < &clk_0 >;
++    }; //end splitter@0x100050000 (hps_emac_interface_splitter_0)
++};
++
++&gmac0 {
++    phy-mode = "rgmii";
++    snps,phy-addr = < 0xFFFFFFFF >;
++    phy-addr = < 0xFFFFFFFF >;
++
++    rxd0-skew-ps = <0>;
++    rxd1-skew-ps = <0>;
++    rxd2-skew-ps = <0>;
++    rxd3-skew-ps = <0>;
++    txen-skew-ps = <0>;
++    txc-skew-ps = <3000>;
++    rxdv-skew-ps = <0>;
++    rxc-skew-ps = <3000>;
++    max-frame-size = <3800>;
++    tx-fifo-depth = <4096>;	/* embeddedsw.dts.params.tx-fifo-depth type NUMBER */
++	rx-fifo-depth = <4096>;	/* embeddedsw.dts.params.rx-fifo-depth type NUMBER */
++    altr,emac-splitter = <&hps_emac_interface_splitter_0>;	/* appended from boardinfo */
++    status = "okay";
+ };
+ 
+ &gmac1 {
+-- 
+1.8.4.5
+

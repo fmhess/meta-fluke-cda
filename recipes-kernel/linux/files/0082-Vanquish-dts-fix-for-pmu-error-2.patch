@@ -1,0 +1,25 @@
+From ee3e1e590e7172afbff22c37fc6ab1ca7aa1bfab Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 5 Sep 2017 14:12:46 -0700
+Subject: [PATCH 82/82] Vanquish dts fix for pmu error 2
+
+---
+ arch/arm/boot/dts/Vanquish_soc.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/Vanquish_soc.dts b/arch/arm/boot/dts/Vanquish_soc.dts
+index 3ab1260..7922aa2 100644
+--- a/arch/arm/boot/dts/Vanquish_soc.dts
++++ b/arch/arm/boot/dts/Vanquish_soc.dts
+@@ -64,7 +64,7 @@
+         compatible = "arm,cortex-a9-pmu";
+         interrupt-parent = <&intc>;
+         interrupts = <0 176 4>;
+-        interrupt-affinity = <&cpu0>;
++        interrupt-affinity = <&cpu>;
+         reg = <0xff111000 0x1000>;
+     };
+ 		
+-- 
+1.8.4.5
+

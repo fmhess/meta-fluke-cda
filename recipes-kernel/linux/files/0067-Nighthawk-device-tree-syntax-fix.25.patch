@@ -1,0 +1,48 @@
+From 68d45d6361c34799a204ffe0ae6fbc2df36b01c4 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 27 Jun 2017 14:48:46 -0700
+Subject: [PATCH 67/67] Nighthawk device tree syntax fix.25
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index c590395..6dcf8dd 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -47,12 +47,13 @@
+ 			clock-output-names = "Nighthawk_FPGA_IO_HPS_CLK-clk";
+ 		}; //end Nighthawk_FPGA_IO_HPS_CLK (Nighthawk_FPGA_IO_HPS_CLK)
+ 
+-        hps_emac_interface_splitter_0: splitter@0x100050000 {
+-            compatible = "altr,splitter-15.1", "altr,emac-splitter-1.0";
+-            reg = <0x00050000 0x00000008>;
+-            clocks = < &clk_0 >;
+-        }; //end splitter@0x100050000 (hps_emac_interface_splitter_0)
+ 	}; //end clocks
++
++    hps_emac_interface_splitter_0: splitter@0x100050000 {
++        compatible = "altr,splitter-15.1", "altr,emac-splitter-1.0";
++        reg = <0x00050000 0x00000008>;
++        clocks = < &clk_0 >;
++    }; //end splitter@0x100050000 (hps_emac_interface_splitter_0)
+ };
+ 
+ &gmac0 {
+@@ -68,11 +69,11 @@
+     txc-skew-ps = <3000>;
+     rxdv-skew-ps = <0>;
+     rxc-skew-ps = <3000>;
++    status = "okay";
+     max-frame-size = <3800>;
+     tx-fifo-depth = <4096>;	/* embeddedsw.dts.params.tx-fifo-depth type NUMBER */
+ 	rx-fifo-depth = <4096>;	/* embeddedsw.dts.params.rx-fifo-depth type NUMBER */
+     altr,emac-splitter = <&hps_emac_interface_splitter_0>;	/* appended from boardinfo */
+-    status = "okay";
+ };
+ 
+ &gmac1 {
+-- 
+1.8.4.5
+

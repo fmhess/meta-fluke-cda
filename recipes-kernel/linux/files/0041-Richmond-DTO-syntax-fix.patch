@@ -1,0 +1,22 @@
+From ed09a8798557c197149798daa9cd283f9cba05ed Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 4 Oct 2016 16:00:25 -0700
+Subject: [PATCH 41/41] Richmond DTO syntax fix
+
+---
+ arch/arm/boot/dts/Richmond_005_overlay.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/Richmond_005_overlay.dts b/arch/arm/boot/dts/Richmond_005_overlay.dts
+index 6f564d9..793c49d 100644
+--- a/arch/arm/boot/dts/Richmond_005_overlay.dts
++++ b/arch/arm/boot/dts/Richmond_005_overlay.dts
+@@ -1,4 +1,4 @@
+- * This program is free software; you can redistribute it and/or modify
++ /* This program is free software; you can redistribute it and/or modify
+  * it under the terms and conditions of the GNU General Public License,
+  * version 2, as published by the Free Software Foundation.
+  *
+-- 
+1.8.4.5
+

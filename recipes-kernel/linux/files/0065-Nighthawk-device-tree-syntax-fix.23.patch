@@ -1,0 +1,29 @@
+From 68b463fb2b3311cddba7badde41d9d8084d1cef4 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 27 Jun 2017 10:39:39 -0700
+Subject: [PATCH 65/65] Nighthawk device tree syntax fix.23
+
+---
+ arch/arm/boot/dts/Nighthawk_soc_overlay.dts | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc_overlay.dts b/arch/arm/boot/dts/Nighthawk_soc_overlay.dts
+index 1e9df81..1d082d1 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc_overlay.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc_overlay.dts
+@@ -236,12 +236,6 @@
+                 interrupts = < 0 64 4 >;
+                 clocks = < &Nighthawk_FPGA_IO_HPS_CLK >;
+             }; //end spi@0x100049200 (Nighthawk_FPGA_IO_spi_0)
+-        
+-            Nighthawk_FPGA_IO_AUDIO_IF_0: unknown@0x10004f000 {
+-                compatible = "unknown,unknown-1.0";
+-                reg = < 0x0004f000 0x00000020 >;
+-                clocks = < &Nighthawk_FPGA_IO_pll_0 2 >;
+-            }; //end unknown@0x10004f000 (Nighthawk_FPGA_IO_AUDIO_IF_0)
+         };
+     };
+ }; //end /
+-- 
+1.8.4.5
+

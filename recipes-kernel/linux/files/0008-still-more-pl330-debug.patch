@@ -1,0 +1,57 @@
+From cc5bb7601fa48ca1eaf9dc85c3d112c69bdbf733 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 19 Jul 2016 11:04:32 -0700
+Subject: [PATCH 8/8] still more pl330 debug
+
+---
+ drivers/dma/pl330.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/dma/pl330.c b/drivers/dma/pl330.c
+index fc7b8e0..37c7bac 100644
+--- a/drivers/dma/pl330.c
++++ b/drivers/dma/pl330.c
+@@ -2779,7 +2779,7 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
+ 
+ 	/*AJD pdat = dev_get_platdata(&adev->dev); */
+     pdat = NULL;
+-
++    printk("AJD pl330 1\n");
+ 	ret = dma_set_mask_and_coherent(&adev->dev, DMA_BIT_MASK(32));
+ 	if (ret)
+ 		return ret;
+@@ -2801,6 +2801,7 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
+ 	if (IS_ERR(pl330->base))
+ 		return PTR_ERR(pl330->base);
+ 
++    printk("AJD pl330 2\n");
+ 	amba_set_drvdata(adev, pl330);
+ 
+ 	for (i = 0; i < AMBA_NR_IRQS; i++) {
+@@ -2823,6 +2824,7 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
+ 	if (ret)
+ 		return ret;
+ 
++    printk("AJD pl330 3\n");
+ 	INIT_LIST_HEAD(&pl330->desc_pool);
+ 	spin_lock_init(&pl330->pool_lock);
+ 
+@@ -2847,6 +2849,7 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
+ 		goto probe_err2;
+ 	}
+ 
++    printk("AJD pl330 4\n");
+ 	for (i = 0; i < num_chan; i++) {
+ 		pch = &pl330->peripherals[i];
+ 		if (!adev->dev.of_node)
+@@ -2866,6 +2869,7 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
+ 		list_add_tail(&pch->chan.device_node, &pd->channels);
+ 	}
+ 
++    printk("AJD pl330 5\n");
+ 	if (pdat) {
+         printk("\npl330:probe.. pdat is not NULL  dma_cap_sets\n");
+ 		pd->cap_mask = pdat->cap_mask;
+-- 
+1.8.4.5
+

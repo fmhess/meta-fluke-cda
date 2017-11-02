@@ -1,0 +1,223 @@
+From 965d0bb6c10e8f80d2a204a211fbaad61aa4ca20 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Mon, 24 Oct 2016 14:24:30 -0700
+Subject: [PATCH 09/13] Add Device Tree for Vanquish
+
+---
+ arch/arm/boot/dts/Vanquish_soc.dts | 204 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 204 insertions(+)
+ create mode 100644 arch/arm/boot/dts/Vanquish_soc.dts
+
+diff --git a/arch/arm/boot/dts/Vanquish_soc.dts b/arch/arm/boot/dts/Vanquish_soc.dts
+new file mode 100644
+index 0000000..c7fb54b
+--- /dev/null
++++ b/arch/arm/boot/dts/Vanquish_soc.dts
+@@ -0,0 +1,204 @@
++/*
++ * Copyright Altera Corporation (C) 2012,2014. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms and conditions of the GNU General Public License,
++ * version 2, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "socfpga_cyclone5.dtsi"
++
++/ {
++	model = "Altera SOCFPGA Cyclone V";
++	compatible = "altr,socfpga-cyclone5", "altr,socfpga";
++
++	chosen {
++		bootargs = "earlyprintk";
++		stdout-path = "serial0:115200n8";
++	};
++
++	memory {
++		name = "memory";
++		device_type = "memory";
++		reg = <0x0 0x80000000>; 
++	};
++
++	aliases {
++		serial0 = &uart0;
++		serial1 = &uart1;
++		/* this allow the ethaddr uboot environmnet variable contents
++		* to be added to the gmac1 device tree blob.
++		*/
++		ethernet0 = &gmac1;
++	};
++
++	clocks {
++		#address-cells = < 1 >;
++		#size-cells = < 1 >;
++		
++		clk_0: clk_0 {
++			compatible = "fixed-clock";
++			#clock-cells = < 0 >;
++			clock-frequency = < 60000000 >;	/* 60.00 MHz */
++			clock-output-names = "clk_0-clk";
++		}; //end clk_0 (clk_0)
++
++		Vanquish_FPGA_IO_HPS_CLK: Vanquish_FPGA_IO_HPS_CLK {
++			compatible = "fixed-clock";
++			#clock-cells = < 0 >;
++			clock-frequency = < 60000000 >;	/* 60.00 MHz */
++			clock-output-names = "Vanquish_FPGA_IO_HPS_CLK-clk";
++		}; //end Vanquish_FPGA_IO_HPS_CLK (Vanquish_FPGA_IO_HPS_CLK)
++
++	};      
++		
++};
++
++&gmac1 {
++	status = "okay";
++	phy-mode = "rgmii";
++	snps,phy-addr = < 0xFFFFFFFF >;
++	phy-addr = < 0xFFFFFFFF >;
++
++	rxd0-skew-ps = <0>;
++	rxd1-skew-ps = <0>;
++	rxd2-skew-ps = <0>;
++	rxd3-skew-ps = <0>;
++	txen-skew-ps = <0>;
++	txc-skew-ps = <3000>;
++	rxdv-skew-ps = <0>;
++	rxc-skew-ps = <3000>;
++	max-frame-size = <3800>;
++};
++
++&mmc0 {
++	status = "disabled";
++};
++
++&i2c0 {
++	status = "okay";
++	speed-mode = <0>;
++
++	eeprom@51 {
++		compatible = "atmel,24c32";
++		reg = <0x51>;
++		pagesize = <32>;
++	};
++};
++
++&i2c1 {
++	status = "okay";
++	speed-mode = <0>;
++	
++	rtc@51 {
++		compatible = "rtc,pcf8563";
++		reg = <0x51>;
++	};
++};
++
++&spi0 {
++	#address-cells = < 1 >;	
++	#size-cells = < 0 >;	
++	bus-num = < 0 >;	
++	num-chipselect = < 4 >;	
++	status = "okay";	
++        
++	temp@1 {
++		compatible = "hwmon,adt7302";
++		reg = < 1 >;	
++		spi-max-frequency = < 100000000 >;	
++		enable-dma = < 1 >;	
++	};
++        
++	spidev@0 {
++		compatible = "spidev";
++		reg = < 0 >;
++		spi-max-frequency = < 100000000 >;
++		enable-dma = < 1 >;
++	};
++};
++
++&qspi {
++	status = "okay";
++	flash0: n25q512a@0 {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		compatible = "n25q512a";
++		reg = <0>;      /* chip select */
++		spi-max-frequency = <100000000>;
++		m25p,fast-read;
++
++		cdns,page-size = <256>;
++		cdns,block-size = <16>;
++		cdns,read-delay = <4>;
++		cdns,tshsl-ns = <50>;
++		cdns,tsd2d-ns = <50>;
++		cdns,tchsh-ns = <4>;
++		cdns,tslch-ns = <4>;
++
++		part0: partition@0 {
++			label = "Flash 0 Raw Data";	/* appended from boardinfo */
++			reg = < 0x00000000 0x00800000 >;	/* appended from boardinfo */
++		}; //end partition@0 (part0)
++
++		part1: partition@800000 {
++			label = "Flash 1 jffs2 Filesystem";	/* appended from boardinfo */
++			reg = < 0x00800000 0x03000000 >;	/* appended from boardinfo */
++		}; //end partition@800000 (part1)
++
++		part2: partition@3800000 {
++			label = "FPGA Image";	/* appended from boardinfo */
++			reg = < 0x03800000 0x00600000 >;	/* appended from boardinfo */
++		}; //end partition@3800000 (part2)
++
++		part3: partition@3e00000 {
++			label = "Splash Screen Image";	/* appended from boardinfo */
++			reg = < 0x03E00000 0x00200000 >;	/* appended from boardinfo */
++		}; //end partition@3e00000 (part3)
++	};
++
++	flash1: n25q00@1 {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		compatible = "n25q00";
++		reg = <1>;      /* chip select */
++		spi-max-frequency = <100000000>;
++
++		cdns,page-size = <256>;
++		cdns,block-size = <16>;
++		cdns,read-delay = <4>;
++		cdns,tshsl-ns = <50>;
++		cdns,tsd2d-ns = <50>;
++		cdns,tchsh-ns = <4>;
++		cdns,tslch-ns = <4>;
++
++		part4: partition@0 {
++			label = "Flash 1 Raw Data";	/* appended from boardinfo */
++			reg = < 0x00000000 0x07000000 >;	/* appended from boardinfo */
++		}; //end partition@0 (part4)
++	}; //end n25q00@1 (flash1)		
++};
++
++&uart0 {
++	status = "okay";
++};
++
++&uart1 {
++	status = "okay";
++};
++
++&usb0 {
++	status = "okay";
++};
++
++&usb1 {
++	status = "okay";
++};
+-- 
+1.8.4.5
+

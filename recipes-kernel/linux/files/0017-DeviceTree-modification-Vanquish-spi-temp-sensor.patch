@@ -1,0 +1,27 @@
+From 4ec818c030ea97c83729647056a3041636f7f40e Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Fri, 28 Oct 2016 14:04:09 -0700
+Subject: [PATCH 17/17] DeviceTree modification Vanquish spi temp sensor
+
+---
+ arch/arm/boot/dts/Vanquish_soc.dts | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/Vanquish_soc.dts b/arch/arm/boot/dts/Vanquish_soc.dts
+index c7fb54b..882e5b6 100644
+--- a/arch/arm/boot/dts/Vanquish_soc.dts
++++ b/arch/arm/boot/dts/Vanquish_soc.dts
+@@ -114,7 +114,9 @@
+ 	temp@1 {
+ 		compatible = "hwmon,adt7302";
+ 		reg = < 1 >;	
+-		spi-max-frequency = < 100000000 >;	
++		spi-max-frequency = < 1000000 >;	
++        spi-cpha = < 1 >;
++        spi-cpol = < 1 >;
+ 		enable-dma = < 1 >;	
+ 	};
+         
+-- 
+1.8.4.5
+

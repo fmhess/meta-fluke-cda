@@ -1,0 +1,25 @@
+From 5b4bd7b9b00602a6945fb1ec673ed52f81acd8d7 Mon Sep 17 00:00:00 2001
+From: Frank Mori Hess <fmh6jj@gmail.com>
+Date: Fri, 15 Jul 2016 13:27:11 -0400
+Subject: [PATCH 2/5] Added drivers/gpib/Kconfig to drivers/Kconfig
+
+---
+ drivers/Kconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/Kconfig b/drivers/Kconfig
+index 9df7978..0c3d3c8 100644
+--- a/drivers/Kconfig
++++ b/drivers/Kconfig
+@@ -62,6 +62,8 @@ source "drivers/ptp/Kconfig"
+ 
+ source "drivers/pinctrl/Kconfig"
+ 
++source "drivers/gpib/Kconfig"
++
+ source "drivers/gpio/Kconfig"
+ 
+ source "drivers/w1/Kconfig"
+-- 
+2.1.4
+

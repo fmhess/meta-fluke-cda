@@ -1,0 +1,37 @@
+From 69015156e3a5b2c5f37d5dbfa7cfea814e98886a Mon Sep 17 00:00:00 2001
+From: Frank Mori Hess <fmh6jj@gmail.com>
+Date: Fri, 13 Oct 2017 15:45:29 -0700
+Subject: [PATCH 8/8] GPIB: after updating CMPL, return updated value instead
+ of previous one.
+
+---
+ drivers/gpib/sys/ibutil.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/gpib/sys/ibutil.c b/drivers/gpib/sys/ibutil.c
+index 8e8efae..cc91846 100644
+--- a/drivers/gpib/sys/ibutil.c
++++ b/drivers/gpib/sys/ibutil.c
+@@ -116,14 +116,15 @@ int general_ibstatus( gpib_board_t *board, const gpib_status_queue_t *device,
+ 
+ 	if( desc )
+ 	{
+-		if( atomic_read(&desc->io_in_progress) )
+-			status &= ~CMPL;
+-		else
+-			status |= CMPL;
+ 		if( set_mask & CMPL )
+ 			atomic_set(&desc->io_in_progress, 1);
+ 		else if( clear_mask & CMPL )
+ 			atomic_set(&desc->io_in_progress, 0);
++		
++		if( atomic_read(&desc->io_in_progress) )
++			status &= ~CMPL;
++		else
++			status |= CMPL;
+ 	}
+ 	if( num_gpib_events( &board->event_queue ) )
+ 		status |= EVENT;
+-- 
+2.7.4
+

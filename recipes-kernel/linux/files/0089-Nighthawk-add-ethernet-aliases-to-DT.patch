@@ -1,0 +1,43 @@
+From 4f3fe8d0cdc6151b58d2def0f54410d47347aeb9 Mon Sep 17 00:00:00 2001
+From: Alex <halfdome@fluke.com>
+Date: Mon, 23 Oct 2017 14:18:17 -0700
+Subject: [PATCH 89/89] Nighthawk-add ethernet aliases to DT
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index 4488482..bf97dd2 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -25,6 +25,8 @@
+ 		serial1 = "&uart1";
+ 		serial2 = "&uart2";
+ 		spi0 = "&spi0";
++        ethernet0 = &gmac1;
++        ethernet1 = &gmac0;
+ 	}; //end aliases
+ 
+ 	clocks {
+@@ -68,7 +70,7 @@
+ };
+ 
+ &gmac0 {
+-    phy-mode = "rgmii";
++    phy-mode = "gmii";
+     snps,phy-addr = < 0xFFFFFFFF >;
+     phy-addr = < 0xFFFFFFFF >;
+ 
+@@ -89,7 +91,7 @@
+ 
+ &gmac1 {
+     status = "okay";
+-    phy-mode = "gmii";
++    phy-mode = "rgmii";
+     snps,phy-addr = < 0xFFFFFFFF >;
+     phy-addr = < 0xFFFFFFFF >;
+ 
+-- 
+1.8.4.5
+

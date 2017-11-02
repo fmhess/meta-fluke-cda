@@ -1,0 +1,30 @@
+From 366c48814fddaf79e3ab1168ecdb82a4f5d660b9 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Mon, 19 Jun 2017 16:32:43 -0700
+Subject: [PATCH 45/45] Nighthawk device tree syntax fix.-8.patch
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index b55eca9..8797572 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -46,7 +46,12 @@
+ 			clock-frequency = <60000000>;	/* 60.00 MHz */
+ 			clock-output-names = "Nighthawk_FPGA_IO_HPS_CLK-clk";
+ 		}; //end Nighthawk_FPGA_IO_HPS_CLK (Nighthawk_FPGA_IO_HPS_CLK)
+-
++        h2f_user0_clock: h2f_user0_clock {
++            compatible = "altr,socfpga-gate-clk";
++            clocks = <&cfg_s2f_usr0_clk>;
++            #clock-cells = <0>;
++            clk-gate = <0x00000060 0x00000009>;
++         }; //end h2f_user0_clock (h2f_user0_clock)
+ 	}; //end clocks
+ 
+     hps_emac_interface_splitter_0: splitter@0x100050000 {
+-- 
+1.8.4.5
+

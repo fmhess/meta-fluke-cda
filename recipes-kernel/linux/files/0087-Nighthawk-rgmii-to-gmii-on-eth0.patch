@@ -1,0 +1,25 @@
+From 53ff0a529833a7aec3ad583f874f35c9248e82c8 Mon Sep 17 00:00:00 2001
+From: Alex <halfdome@fluke.com>
+Date: Mon, 23 Oct 2017 09:14:30 -0700
+Subject: [PATCH 87/87] Nighthawk rgmii to gmii on eth0
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index 1ee2859..791c374 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -68,7 +68,7 @@
+ };
+ 
+ &gmac0 {
+-    phy-mode = "rgmii";
++    phy-mode = "gmii";
+     snps,phy-addr = < 0xFFFFFFFF >;
+     phy-addr = < 0xFFFFFFFF >;
+ 
+-- 
+1.8.4.5
+

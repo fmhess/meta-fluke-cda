@@ -1,0 +1,35 @@
+From d543a65d113411902507aee1862731b36740aa89 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 13 Sep 2016 14:07:30 -0700
+Subject: [PATCH 21/21] One more patch for dts
+
+---
+ arch/arm/boot/dts/Triclamp_soc.dts | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Triclamp_soc.dts b/arch/arm/boot/dts/Triclamp_soc.dts
+index a2efa8d..3df9fa6 100644
+--- a/arch/arm/boot/dts/Triclamp_soc.dts
++++ b/arch/arm/boot/dts/Triclamp_soc.dts
+@@ -31,7 +31,6 @@
+ 		reg = <0x0 0x80000000>;
+ 	};
+ 
+-#		serial1 = &uart1;
+ 	aliases {
+ 		serial0 = &uart0;
+ 		ethernet0 = &gmac1;
+@@ -216,10 +215,6 @@
+ 	status = "okay";
+ };
+ 
+-#&uart1 {
+-#	status = "okay";
+-#};
+-
+ &usb0 {
+ 	status = "okay";
+ };
+-- 
+1.8.4.5
+

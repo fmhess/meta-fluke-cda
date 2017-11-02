@@ -1,0 +1,24 @@
+From bc30fff0392c3bd15169e31596e0f4b250d969d7 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 28 Feb 2017 11:32:59 -0800
+Subject: [PATCH 23/23] Triclamp DTB remove flash 0 fast read entry
+
+---
+ arch/arm/boot/dts/Triclamp_soc.dts | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/Triclamp_soc.dts b/arch/arm/boot/dts/Triclamp_soc.dts
+index 95a35d4..4fe580d 100644
+--- a/arch/arm/boot/dts/Triclamp_soc.dts
++++ b/arch/arm/boot/dts/Triclamp_soc.dts
+@@ -108,7 +108,6 @@
+ 
+ 		cdns,page-size = <256>;
+ 		cdns,block-size = <16>;
+-		m25p,fast-read;
+ 		cdns,read-delay = <4>;
+ 		cdns,tshsl-ns = <50>;
+ 		cdns,tsd2d-ns = <50>;
+-- 
+1.8.4.5
+

@@ -1,0 +1,25 @@
+From a0eae734575ea2bc606544664fafbcac9737564b Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 4 Oct 2016 14:47:11 -0700
+Subject: [PATCH 39/39] Richmond Device Tree removed Soc to Dts ver
+
+---
+ arch/arm/boot/dts/Richmond_005.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/Richmond_005.dts b/arch/arm/boot/dts/Richmond_005.dts
+index 7981c35..f192eeb 100644
+--- a/arch/arm/boot/dts/Richmond_005.dts
++++ b/arch/arm/boot/dts/Richmond_005.dts
+@@ -3,7 +3,7 @@
+  * Sopc2dts is written by Walter Goossens <waltergoossens@home.nl>
+  * in cooperation with the nios2 community <nios2-dev@lists.rocketboards.org>
+  */
+-/dts-v1/;
++
+ #include "socfpga_cyclone5.dtsi"
+ 
+ / {
+-- 
+1.8.4.5
+

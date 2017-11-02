@@ -1,0 +1,44 @@
+From 8b9b31c455a329329111ee0567b07196861efb90 Mon Sep 17 00:00:00 2001
+From: Frank Mori Hess <fmh6jj@gmail.com>
+Date: Fri, 15 Jul 2016 13:41:13 -0400
+Subject: [PATCH 5/5] Removed obsolete dma skip unmap flags.
+
+---
+ drivers/gpib/fluke_custom/fluke_gpib.c | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/gpib/fluke_custom/fluke_gpib.c b/drivers/gpib/fluke_custom/fluke_gpib.c
+index f36b5c3..4901a8b 100644
+--- a/drivers/gpib/fluke_custom/fluke_gpib.c
++++ b/drivers/gpib/fluke_custom/fluke_gpib.c
+@@ -274,12 +274,8 @@ static int fluke_dma_write(gpib_board_t *board,
+ 	retval = fluke_config_dma(board, 1);
+ 	if(retval) goto cleanup;
+ 
+-	/* pl330.c driver doesn't seem to support automatic unmapping of dma mappings,
+-	so we'll specify DMA_COMPL_SKIP_DEST_UNMAP | DMA_COMPL_SKIP_SRC_UNMAP as flags,
+-	so our code won't break if the pl330.c driver is ever fixed.
+-	*/
+ 	tx_desc = dmaengine_prep_slave_single(e_priv->dma_channel, address, length, DMA_MEM_TO_DEV, 
+-			DMA_PREP_INTERRUPT | DMA_CTRL_ACK | DMA_COMPL_SKIP_DEST_UNMAP | DMA_COMPL_SKIP_SRC_UNMAP);
++			DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
+ 	if(tx_desc == NULL)
+ 	{
+ 		printk("fluke_gpib: failed to allocate dma transmit descriptor\n");
+@@ -441,12 +437,8 @@ static int fluke_dma_read(gpib_board_t *board, uint8_t *buffer,
+ 		dma_unmap_single(NULL, bus_address, length, DMA_FROM_DEVICE);
+ 		return retval;
+ 	}
+-	/* pl330.c driver doesn't seem to support automatic unmapping of dma mappings,
+-	so we'll specify DMA_COMPL_SKIP_DEST_UNMAP | DMA_COMPL_SKIP_SRC_UNMAP as flags,
+-	so our code won't break if the pl330.c driver is ever fixed.
+-	*/
+ 	tx_desc = dmaengine_prep_slave_single(e_priv->dma_channel, bus_address, length, DMA_DEV_TO_MEM, 
+-		DMA_PREP_INTERRUPT | DMA_CTRL_ACK | DMA_COMPL_SKIP_DEST_UNMAP | DMA_COMPL_SKIP_SRC_UNMAP);
++		DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
+ 	if(tx_desc == NULL)
+ 	{
+ 		printk("fluke_gpib: failed to allocate dma transmit descriptor\n");
+-- 
+2.1.4
+

@@ -1,0 +1,26 @@
+From c9e50a3317c32daa492dce006835fcc7bfc38e5a Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 7 Mar 2017 16:46:18 -0800
+Subject: [PATCH 29/29] Changed read mode hard wired in cadence-quadspi
+
+---
+ drivers/mtd/spi-nor/cadence-quadspi.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/mtd/spi-nor/cadence-quadspi.c b/drivers/mtd/spi-nor/cadence-quadspi.c
+index 6af1ec1..bb6f7da 100644
+--- a/drivers/mtd/spi-nor/cadence-quadspi.c
++++ b/drivers/mtd/spi-nor/cadence-quadspi.c
+@@ -1258,7 +1258,8 @@ printk("Get flash device data chip selesct = %d\n", cs);
+ 
+ 		nor->prepare = cqspi_prep;
+ 
+-		ret = spi_nor_scan(nor, NULL, SPI_NOR_QUAD);
++		/* ret = spi_nor_scan(nor, NULL, SPI_NOR_QUAD); */
++		ret = spi_nor_scan(nor, NULL, SPI_NOR_FAST);
+ 		if (ret)
+ 			goto probe_failed;
+ 
+-- 
+1.8.4.5
+

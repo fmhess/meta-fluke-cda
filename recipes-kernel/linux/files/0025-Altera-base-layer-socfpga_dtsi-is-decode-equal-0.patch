@@ -1,0 +1,25 @@
+From cb4d8e41df2eacd8cc60457156693d106a48ee7d Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Wed, 1 Mar 2017 11:06:47 -0800
+Subject: [PATCH 25/25] Altera base layer socfpga_dtsi is-decode equal 0
+
+---
+ arch/arm/boot/dts/socfpga.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/socfpga.dtsi b/arch/arm/boot/dts/socfpga.dtsi
+index e8024dc..df6c6cb 100644
+--- a/arch/arm/boot/dts/socfpga.dtsi
++++ b/arch/arm/boot/dts/socfpga.dtsi
+@@ -768,7 +768,7 @@
+ 				<0xffa00000 0x1000>;
+ 			interrupts = <0 151 4>;
+ 			clocks = <&qspi_clk>;
+-			is-decoded-cs = <1>;
++			is-decoded-cs = <0>;
+ 			fifo-depth = <128>;
+ 			status = "disabled";
+ 			m25p,fast-read;
+-- 
+1.8.4.5
+

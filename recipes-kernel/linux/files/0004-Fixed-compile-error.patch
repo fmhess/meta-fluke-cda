@@ -1,0 +1,25 @@
+From 2b2d261b4f34e6d3b303475ba151075b92854fad Mon Sep 17 00:00:00 2001
+From: Frank Mori Hess <fmh6jj@gmail.com>
+Date: Wed, 11 Oct 2017 14:34:01 -0700
+Subject: [PATCH 4/4] Fixed compile error
+
+---
+ drivers/gpib/fluke_custom/fluke_gpib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpib/fluke_custom/fluke_gpib.c b/drivers/gpib/fluke_custom/fluke_gpib.c
+index b09c3bb..f4c8e27 100644
+--- a/drivers/gpib/fluke_custom/fluke_gpib.c
++++ b/drivers/gpib/fluke_custom/fluke_gpib.c
+@@ -651,7 +651,7 @@ irqreturn_t fluke_gpib_internal_interrupt(gpib_board_t *board)
+ 	nec7210_private_t *nec_priv = &priv->nec7210_priv;
+ 	int retval = IRQ_NONE;
+ 
+-	status0 = fluke_paged_read_byte(e_priv, ISR0_IMR0, ISR0_IMR0_PAGE);
++	status0 = fluke_paged_read_byte(priv, ISR0_IMR0, ISR0_IMR0_PAGE);
+ 	status1 = read_byte( nec_priv, ISR1 );
+ 	status2 = read_byte( nec_priv, ISR2 );
+ 
+-- 
+2.7.4
+

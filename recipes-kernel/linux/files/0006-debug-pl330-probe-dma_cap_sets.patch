@@ -1,0 +1,24 @@
+From 234e93c7118184799875a3a38675b42695d733f0 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Tue, 19 Jul 2016 10:19:24 -0700
+Subject: [PATCH 6/6] debug pl330 probe dma_cap_sets
+
+---
+ drivers/dma/pl330.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/dma/pl330.c b/drivers/dma/pl330.c
+index a9d3b10..b602ed2 100644
+--- a/drivers/dma/pl330.c
++++ b/drivers/dma/pl330.c
+@@ -2871,6 +2871,7 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
+ 	} else {
+ 		dma_cap_set(DMA_MEMCPY, pd->cap_mask);
+ 		if (pcfg->num_peri) {
++            printk("\npl330:probe.. calling dma_cap_sets\n");
+ 			dma_cap_set(DMA_SLAVE, pd->cap_mask);
+ 			dma_cap_set(DMA_CYCLIC, pd->cap_mask);
+ 			dma_cap_set(DMA_PRIVATE, pd->cap_mask);
+-- 
+1.8.4.5
+

@@ -1,0 +1,39 @@
+From a8193ae11eedc8b25f06dd831e26ddf249502590 Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Fri, 7 Jul 2017 10:07:00 -0700
+Subject: [PATCH 71/71] Nighthawk device tree syntax fix.28
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts                 | 2 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index 9b58af8d..816aa22 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -62,7 +62,7 @@
+ 
+     hps_emac_interface_splitter_0: splitter@0x100050000 {
+         compatible = "altr,splitter-15.1", "altr,emac-splitter-1.0";
+-        reg = <0x00050000 0x00000008>;
++        reg = <0x100050000 0x00000008>;
+         clocks = < &h2f_user0_clock >;
+     }; //end splitter@0x100050000 (hps_emac_interface_splitter_0)
+ };
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+index 3f9588e..c0ff8b1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+@@ -190,7 +190,7 @@ static void *socfpga_dwmac_probe(struct platform_device *pdev)
+ 		dev_err(dev, "Unable to parse OF data\n");
+ 		return ERR_PTR(ret);
+ 	}
+-
++    printk("Splitter probe function exited normally\n\n");
+ 	return dwmac;
+ }
+ 
+-- 
+1.8.4.5
+

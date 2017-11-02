@@ -1,0 +1,57 @@
+PR = "r94"
+
+# KERNEL_DEVICETREE_fluke-cda-richmond = "Richmond_005.dtb Richmond_005_overlay.dtb"
+KERNEL_DEVICETREE_fluke-cda-vanquish = "Vanquish_soc.dtb Vanquish_soc_overlay.dtb"
+KERNEL_DEVICETREE_fluke-cda-richmond = "Richmond_005.dtb Richmond_005_overlay.dtb"
+KERNEL_DEVICETREE_fluke-cda-triclamp = "Triclamp_soc.dtb Triclamp_soc_overlay.dtb"
+
+FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+
+#  file://0005-Kludge-to-get-around-IRQF_DISABLED-going-away.patch
+
+SRC_URI_append = "\
+    file://0001-Driver-support-for-Altera-interval-timers.patch \
+    file://0002-Driver-support-for-Fluke-GPIO-devices.patch \
+    file://0001-Added-gpib-driver-files.patch \
+    file://0002-Added-drivers-gpib-Kconfig-to-drivers-Kconfig.patch \
+    file://0003-Added-gpib-to-drivers-Makefile.patch \
+    file://0005-Removed-obsolete-dma-skip-unmap-flags.patch \
+    file://0006-Replaced-platform_driver_probe-with-platform_driver_.patch \
+    file://0007-Backported-fix-to-make-dma_get_slave_channel-properl.patch \
+    file://0009-Reverted-the-spidev-driver-to-allow-the-generic-spid.patch \
+    file://fluke-cda.cfg \
+"
+
+SRC_URI_append_fluke-cda-vanquish = "\
+    file://0024-Add-dt-and-dto-for-Vanquish.patch \
+    file://0025-format-Vanquish-dts-file.patch \
+    file://0026-added-m25p-fast-read-to-dts-for-512-part.patch \
+"
+SRC_URI_append_fluke-cda-richmond = "\
+    file://0036-Richmond-device-tree.patch \
+    file://0037-Richmond-dts-v2.patch \
+    file://0038-Richmond-dts-with-include-line.patch \
+    file://0039-Richmond-Device-Tree-removed-Soc-to-Dts-ver.patch \
+    file://0040-Richmond-Device-Tree-Overlay.patch \
+    file://0041-Richmond-DTO-syntax-fix.patch \
+    file://0042-Richmond-DT0-remove-first-param-in-reg-region.patch \
+"
+SRC_URI_append_fluke-cda-triclamp = "\
+    file://0001-Updated-the-fluke-keypad-driver.patch \
+    file://0018-Triclamp-Device-Tree-2.0.patch \
+    file://0019-Remove-uart1-test.patch \
+    file://0020-More-DTS-troubleshooting.patch \
+    file://0021-One-more-patch-for-dts.patch \
+    file://0027-Device-tree-overlay-Triclamp.patch \
+    file://0028-added-1-wire-to-Triclamp-overlay.patch \
+    file://0029-working-on-keyboard.patch \
+    file://0030-Fixed-a-bug-in-the-fluke-keypad.patch \
+    file://0031-changed-fkeypad-num-resources-debug.patch \
+    file://0032-keypad-debug-continued.patch \
+    file://0033-keypad-no-resource-check.patch \
+    file://0034-keypad-back-to-start.patch \
+    file://0035-keybd-interrupt-fix.patch \
+    file://0043-Triclamp-DTS-remove-hps-spi-controllers.patch \
+    file://0044-Triclamp-overlay-fix-for-spi.patch \
+    file://0045-Triclamp-DTSO-troubleshooting-0.patch \
+"

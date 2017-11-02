@@ -1,0 +1,24 @@
+From 8b404dd5f20457051a999eb45b7d7f5cb007440b Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Thu, 27 Oct 2016 11:06:54 -0700
+Subject: [PATCH 14/14] DeviceTreeOverlay modification Richmond,fgpio
+
+---
+ arch/arm/boot/dts/Richmond_005_overlay.dts | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/Richmond_005_overlay.dts b/arch/arm/boot/dts/Richmond_005_overlay.dts
+index d34fead..c3a00f9 100644
+--- a/arch/arm/boot/dts/Richmond_005_overlay.dts
++++ b/arch/arm/boot/dts/Richmond_005_overlay.dts
+@@ -98,7 +98,6 @@
+ 				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
+ 				reg = < 0x0004A440 0x00000020 >;
+ 				clocks = < &Richmond_FPGA_IO_HPS_CLK >;
+-				flk,gpio-bank-width = < 1 >;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
+ 				resetvalue = < 1 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+ 				#gpio-cells = < 2 >;
+ 				gpio-controller;
+-- 
+1.8.4.5
+

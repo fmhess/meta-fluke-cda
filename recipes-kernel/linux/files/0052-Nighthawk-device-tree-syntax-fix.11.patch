@@ -1,0 +1,78 @@
+From 6e605df852bd124268e9aca4cc6c7ffd172484bd Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Mon, 26 Jun 2017 10:17:39 -0700
+Subject: [PATCH 52/52] Nighthawk device tree syntax fix.11
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts | 39 -------------------------------------
+ 1 file changed, 39 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index bb698bb..d819ac2 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -25,7 +25,6 @@
+ 		serial1 = "&uart1";
+ 		serial2 = "&uart2";
+ 		ethernet0 = "&gmac1";
+-		ethernet1 = "&gmac0";
+ 		spi0 = "&spi0";
+ 	}; //end aliases
+ 
+@@ -40,13 +39,6 @@
+ 			clock-output-names = "clk_0-clk";
+ 		}; //end clk_0 (clk_0)
+ 
+-        cfg_s2f_usr0_clk: cfg_s2f_usr0_clk {
+-            compatible = "altr,socfpga-perip-clk";
+-            reg = <0x0000005c>;
+-            clocks = <&main_pll>;
+-            #clock-cells = <0>;
+-        }; //end cfg_s2f_usr0_clk (cfg_s2f_usr0_clk)
+-
+ 		Nighthawk_FPGA_IO_HPS_CLK: Nighthawk_FPGA_IO_HPS_CLK {
+ 			compatible = "fixed-clock";
+ 			#clock-cells = <0>;
+@@ -54,39 +46,8 @@
+ 			clock-output-names = "Nighthawk_FPGA_IO_HPS_CLK-clk";
+ 		}; //end Nighthawk_FPGA_IO_HPS_CLK (Nighthawk_FPGA_IO_HPS_CLK)
+ 
+-        h2f_user0_clock: h2f_user0_clock {
+-            compatible = "altr,socfpga-gate-clk";
+-            clocks = <&cfg_s2f_usr0_clk>;
+-            #clock-cells = <0>;
+-            clk-gate = <0x00000060 0x00000009>;
+-         }; //end h2f_user0_clock (h2f_user0_clock)
+ 	}; //end clocks
+ 
+-    hps_emac_interface_splitter_0: splitter@0x100050000 {
+-        compatible = "altr,splitter-15.1", "altr,emac-splitter-1.0";
+-        reg = <0x00050000 0x00000008>;
+-        clocks = <&h2f_user0_clock>;
+-    }; //end splitter@0x100050000 (hps_emac_interface_splitter_0)
+-};
+-
+-&gmac0 {
+-    phy-mode = "rgmii";
+-    snps,phy-addr = < 0xFFFFFFFF >;
+-    phy-addr = < 0xFFFFFFFF >;
+-
+-    rxd0-skew-ps = <0>;
+-    rxd1-skew-ps = <0>;
+-    rxd2-skew-ps = <0>;
+-    rxd3-skew-ps = <0>;
+-    txen-skew-ps = <0>;
+-    txc-skew-ps = <3000>;
+-    rxdv-skew-ps = <0>;
+-    rxc-skew-ps = <3000>;
+-    max-frame-size = <3800>;
+-    tx-fifo-depth = <4096>;	/* embeddedsw.dts.params.tx-fifo-depth type NUMBER */
+-	rx-fifo-depth = <4096>;	/* embeddedsw.dts.params.rx-fifo-depth type NUMBER */
+-    altr,emac-splitter = <&hps_emac_interface_splitter_0>;	/* appended from boardinfo */
+-    status = "okay";
+ };
+ 
+ &gmac1 {
+-- 
+1.8.4.5
+

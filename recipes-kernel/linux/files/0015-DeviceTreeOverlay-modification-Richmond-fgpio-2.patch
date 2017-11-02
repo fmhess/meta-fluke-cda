@@ -1,0 +1,56 @@
+From c402083dbc6699e20478c82e2a08f5d12e27dd7b Mon Sep 17 00:00:00 2001
+From: Alex Dorchak <halfdome@fluke.com>
+Date: Thu, 27 Oct 2016 15:13:01 -0700
+Subject: [PATCH 15/15] DeviceTreeOverlay modification Richmond fgpio 2
+
+---
+ arch/arm/boot/dts/Richmond_005_overlay.dts | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Richmond_005_overlay.dts b/arch/arm/boot/dts/Richmond_005_overlay.dts
+index c3a00f9..fe5e76b 100644
+--- a/arch/arm/boot/dts/Richmond_005_overlay.dts
++++ b/arch/arm/boot/dts/Richmond_005_overlay.dts
+@@ -75,7 +75,6 @@
+ 				interrupt-parent = < &intc >;
+ 				interrupts = < 0 59 1 >;
+ 				clocks = < &Richmond_FPGA_IO_HPS_CLK >;
+-				flk,gpio-bank-width = < 7 >;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
+ 				flk,interrupt_type = < 1 >;	/* embeddedsw.dts.params.altr,interrupt_type type NUMBER */
+ 				edge_type = < 0 >;	/* embeddedsw.dts.params.edge_type type NUMBER */
+ 				level_trigger = < 0 >;	/* embeddedsw.dts.params.level_trigger type NUMBER */
+@@ -88,7 +87,6 @@
+ 				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
+ 				reg = < 0x00049180 0x00000020 >;
+ 				clocks = < &Richmond_FPGA_IO_HPS_CLK >;
+-				flk,gpio-bank-width = < 1 >;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
+ 				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+ 				#gpio-cells = < 2 >;
+ 				gpio-controller;
+@@ -115,7 +113,6 @@
+ 				compatible = "flk,fgpio-1.0";	/* appended from boardinfo */
+ 				reg = < 0x0004A540 0x00000010 >;
+ 				clocks = < &Richmond_FPGA_IO_HPS_CLK >;
+-				flk,gpio-bank-width = < 5 >;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
+ 				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+ 				#gpio-cells = < 2 >;
+ 				gpio-controller;
+@@ -127,7 +124,6 @@
+ 				interrupt-parent = < &intc >;
+ 				interrupts = < 0 65 4 >;
+ 				clocks = < &Richmond_FPGA_IO_HPS_CLK >;
+-				flk,gpio-bank-width = < 1 >;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
+ 				flk,interrupt_type = < 4 >;	/* embeddedsw.dts.params.altr,interrupt_type type NUMBER */
+ 				level_trigger = < 1 >;	/* embeddedsw.dts.params.level_trigger type NUMBER */
+ 				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+@@ -141,7 +137,6 @@
+ 				interrupt-parent = < &intc >;
+ 				interrupts = < 0 66 4 >;
+ 				clocks = < &Richmond_FPGA_IO_HPS_CLK >;
+-				flk,gpio-bank-width = < 8 >;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
+ 				flk,interrupt_type = < 4 >;	/* embeddedsw.dts.params.altr,interrupt_type type NUMBER */
+ 				level_trigger = < 1 >;	/* embeddedsw.dts.params.level_trigger type NUMBER */
+ 				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+-- 
+1.8.4.5
+
