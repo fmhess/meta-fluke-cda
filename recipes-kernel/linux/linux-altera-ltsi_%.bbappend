@@ -1,4 +1,4 @@
-PR = "r205"
+PR = "r216"
 KERNEL_REPO = "git://github.com/fmhess/linux-socfpga.git"
 LINUX_VERSION_SUFFIX = "-ltsi-${MACHINE}"
 SRCREV = "${AUTOREV}"
@@ -16,6 +16,20 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI_append = "\
     file://fluke-cda.cfg \
 "
+SRC_URI_append_fluke-cda-nighthawk = "\
+    file://0102-Nighthawk-dts-claim-upper-1M-FS-space.patch \
+"
+SRC_URI_append_fluke-cda-vanquish = "\
+    file://0091-Modify-Vanquish-dts-to-enable-sd-and-use-2GB-flash.patch \
+    file://0093-a-quick-test.patch \
+    file://0094-Device-tree-mods-add-1G-U10.patch \
+    file://0095-Expanded-the-Jffs2-partition-on-U11-2G.patch \
+    file://0097-Vanquish-DT-and-spi_nor.c-for-bigger-flash.patch \
+    file://0099-Vanquish-fix-U10-flash-names.patch \
+    file://0100-Vanquish-overlay-added-bits-cntr_ref-and-led-gpio.patch \
+    file://0101-Vanquish-repartition-Q10-in-device-tree.patch \
+"
+
     
 # SRC_URI_append = "\
 #     file://0001-Driver-support-for-Altera-interval-timers.patch \
@@ -70,7 +84,7 @@ SRC_URI_append = "\
 #     file://0019-Driver-modification-fluke-matrix-keypad-Kconfig.patch \
 #     file://0006-Driver-support-for-fluke-matrix-keypad.patch \
 # "
-# SRC_URI_append_fluke-cda-nighthawk = "\
+#     Original patch list for Nighthawk. 
 #     file://0037-Add-Nighthawk_soc.dts-file.patch \
 #     file://0038-Nighthawk-device-tree-syntax-fix.-1.patch \
 #     file://0039-Nighthawk-device-tree-syntax-fix.-2.patch \
@@ -117,5 +131,4 @@ SRC_URI_append = "\
 #     file://0088-Nighthawk-rgmii-to-gmii-on-eth1.patch \
 #     file://0089-Nighthawk-add-ethernet-aliases-to-DT.patch \
 #     file://0090-Nighthawk-fix-ethernet-aliases-to-DT.patch \
-#     file://0091-Nighthawk-stmmac-socfpga-remove-extra-call-to-socfpga_dwmac_se.patch \
-# "
+#     file://0091-Nighthawk-stmmac-socfpga-remove-extra-call-to-socfpga_dwmac_se.patch 
