@@ -1,0 +1,41 @@
+From 0b3204443a560808af309e1d751c3a62726bf9c5 Mon Sep 17 00:00:00 2001
+From: Alex <halfdome@fluke.com>
+Date: Mon, 13 Nov 2017 15:05:10 -0800
+Subject: [PATCH 101/101] Vanquish repartition Q10 in device tree
+
+---
+ arch/arm/boot/dts/Vanquish_soc.dts | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Vanquish_soc.dts b/arch/arm/boot/dts/Vanquish_soc.dts
+index 78700d1..f0fd987 100644
+--- a/arch/arm/boot/dts/Vanquish_soc.dts
++++ b/arch/arm/boot/dts/Vanquish_soc.dts
+@@ -162,18 +162,18 @@
+         }; //end partition@0 (part0)
+ 
+         part1: partition@800000 {
+-            label = "Flash 1 jffs2 Filesystem";	/* appended from boardinfo */
+-            reg = < 0x00800000 0x03000000 >;	/* appended from boardinfo */
++            label = "FPGA Image";	/* appended from boardinfo */
++            reg = < 0x00800000 0x00600000 >;	/* appended from boardinfo */
+         }; //end partition@800000 (part1)
+ 
+         part2: partition@3800000 {
+-            label = "FPGA Image";	/* appended from boardinfo */
+-            reg = < 0x03800000 0x00600000 >;	/* appended from boardinfo */
++            label = "Splash Screen Image";	/* appended from boardinfo */
++            reg = < 0x00e00000 0x00200000 >;	/* appended from boardinfo */
+         }; //end partition@3800000 (part2)
+ 
+         part3: partition@3e00000 {
+-            label = "Splash Screen Image";	/* appended from boardinfo */
+-            reg = < 0x03E00000 0x00200000 >;	/* appended from boardinfo */
++            label = "Aux JFFS2 Image";	/* appended from boardinfo */
++            reg = < 0x01000000 0x03000000 >;	/* appended from boardinfo */
+         }; //end partition@3e00000 (part3)
+     };
+ 
+-- 
+1.8.4.5
+

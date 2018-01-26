@@ -1,0 +1,29 @@
+From b310d449efe026b816e2994b1cf51ad535b8217b Mon Sep 17 00:00:00 2001
+From: Alex <halfdome@fluke.com>
+Date: Mon, 13 Nov 2017 14:42:45 -0800
+Subject: [PATCH 099/101] Vanquish fix U10 flash names
+
+---
+ arch/arm/boot/dts/Vanquish_soc.dts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Vanquish_soc.dts b/arch/arm/boot/dts/Vanquish_soc.dts
+index 5c56f98..78700d1 100644
+--- a/arch/arm/boot/dts/Vanquish_soc.dts
++++ b/arch/arm/boot/dts/Vanquish_soc.dts
+@@ -140,10 +140,10 @@
+ &qspi {
+ 
+     status = "okay";
+-    flash0: n25q00@0 {
++    flash0: n25q512@0 {
+         #address-cells = <1>;
+         #size-cells = <1>;
+-        compatible = "n25q00";
++        compatible = "n25q512a";
+         reg = <0>;      /* chip select */
+         spi-max-frequency = <50000000>;
+ 
+-- 
+1.8.4.5
+

@@ -1,0 +1,38 @@
+From c0f66fbd015820b5f8a175a5fffde7fe91194bce Mon Sep 17 00:00:00 2001
+From: Alex <halfdome@fluke.com>
+Date: Fri, 27 Oct 2017 15:18:13 -0700
+Subject: [PATCH 094/101] Device tree mods add 1G U10
+
+---
+ arch/arm/boot/dts/Vanquish_soc.dts | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Vanquish_soc.dts b/arch/arm/boot/dts/Vanquish_soc.dts
+index 7396f66..ad7fde2 100644
+--- a/arch/arm/boot/dts/Vanquish_soc.dts
++++ b/arch/arm/boot/dts/Vanquish_soc.dts
+@@ -89,7 +89,7 @@
+ };
+ 
+ &mmc0 {
+-	status = "okay";
++	status = "disabled";
+ };
+ 
+ &i2c0 {
+@@ -140,10 +140,10 @@
+ &qspi {
+ 
+     status = "okay";
+-    flash0: n25q512a@0 {
++    flash0: n25q00@0 {
+         #address-cells = <1>;
+         #size-cells = <1>;
+-        compatible = "n25q512a";
++        compatible = "n25q00";
+         reg = <0>;      /* chip select */
+         spi-max-frequency = <50000000>;
+ 
+-- 
+1.8.4.5
+

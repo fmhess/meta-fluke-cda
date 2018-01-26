@@ -1,0 +1,40 @@
+From b5978110015f0fb01af91257b9069b42d25955e8 Mon Sep 17 00:00:00 2001
+From: Alex <halfdome@fluke.com>
+Date: Mon, 13 Nov 2017 14:57:52 -0800
+Subject: [PATCH 100/101] Vanquish overlay added bits cntr_ref and led gpio
+
+---
+ arch/arm/boot/dts/Vanquish_soc_overlay.dts | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Vanquish_soc_overlay.dts b/arch/arm/boot/dts/Vanquish_soc_overlay.dts
+index 71b41e6..a2914f7 100644
+--- a/arch/arm/boot/dts/Vanquish_soc_overlay.dts
++++ b/arch/arm/boot/dts/Vanquish_soc_overlay.dts
+@@ -92,8 +92,8 @@
+ 				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+ 				#gpio-cells = < 2 >;
+ 				gpio-controller;
+-				activebits = < 0x00000001 >;	/* appended from boardinfo */
+-				directionbits = < 0x00000001 >;	/* appended from boardinfo */
++				activebits = < 0x000000ff >;	/* appended from boardinfo */
++				directionbits = < 0x000000ff >;	/* appended from boardinfo */
+ 				bidirbits = < 0x00000000 >;	/* appended from boardinfo */
+ 			}; //end gpio@0x100049B40 (Vanquish_FPGA_IO_Beeper_Enable)
+ 
+@@ -306,9 +306,9 @@
+ 				resetvalue = < 0 >;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+ 				#gpio-cells = < 2 >;
+ 				gpio-controller;
+-				activebits = < 0x00000003 >;	/* appended from boardinfo */
+-				directionbits = < 0x00000003 >;	/* appended from boardinfo */
+-				bidirbits = < 0x00000003 >;	/* appended from boardinfo */
++				activebits = < 0x000000ff >;	/* appended from boardinfo */
++				directionbits = < 0x000000ff >;	/* appended from boardinfo */
++				bidirbits = < 0x00000000 >;	/* appended from boardinfo */
+ 			}; //end gpio@0x10004A500 (Vanquish_FPGA_IO_cntr_ref)
+ 
+ 			Vanquish_FPGA_IO_RVFB_180_0: unknown@0x0004A700 {
+-- 
+1.8.4.5
+

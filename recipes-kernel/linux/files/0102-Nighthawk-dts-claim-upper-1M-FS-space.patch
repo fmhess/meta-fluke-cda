@@ -1,0 +1,25 @@
+From 00660551b310cb2e0336f845761902a365b9a2f4 Mon Sep 17 00:00:00 2001
+From: Alex <halfdome@fluke.com>
+Date: Wed, 29 Nov 2017 10:11:35 -0800
+Subject: [PATCH 102/102] Nighthawk dts claim upper 1M FS space
+
+---
+ arch/arm/boot/dts/Nighthawk_soc.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/Nighthawk_soc.dts b/arch/arm/boot/dts/Nighthawk_soc.dts
+index f5a8439..e8c124a7 100644
+--- a/arch/arm/boot/dts/Nighthawk_soc.dts
++++ b/arch/arm/boot/dts/Nighthawk_soc.dts
+@@ -221,7 +221,7 @@
+ 
+         part4: partition@0 {
+                     label = "Flash 1 Root FS"; /* appended from boardinfo */
+-                    reg = < 0x00000000 0x07000000 >;    /* appended from boardinfo */
++                    reg = < 0x00000000 0x08000000 >;    /* appended from boardinfo */
+         }; //end partition@0 (part4)
+     }; //end n25q00@1 (flash1)
+ };
+-- 
+1.8.4.5
+

@@ -1,0 +1,38 @@
+From 61e2243ffe1865560529bdde476d08a6a8debb89 Mon Sep 17 00:00:00 2001
+From: Alex <halfdome@fluke.com>
+Date: Fri, 27 Oct 2017 16:42:58 -0700
+Subject: [PATCH 095/101] Expanded the Jffs2 partition on U11 (2G)
+
+---
+ arch/arm/boot/dts/Vanquish_soc.dts | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Vanquish_soc.dts b/arch/arm/boot/dts/Vanquish_soc.dts
+index ad7fde2..f08e81b 100644
+--- a/arch/arm/boot/dts/Vanquish_soc.dts
++++ b/arch/arm/boot/dts/Vanquish_soc.dts
+@@ -89,7 +89,7 @@
+ };
+ 
+ &mmc0 {
+-	status = "disabled";
++	status = "okay";
+ };
+ 
+ &i2c0 {
+@@ -194,10 +194,9 @@
+ 
+         part4: partition@0 {
+             label = "Flash 1 Raw Data";	/* appended from boardinfo */
+-            reg = < 0x00000000 0x07000000 >;	/* appended from boardinfo */
++            reg = < 0x00000000 0x10000000 >;	/* appended from boardinfo */
+         }; //end partition@0 (part4)
+-    }; //end n25q00@1 (flash1)		
+-
++    }; //end n25q02@1 (flash1)		
+ };
+ 
+ &uart0 {
+-- 
+1.8.4.5
+

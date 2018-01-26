@@ -1,0 +1,38 @@
+From ffc9ba4412875d75fe7a67689492890d9027c97e Mon Sep 17 00:00:00 2001
+From: Alex <halfdome@fluke.com>
+Date: Fri, 27 Oct 2017 10:09:18 -0700
+Subject: [PATCH 091/101] Modify Vanquish dts to enable sd and use 2GB flash
+
+---
+ arch/arm/boot/dts/Vanquish_soc.dts | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/boot/dts/Vanquish_soc.dts b/arch/arm/boot/dts/Vanquish_soc.dts
+index 3ab1260..7396f66 100644
+--- a/arch/arm/boot/dts/Vanquish_soc.dts
++++ b/arch/arm/boot/dts/Vanquish_soc.dts
+@@ -89,7 +89,7 @@
+ };
+ 
+ &mmc0 {
+-	status = "disabled";
++	status = "okay";
+ };
+ 
+ &i2c0 {
+@@ -177,10 +177,10 @@
+         }; //end partition@3e00000 (part3)
+     };
+ 
+-    flash1: n25q00@1 {
++    flash1: n25q02@1 {
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+-		compatible = "n25q00";
++		compatible = "n25q02";
+ 		reg = <1>;      /* chip select */
+ 		spi-max-frequency = <50000000>;
+ 
+-- 
+1.8.4.5
+
