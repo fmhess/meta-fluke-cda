@@ -16,19 +16,19 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI_append = "\
     file://fluke-cda.cfg \
 "
-SRC_URI_append_fluke-cda-nighthawk = "\
-    file://0102-Nighthawk-dts-claim-upper-1M-FS-space.patch \
-"
-SRC_URI_append_fluke-cda-vanquish = "\
-    file://0091-Modify-Vanquish-dts-to-enable-sd-and-use-2GB-flash.patch \
-    file://0093-a-quick-test.patch \
-    file://0094-Device-tree-mods-add-1G-U10.patch \
-    file://0095-Expanded-the-Jffs2-partition-on-U11-2G.patch \
-    file://0097-Vanquish-DT-and-spi_nor.c-for-bigger-flash.patch \
-    file://0099-Vanquish-fix-U10-flash-names.patch \
-    file://0100-Vanquish-overlay-added-bits-cntr_ref-and-led-gpio.patch \
-    file://0101-Vanquish-repartition-Q10-in-device-tree.patch \
-"
+# SRC_URI_append_fluke-cda-nighthawk = "\
+#     file://0102-Nighthawk-dts-claim-upper-1M-FS-space.patch \
+# "
+# SRC_URI_append_fluke-cda-vanquish = "\
+#     file://0091-Modify-Vanquish-dts-to-enable-sd-and-use-2GB-flash.patch \
+#     file://0093-a-quick-test.patch \
+#     file://0094-Device-tree-mods-add-1G-U10.patch \
+#     file://0095-Expanded-the-Jffs2-partition-on-U11-2G.patch \
+#     file://0097-Vanquish-DT-and-spi_nor.c-for-bigger-flash.patch \
+#     file://0099-Vanquish-fix-U10-flash-names.patch \
+#     file://0100-Vanquish-overlay-added-bits-cntr_ref-and-led-gpio.patch \
+#     file://0101-Vanquish-repartition-Q10-in-device-tree.patch \
+# "
 
     
 # SRC_URI_append = "\
