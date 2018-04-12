@@ -2,18 +2,19 @@
 require recipes-images/angstrom/small-image.bb
 
 DEPENDS += "lighttpd \
+	iproute2 \
+	linux-gpib-user \
 "
 #DEPENDS += "fcgi \
 #"
-DEPENDS += "iproute2 \
-"
 
 IMAGE_INSTALL += "lighttpd \
+	iproute2 \
+	linux-gpib-user \
 "
 #IMAGE_INSTALL += "fcgi \
 #"
-IMAGE_INSTALL += "iproute2 \
-"
+
 #EXTRA_IMAGE_FEATURES = "dbg-pkgs debug-tweaks "
 
 #IMAGE_INSTALL := "${@oe_filter_out('gcc', '${IMAGE_INSTALL}', d)}"

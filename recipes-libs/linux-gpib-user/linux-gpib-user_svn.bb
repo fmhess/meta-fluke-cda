@@ -7,7 +7,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3"
 
 #SRCREV = "${AUTOREV}"
-SRCREV = "1743"
+SRCREV = "1747"
 PV = "svnr${SRCREV}"
 PR = "r0"
 
@@ -17,22 +17,10 @@ S = "${WORKDIR}/trunk/linux-gpib-user"
 
 inherit autotools
 
-#DEPENDS =+ ""
-
-#FILES_${PN} += "${libdir}/libgdiplus.so"
-#INSANE_SKIP_${PN} += "dev-so"
-
-CONFIGUREOPTS += " --disable-documentation\
+EXTRA_OECONF += " --disable-documentation\
 	--disable-guile-binding\
 	--disable-perl-binding\
 	--disable-php-binding\
 	--disable-python-binding\
 	--disable-tcl-binding\
 	"
-
-do_configure() {
-	cd ${S}
-	./bootstrap
-	cd ${B}
-	autotools_do_configure
-}
