@@ -4,6 +4,7 @@ require recipes-images/angstrom/small-image.bb
 DEPENDS += "lighttpd \
 	iproute2 \
 	linux-gpib-user \
+	libnrp \
 "
 #DEPENDS += "fcgi \
 #"
@@ -11,6 +12,7 @@ DEPENDS += "lighttpd \
 IMAGE_INSTALL += "lighttpd \
 	iproute2 \
 	linux-gpib-user \
+	libnrp \
 "
 #IMAGE_INSTALL += "fcgi \
 #"
