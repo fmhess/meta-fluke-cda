@@ -1,4 +1,4 @@
-SUMMARY = "Rohde & Schwarz power sensor NRP library for Linux"
+SUMMARY = "Rohde & Schwarz NRP power sensor low level library for Linux"
 DESCRIPTION = "https://www.rohde-schwarz.com"
 HOMEPAGE = "https://www.rohde-schwarz.com"
 SECTION = "libs"
@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = "file://version.h;md5=f5ad084ad7627a064cfed509a116e9cf"
 
 DEPENDS = "udev"
 RDEPENDS_${PN} = "udev"
+PROVIDES = "libnrp"
 
 PV = "4.15"
 PR = "r0"

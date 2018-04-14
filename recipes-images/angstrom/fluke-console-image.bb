@@ -5,6 +5,7 @@ DEPENDS += "lighttpd \
 	iproute2 \
 	linux-gpib-user \
 	libnrp \
+	librsnrpz \
 "
 #DEPENDS += "fcgi \
 #"
@@ -13,6 +14,7 @@ IMAGE_INSTALL += "lighttpd \
 	iproute2 \
 	linux-gpib-user \
 	libnrp \
+	librsnrpz \
 "
 #IMAGE_INSTALL += "fcgi \
 #"
