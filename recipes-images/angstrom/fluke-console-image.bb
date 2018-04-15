@@ -4,18 +4,20 @@ require recipes-images/angstrom/small-image.bb
 DEPENDS += "lighttpd \
 	iproute2 \
 	linux-gpib-user \
+"
+DEPENDS_fluke-cda-vanquish += "\
 	libnrp \
 	librsnrpz \
 "
-#DEPENDS += "fcgi \
-#"
-
 IMAGE_INSTALL += "lighttpd \
 	iproute2 \
 	linux-gpib-user \
+"
+IMAGE_INSTALL_fluke-cda-vanquish += "\
 	libnrp \
 	librsnrpz \
 "
+
 #IMAGE_INSTALL += "fcgi \
 #"
 
