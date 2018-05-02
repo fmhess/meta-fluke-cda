@@ -5,7 +5,7 @@ DEPENDS += "lighttpd \
 	iproute2 \
 	linux-gpib-user \
 "
-DEPENDS_fluke-cda-vanquish += "\
+DEPENDS_append_fluke-cda-vanquish = " \
 	libnrp \
 	librsnrpz \
 "
@@ -13,7 +13,7 @@ IMAGE_INSTALL += "lighttpd \
 	iproute2 \
 	linux-gpib-user \
 "
-IMAGE_INSTALL_fluke-cda-vanquish += "\
+IMAGE_INSTALL_append_fluke-cda-vanquish = " \
 	libnrp \
 	librsnrpz \
 "
