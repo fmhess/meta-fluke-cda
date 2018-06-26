@@ -4,6 +4,7 @@ require recipes-images/angstrom/small-image.bb
 DEPENDS += "lighttpd \
 	iproute2 \
 	linux-gpib-user \
+    ttf-roboto \
 "
 DEPENDS_append_fluke-cda-vanquish = " \
 	libnrp \
@@ -12,6 +13,7 @@ DEPENDS_append_fluke-cda-vanquish = " \
 IMAGE_INSTALL += "lighttpd \
 	iproute2 \
 	linux-gpib-user \
+	ttf-roboto \
 "
 IMAGE_INSTALL_append_fluke-cda-vanquish = " \
 	libnrp \

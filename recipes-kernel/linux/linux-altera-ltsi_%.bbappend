@@ -1,4 +1,4 @@
-PR = "r216"
+PR = "r253"
 KERNEL_REPO = "git://github.com/fmhess/linux-socfpga.git"
 LINUX_VERSION_SUFFIX = "-ltsi-${MACHINE}"
 SRCREV = "${AUTOREV}"
