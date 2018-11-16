@@ -1,5 +1,6 @@
 
-require recipes-images/angstrom/small-image.bb
+#require recipes-images/angstrom/small-image.bb
+require recipes-images/angstrom/console-base-image.bb
 
 DEPENDS += "lighttpd \
 	iproute2 \
@@ -11,6 +12,7 @@ DEPENDS_append_fluke-cda-vanquish = " \
 	librsnrpz \
 "
 IMAGE_INSTALL_append = " \
+    dropbear \
 	qtbase qtbase-tools qtbase-plugins freetype fontconfig fontconfig-utils \
 	packagegroup-fonts-truetype  \
 	ttf-droid-sans \
