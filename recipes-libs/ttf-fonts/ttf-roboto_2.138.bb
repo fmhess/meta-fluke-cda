@@ -64,6 +64,8 @@ inherit allarch
 
 do_compile[noexec] = "1"
 
+do_clean[noexec] = "1"
+
 do_install () {
     # We are using the hinted version for the time being
     install -d ${D}${datadir}/fonts/ttf/
