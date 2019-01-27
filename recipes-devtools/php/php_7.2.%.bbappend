@@ -1,4 +1,7 @@
-#fix broken detection of valgrind in php7.2.7 configure
+# Fix broken detection of valgrind in php7.2.7 configure.
+# Also customize php-fpm.conf (there is a php-fpm.conf file
+# in ${THISDIR}/files which will take precedence over the
+# one from the original php package).
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
