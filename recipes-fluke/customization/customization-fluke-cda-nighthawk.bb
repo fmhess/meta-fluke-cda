@@ -9,7 +9,18 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=f19e4f8ee79c4b8ff1fbb449f7e56c54"
 
 #PR = "r0"
 
-DEPENDS = ""
+#fontconfig, freetype, libpng, libcrypto (provided by openssl) used by "/home/Nighthawk/bin/update" executable
+#linux-gpib-user used by "/home/Nighthawk/bin/remoteapp" executable
+#qtbase, qtdeclarative used by "/home/Nighthawk/bin/fp" executable
+DEPENDS = " \
+	fontconfig \
+	freetype \
+	libpng \
+	openssl \
+	linux-gpib-user \
+	qtbase \
+	qtdeclarative \
+ "
 
 SRC_URI = "git://github.com/ADorchak/sumo-rootfs-extras.git;protocol=https;branch=master"
 
@@ -19,7 +30,6 @@ FILES_${PN} += " \
 	${base_prefix}/www/* \
 	${base_prefix}/home/Nighthawk/* \
 	${base_prefix}/home/setup_environment_target \
-	${nonarch_libdir}/fonts/* \
 "
 
 S = "${WORKDIR}/git"
