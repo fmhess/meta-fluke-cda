@@ -10,3 +10,10 @@ IMAGE_INSTALL_append_fluke-cda-nighthawk = " \
 "
 
 export IMAGE_BASENAME = "fluke-full-image"
+
+postprocess_nighthawk() {
+	ln -srf ${IMAGE_ROOTFS}/dev/null ${IMAGE_ROOTFS}/${sysconfdir}/systemd/network/10-en.network
+	ln -srf ${IMAGE_ROOTFS}/dev/null ${IMAGE_ROOTFS}/${sysconfdir}/systemd/network/11-eth.network
+}
+
+ROOTFS_POSTPROCESS_COMMAND_fluke-cda-nighthawk += "postprocess_nighthawk; "
