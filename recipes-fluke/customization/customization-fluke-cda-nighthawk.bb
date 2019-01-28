@@ -43,7 +43,7 @@ do_install () {
 	#sudo ln -s /dev/null ./target/etc/systemd/network/11-eth.network
 
 	(
-		cd ${S}/Nighthawk/extraFiles &&
+		cd ${S}/Nighthawk/extraFiles/target_root/ &&
 			find -type f \! -executable -exec install -D -m 644 \{\} ${D}/\{\} \; &&
 			find -type f -executable -exec install -D -m 755 \{\} ${D}/\{\} \; 
 	)
