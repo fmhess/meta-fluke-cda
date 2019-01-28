@@ -8,7 +8,9 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI_append = "\
     file://0002-disable-valgrind-in-php-configure-ac.patch \
 "
+FILES_${PN}-fpm += "${sysconfdir}/systemd/system/multi-user.target.wants/php-fpm.service"
 
 do_install_append() {
+	install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
 	ln -sr ${D}${systemd_system_unitdir}/php-fpm.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
 }
