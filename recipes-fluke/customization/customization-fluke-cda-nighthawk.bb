@@ -48,11 +48,6 @@ do_install () {
 			find -type f -executable -exec install -D -m 755 \{\} ${D}/\{\} \; 
 	)
 
-# still need to modify php-fpm.conf with include directive
-# include=/etc/fpm.d/*.conf
-
-# sudo sed -i "s/#NAutoVTs=.*$/NAutoVTs=0/" ./target/etc/systemd/logind.conf
-# sudo sed -i "s/#ReserveVT=.*$/ReserveVT=0/" ./target/etc/systemd/logind.conf
 # sudo sed -i '/root/d' ./target/etc/passwd
 # sudo bash -c "cat ./extraFiles/passwd >> ./target/etc/passwd"
 # sudo bash -c "cat ./extraFiles/group  >> ./target/etc/group"
@@ -60,8 +55,4 @@ do_install () {
 # 
 # sudo cp -p ./DeviceTree/zImage-Nighthawk_soc_overlay.dtb ./target/lib/firmware/.
 #
-	install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
-	ln -sr ${D}/lib/systemd/system/php-fpm.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
-	ln -sr ${D}${sysconfdir}/systemd/system/instrument.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
-	ln -sr ${D}${sysconfdir}/systemd/system/launchApp.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
 }
