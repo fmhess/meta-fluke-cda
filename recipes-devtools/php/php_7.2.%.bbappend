@@ -14,3 +14,11 @@ do_install_append_fluke-cda-nighthawk() {
 	install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
 	ln -sr ${D}${systemd_system_unitdir}/php-fpm.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
 }
+
+
+# add lighttpd user/group
+inherit useradd
+
+USERADD_PACKAGES_fluke-cda-nighthawk = "${PN}-fpm"
+GROUPADD_PARAM_${PN}-fpm_fluke-cda-nighthawk = "-g 1000 lighttpd"
+USERADD_PARAM_${PN}-fpm_fluke-cda-nighthawk = "-u 1000 -g lighttpd -d ${base_prefix}/www/pages -s ${base_sbindir}/nologin lighttpd"
