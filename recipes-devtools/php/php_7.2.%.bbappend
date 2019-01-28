@@ -10,7 +10,7 @@ SRC_URI_append = "\
 "
 FILES_${PN}-fpm += "${sysconfdir}/systemd/system/multi-user.target.wants/php-fpm.service"
 
-do_install_append() {
+do_install_append_fluke-cda-nighthawk() {
 	install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
 	ln -sr ${D}${systemd_system_unitdir}/php-fpm.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
 }

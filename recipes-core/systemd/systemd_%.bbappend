@@ -2,13 +2,13 @@
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
-SRC_URI_append = "\
+SRC_URI_append_fluke-cda-nighthawk = "\
     file://instrument.service \
     file://launchApp.service \
 "
 
 
-do_install_append() {
+do_install_append_fluke-cda-nighthawk() {
 	echo NAutoVTs=0 >> ${D}${sysconfdir}/systemd/logind.conf
 	echo ReserveVT=0 >> ${D}${sysconfdir}/systemd/logind.conf
 
