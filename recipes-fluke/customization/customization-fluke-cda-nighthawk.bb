@@ -30,6 +30,7 @@ FILES_${PN} += " \
 	${base_prefix}/www/* \
 	${base_prefix}/home/Nighthawk/* \
 	${base_prefix}/home/setup_environment_target \
+	${base_prefix}/tmp/customization_data/* \
 "
 
 S = "${WORKDIR}/git"
@@ -39,20 +40,10 @@ do_compile[noexec] = "1"
 do_clean[noexec] = "1"
 
 do_install () {
-	#sudo ln -s /dev/null ./target/etc/systemd/network/10-en.network
-	#sudo ln -s /dev/null ./target/etc/systemd/network/11-eth.network
-
 	(
 		cd ${S}/Nighthawk/extraFiles/target_root/ &&
 			find -type f \! -executable -exec install -D -m 644 \{\} ${D}/\{\} \; &&
 			find -type f -executable -exec install -D -m 755 \{\} ${D}/\{\} \; 
 	)
-
-# sudo sed -i '/root/d' ./target/etc/passwd
-# sudo bash -c "cat ./extraFiles/passwd >> ./target/etc/passwd"
-# sudo bash -c "cat ./extraFiles/group  >> ./target/etc/group"
-# #cat ./extraFiles/fstab  >> ./target/etc/fstab
-# 
-# sudo cp -p ./DeviceTree/zImage-Nighthawk_soc_overlay.dtb ./target/lib/firmware/.
-#
 }
+
