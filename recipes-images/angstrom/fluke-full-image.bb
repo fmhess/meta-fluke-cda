@@ -14,11 +14,18 @@ export IMAGE_BASENAME = "fluke-full-image"
 postprocess_nighthawk() {
 	ln -srf ${IMAGE_ROOTFS}/dev/null ${IMAGE_ROOTFS}/${sysconfdir}/systemd/network/10-en.network
 	ln -srf ${IMAGE_ROOTFS}/dev/null ${IMAGE_ROOTFS}/${sysconfdir}/systemd/network/11-eth.network
+}
 
+ROOTFS_POSTPROCESS_COMMAND_fluke-cda-nighthawk += "postprocess_nighthawk; "
+
+# we do the following using SORT_PASSWD_POSTPROCESS_COMMAND instead of
+# ROOTFS_POSTPROCESS_COMMAND to avoid having our multiple root accounts 
+# getting sorted by username in the passwd file (we want the one named 
+# "root" to be first).
+postsort_passwd_nighthawk() {
 	# add Fluke CDA developer accounts and set root password
 	sed -i '/root/d' ${IMAGE_ROOTFS}${sysconfdir}/passwd
 	cat ${IMAGE_ROOTFS}${base_prefix}/tmp/customization_data/passwd_append >> ${IMAGE_ROOTFS}${sysconfdir}/passwd
 	rm ${IMAGE_ROOTFS}${base_prefix}/tmp/customization_data/passwd_append
 }
-
-ROOTFS_POSTPROCESS_COMMAND_fluke-cda-nighthawk += "postprocess_nighthawk; "
+SORT_PASSWD_POSTPROCESS_COMMAND_append_fluke-cda-nighthawk = " postsort_passwd_nighthawk; "
