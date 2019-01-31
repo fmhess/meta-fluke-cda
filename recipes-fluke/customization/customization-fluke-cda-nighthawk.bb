@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=f19e4f8ee79c4b8ff1fbb449f7e56c54"
 
 #fontconfig, freetype, libpng, libcrypto (provided by openssl) used by "/home/Nighthawk/bin/update" executable
 #linux-gpib-user used by "/home/Nighthawk/bin/remoteapp" executable
-#qtbase, qtdeclarative used by "/home/Nighthawk/bin/fp" executable
+#qtbase, qtdeclarative, qtquickcontrols2-qmlplugins used by "/home/Nighthawk/bin/fp" executable
 DEPENDS = " \
 	fontconfig \
 	freetype \
@@ -20,7 +20,10 @@ DEPENDS = " \
 	linux-gpib-user \
 	qtbase \
 	qtdeclarative \
- "
+"
+RDEPENDS_${PN} += " \
+	qtquickcontrols2-qmlplugins \
+"
 
 SRC_URI = "git://github.com/ADorchak/sumo-rootfs-extras.git;protocol=https;branch=master"
 
