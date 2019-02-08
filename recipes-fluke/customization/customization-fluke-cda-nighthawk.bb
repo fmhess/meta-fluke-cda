@@ -31,9 +31,9 @@ SRCREV ?= "${AUTOREV}"
 
 FILES_${PN} += " \
 	${base_prefix}/www/* \
-	${base_prefix}/home/Nighthawk/* \
-	${base_prefix}/home/setup_environment_target \
+	${base_prefix}/home/* \
 	${base_prefix}/tmp/customization_data/* \
+	${base_prefix}/config/ \
 "
 
 S = "${WORKDIR}/git"
@@ -48,5 +48,8 @@ do_install () {
 			find -type f \! -executable -exec install -D -m 644 \{\} ${D}/\{\} \; &&
 			find -type f -executable -exec install -D -m 755 \{\} ${D}/\{\} \; 
 	)
+	install -d ${D}/home/Test
+	install -d ${D}/home/Proto
+	install -d ${D}/config
 }
 
