@@ -45,3 +45,10 @@ IMAGE_INSTALL_append_fluke-cda-vanquish = " \
 #IMAGE_INSTALL := "${@oe_filter_out('gcc', '${IMAGE_INSTALL}', d)}"
 
 export IMAGE_BASENAME = "fluke-console-image"
+
+fluke_console_image_postprocess_common() {
+	# add an image build date file
+	date -u > ${IMAGE_ROOTFS}${sysconfdir}/rootfs_build_timestamp
+}
+
+ROOTFS_POSTPROCESS_COMMAND_append = " fluke_console_image_postprocess_common; "
