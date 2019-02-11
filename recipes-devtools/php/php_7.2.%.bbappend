@@ -17,7 +17,9 @@ do_install_append_fluke-cda-nighthawk() {
 
 
 # add lighttpd user/group
-inherit useradd
+MAYBE_USERADD_CLASS ??= ""
+MAYBE_USERADD_CLASS_fluke-cda-nighthawk = "useradd"
+inherit ${MAYBE_USERADD_CLASS}
 
 USERADD_PACKAGES_fluke-cda-nighthawk = "${PN}-fpm"
 GROUPADD_PARAM_${PN}-fpm_fluke-cda-nighthawk = "-g 1000 lighttpd"
