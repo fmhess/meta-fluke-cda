@@ -40,6 +40,18 @@ IMAGE_INSTALL_append_fluke-cda-vanquish = " \
 #IMAGE_INSTALL += "fcgi \
 #"
 
+# the ttf-droid recipe is buggy in sumo.  We don't need it, so just drop it.
+DEPENDS_remove = " \
+	ttf-droid \
+"
+IMAGE_INSTALL_remove = " \
+	ttf-droid-sans \
+	ttf-droid-sans-fallback \
+	ttf-droid-sans-japanese \
+	ttf-droid-sans-mono \
+	ttf-droid-serif \
+"
+
 #EXTRA_IMAGE_FEATURES = "dbg-pkgs debug-tweaks "
 
 #IMAGE_INSTALL := "${@oe_filter_out('gcc', '${IMAGE_INSTALL}', d)}"
