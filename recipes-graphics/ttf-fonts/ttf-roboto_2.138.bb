@@ -75,12 +75,11 @@ do_install () {
     for i in src/hinted/*.ttf; do
         fontname=$(basename "$i")
 
-        # Install into the /usr/share directory for fontconfig to find
-        install -m 644 $i ${D}${datadir}/fonts/ttf/${fontname}
-
         # Install into the /usr/lib/fonts directory for Qt's
         # QBasicFontDatabase to find (if system doesn't use fontconfig)
         install -m 644 $i ${D}${libdir}/fonts/${fontname}
+        # Install into the /usr/share directory for fontconfig to find
+        ln -sr ${D}${libdir}/fonts/${fontname} ${D}${datadir}/fonts/ttf/${fontname}
     done
 }
 
