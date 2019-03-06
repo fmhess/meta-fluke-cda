@@ -13,12 +13,6 @@ DEPENDS_append_fluke-cda-vanquish = " \
 "
 IMAGE_INSTALL_append = " \
 	qtbase qtbase-tools qtbase-plugins freetype fontconfig fontconfig-utils \
-	packagegroup-fonts-truetype  \
-	ttf-droid-sans \
-	ttf-droid-sans-mono \
-	ttf-droid-sans-fallback \
-	ttf-droid-sans-japanese \
-	ttf-droid-serif \
 	ttf-roboto \
 	libusb-compat \
 	mtd-utils \
@@ -35,22 +29,11 @@ IMAGE_INSTALL_append = " \
 IMAGE_INSTALL_append_fluke-cda-vanquish = " \
 	libnrp \
 	librsnrpz \
+	packagegroup-fonts-truetype \
 "
 
 #IMAGE_INSTALL += "fcgi \
 #"
-
-# the ttf-droid recipe is buggy in sumo.  We don't need it, so just drop it.
-DEPENDS_remove = " \
-	ttf-droid \
-"
-IMAGE_INSTALL_remove = " \
-	ttf-droid-sans \
-	ttf-droid-sans-fallback \
-	ttf-droid-sans-japanese \
-	ttf-droid-sans-mono \
-	ttf-droid-serif \
-"
 
 #EXTRA_IMAGE_FEATURES = "dbg-pkgs debug-tweaks "
 
