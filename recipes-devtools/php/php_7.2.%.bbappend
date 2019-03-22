@@ -3,6 +3,8 @@
 # in ${THISDIR}/files which will take precedence over the
 # one from the original php package).
 
+# we put a php-fpm.conf file in our FILESEXTRAPATHS which should override the one
+# from the original package, since we are prepending
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI_append = "\
@@ -10,17 +12,23 @@ SRC_URI_append = "\
 "
 FILES_${PN}-fpm += "${sysconfdir}/systemd/system/multi-user.target.wants/php-fpm.service"
 
-do_install_append_fluke-cda-nighthawk() {
+fluke_common_do_install() {
 	install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
 	ln -sr ${D}${systemd_system_unitdir}/php-fpm.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
 }
-
+do_install_append_fluke-cda-nighthawk() {
+	fluke_common_do_install
+}
+do_install_append_fluke-cda-caldera() {
+	fluke_common_do_install
+}
 
 # add lighttpd user/group
 MAYBE_USERADD_CLASS ??= ""
 MAYBE_USERADD_CLASS_fluke-cda-nighthawk = "useradd"
+MAYBE_USERADD_CLASS_fluke-cda-caldera = "useradd"
 inherit ${MAYBE_USERADD_CLASS}
 
-USERADD_PACKAGES_fluke-cda-nighthawk = "${PN}-fpm"
-GROUPADD_PARAM_${PN}-fpm_fluke-cda-nighthawk = "-g 1000 lighttpd"
-USERADD_PARAM_${PN}-fpm_fluke-cda-nighthawk = "-u 1000 -g lighttpd -d ${base_prefix}/www/pages -s ${base_sbindir}/nologin lighttpd"
+USERADD_PACKAGES = "${PN}-fpm"
+GROUPADD_PARAM_${PN}-fpm = "-g 1000 lighttpd"
+USERADD_PARAM_${PN}-fpm = "-u 1000 -g lighttpd -d ${base_prefix}/www/pages -s ${base_sbindir}/nologin lighttpd"

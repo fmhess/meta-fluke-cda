@@ -1,5 +1,5 @@
 SUMMARY = "Fluke CDA customization for Nighthawk"
-DESCRIPTION = "Nighthawk application, etc."
+DESCRIPTION = "Fluke Caldera application, etc."
 AUTHOR = "Fluke"
 SECTION = ""
 HOMEPAGE = ""
@@ -49,7 +49,7 @@ do_install () {
 			find -type f -executable -exec install -D -m 755 \{\} ${D}/\{\} \; 
 	)
 	(
-		cd ${S}/Nighthawk/extraFiles/target_root/ &&
+		cd ${S}/Caldera/extraFiles/target_root/ &&
 			find -type f \! -executable -exec install -D -m 644 \{\} ${D}/\{\} \; &&
 			find -type f -executable -exec install -D -m 755 \{\} ${D}/\{\} \; 
 	)
