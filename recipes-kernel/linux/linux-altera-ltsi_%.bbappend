@@ -14,3 +14,11 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI_append = "\
     file://fluke-cda.cfg \
 "
+
+SRC_URI_append_fluke-cda-caldera = "\
+    file://fluke-cda-caldera.cfg \
+"
+
+SRC_URI_append_fluke-cda-triclamp = "\
+    file://fluke-cda-triclamp.cfg \
+"
