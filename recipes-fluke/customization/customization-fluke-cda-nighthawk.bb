@@ -56,5 +56,7 @@ do_install () {
 	install -d ${D}/home/Test
 	install -d ${D}/home/Proto
 	install -d ${D}/config
+	#fixup ssh permissions
+	chmod 700 ${D}${ROOT_HOME}/.ssh 
 }
 
