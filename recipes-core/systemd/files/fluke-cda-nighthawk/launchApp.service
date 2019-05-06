@@ -5,7 +5,7 @@ Description=Autostart the application's launch script
 
 [Service]
 Type=oneshot
-ExecStart=/home/Nighthawk/bin/nighthawk
+ExecStart=/home/Nighthawk/nighthawk
 RemainAfterExit=yes
 
 [Install]
