@@ -19,6 +19,10 @@ SRC_URI_append_fluke-cda-caldera = "\
     file://fluke-cda-caldera.cfg \
 "
 
+SRC_URI_append_fluke-cda-nighthawk = "\
+    file://fluke-cda-nighthawk.cfg \
+"
+
 SRC_URI_append_fluke-cda-triclamp = "\
     file://fluke-cda-triclamp.cfg \
 "
