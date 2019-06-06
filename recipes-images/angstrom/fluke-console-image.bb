@@ -7,6 +7,10 @@ DEPENDS += "lighttpd \
 	linux-gpib-user \
     ttf-roboto \
 "
+DEPENDS_append_fluke-cda-nighthawk = " \
+	e2fsprogs \
+"
+
 DEPENDS_append_fluke-cda-vanquish = " \
 	libnrp \
 	librsnrpz \
@@ -24,6 +28,11 @@ IMAGE_INSTALL_append = " \
 	lighttpd \
 	iproute2 \
 	linux-gpib-user \
+"
+
+IMAGE_INSTALL_append_fluke-cda-nighthawk = " \
+	e2fsprogs \
+	e2fsprogs-resize2fs \
 "
 
 IMAGE_INSTALL_append_fluke-cda-vanquish = " \
