@@ -54,13 +54,11 @@ do_clean[noexec] = "1"
 do_install () {
 	(
 		cd ${S}/common/extraFiles/target_root/ &&
-			find -type f \! -executable -exec install -D -m 644 \{\} ${D}/\{\} \; &&
-			find -type f -executable -exec install -D -m 755 \{\} ${D}/\{\} \; 
+			find -type f -exec sh -c 'install -D -m $(stat -c "%a" "$1") "$1" ${D}/"$1"' sh \{\} \; 
 	)
 	(
 		cd ${S}/Nighthawk/extraFiles/target_root/ &&
-			find -type f \! -executable -exec install -D -m 644 \{\} ${D}/\{\} \; &&
-			find -type f -executable -exec install -D -m 755 \{\} ${D}/\{\} \; 
+			find -type f -exec sh -c 'install -D -m $(stat -c "%a" "$1") "$1" ${D}/"$1"' sh \{\} \; 
 	)
 	#fixup ssh dir permissions
 	chmod 700 ${D}${ROOT_HOME}/.ssh 
