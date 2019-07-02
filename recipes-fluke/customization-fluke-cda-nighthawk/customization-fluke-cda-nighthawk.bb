@@ -23,6 +23,7 @@ DEPENDS = " \
 "
 RDEPENDS_${PN} += " \
 	qtquickcontrols2-qmlplugins \
+	systemd \
 "
 
 SRC_URI = "git://github.com/ADorchak/sumo-rootfs-extras.git;protocol=https;branch=master"
@@ -37,6 +38,12 @@ FILES_${PN} += " \
 "
 
 S = "${WORKDIR}/git"
+
+FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+SRC_URI_append = "\
+	file://instrument.service \
+	file://launchApp.service \
+"
 
 do_compile[noexec] = "1"
 
@@ -53,10 +60,15 @@ do_install () {
 			find -type f \! -executable -exec install -D -m 644 \{\} ${D}/\{\} \; &&
 			find -type f -executable -exec install -D -m 755 \{\} ${D}/\{\} \; 
 	)
+	#fixup ssh dir permissions
+	chmod 700 ${D}${ROOT_HOME}/.ssh 
 	install -d ${D}/home/Test
 	install -d ${D}/home/Proto
 	install -d ${D}/config
-	#fixup ssh permissions
-	chmod 700 ${D}${ROOT_HOME}/.ssh 
-}
 
+	#install systemd services for starting instrument app
+	install -m 644 ${WORKDIR}/instrument.service ${D}${systemd_system_unitdir}/
+	install -m 644 ${WORKDIR}/launchApp.service ${D}${systemd_system_unitdir}/
+	ln -sr ${D}${systemd_system_unitdir}/instrument.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
+	ln -sr ${D}${systemd_system_unitdir}/launchApp.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
+}

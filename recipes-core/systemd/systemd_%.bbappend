@@ -4,10 +4,6 @@ fluke_common_do_install() {
 	echo NAutoVTs=0 >> ${D}${sysconfdir}/systemd/logind.conf
 	echo ReserveVT=0 >> ${D}${sysconfdir}/systemd/logind.conf
 
-	install -m 644 ${WORKDIR}/${MACHINE}/instrument.service ${D}${systemd_system_unitdir}/
-	install -m 644 ${WORKDIR}/${MACHINE}/launchApp.service ${D}${systemd_system_unitdir}/
-	ln -sr ${D}${systemd_system_unitdir}/instrument.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
-	ln -sr ${D}${systemd_system_unitdir}/launchApp.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
 
 	#disable auto startup of some systemd services
 	rm -f ${D}${sysconfdir}/systemd/system/sockets.target.wants/systemd-networkd.socket

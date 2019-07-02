@@ -15,6 +15,9 @@ DEPENDS = " \
 	openssl \
 	qtbase \
 "
+RDEPENDS_${PN} += " \
+	systemd \
+# "
 # DEPENDS = " \
 # 	fontconfig \
 # 	freetype \
@@ -41,6 +44,12 @@ FILES_${PN} += " \
 
 S = "${WORKDIR}/git"
 
+FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+SRC_URI_append = "\
+	file://instrument.service \
+	file://launchApp.service \
+"
+
 do_compile[noexec] = "1"
 
 do_clean[noexec] = "1"
@@ -59,5 +68,11 @@ do_install () {
 	install -d ${D}/home/Test
 	install -d ${D}/home/Proto
 	install -d ${D}/config
+
+	#install systemd services for starting instrument app
+	install -m 644 ${WORKDIR}/instrument.service ${D}${systemd_system_unitdir}/
+	install -m 644 ${WORKDIR}/launchApp.service ${D}${systemd_system_unitdir}/
+	ln -sr ${D}${systemd_system_unitdir}/instrument.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
+	ln -sr ${D}${systemd_system_unitdir}/launchApp.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
 }
 
