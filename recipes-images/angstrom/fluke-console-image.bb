@@ -53,6 +53,10 @@ export IMAGE_BASENAME = "fluke-console-image"
 fluke_console_image_postprocess_common() {
 	# add an image build date file
 	date -u > ${IMAGE_ROOTFS}${sysconfdir}/rootfs_build_timestamp
+
+	#Prevent front panel display from being allocated as a virtual terminal by logind
+	echo NAutoVTs=0 >> ${IMAGE_ROOTFS}${sysconfdir}/systemd/logind.conf
+	echo ReserveVT=0 >> ${IMAGE_ROOTFS}${sysconfdir}/systemd/logind.conf
 }
 
 ROOTFS_POSTPROCESS_COMMAND_append = " fluke_console_image_postprocess_common; "

@@ -1,9 +1,6 @@
 #customize systemd config.
 
 fluke_common_do_install() {
-	echo NAutoVTs=0 >> ${D}${sysconfdir}/systemd/logind.conf
-	echo ReserveVT=0 >> ${D}${sysconfdir}/systemd/logind.conf
-
 
 	#disable auto startup of some systemd services
 	rm -f ${D}${sysconfdir}/systemd/system/sockets.target.wants/systemd-networkd.socket
