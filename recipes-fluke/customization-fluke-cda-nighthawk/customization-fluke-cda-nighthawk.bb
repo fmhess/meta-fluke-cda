@@ -35,6 +35,8 @@ FILES_${PN} += " \
 	${base_prefix}/home/* \
 	${base_prefix}/tmp/customization_data/* \
 	${base_prefix}/config/ \
+	${base_prefix}${systemd_system_unitdir} \
+	${base_prefix}${sysconfdir}/systemd/system/multi-user.target.wants/ \
 "
 
 S = "${WORKDIR}/git"
@@ -67,6 +69,8 @@ do_install () {
 	install -d ${D}/config
 
 	#install systemd services for starting instrument app
+	install -d ${D}${systemd_system_unitdir}
+	install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
 	install -m 644 ${WORKDIR}/instrument.service ${D}${systemd_system_unitdir}/
 	install -m 644 ${WORKDIR}/launchApp.service ${D}${systemd_system_unitdir}/
 	ln -sr ${D}${systemd_system_unitdir}/instrument.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
