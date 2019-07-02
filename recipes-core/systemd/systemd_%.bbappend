@@ -1,17 +1,5 @@
 #customize systemd config.
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
-
-SRC_URI_append_fluke-cda-nighthawk = "\
-    file://${MACHINE}/instrument.service \
-    file://${MACHINE}/launchApp.service \
-"
-SRC_URI_append_fluke-cda-caldera = "\
-    file://${MACHINE}/instrument.service \
-    file://${MACHINE}/launchApp.service \
-"
-
-
 fluke_common_do_install() {
 	echo NAutoVTs=0 >> ${D}${sysconfdir}/systemd/logind.conf
 	echo ReserveVT=0 >> ${D}${sysconfdir}/systemd/logind.conf
