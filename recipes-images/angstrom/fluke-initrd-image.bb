@@ -24,9 +24,10 @@ IMAGE_INSTALL_remove = " \
 #we only need a compressed ext4 image for the initrd
 IMAGE_FSTYPES_remove = "ubi tar.xz wic.gz"
 IMAGE_FSTYPES_append = " ext4.gz"
-#turn off huge_file feature of ext4, otherwise kernel will not be able to 
-#mount it rw without kernel config CONFIG_LBDAF
-EXTRA_IMAGECMD_ext4 += "-O ^huge_file"
+#We used to turn off huge_file feature of ext4, since kernel will not be able to 
+#mount it rw without kernel config CONFIG_LBDAF.  But we use CONFIG_LBDAF=y now
+#so it is no longer needed.
+#EXTRA_IMAGECMD_ext4 += "-O ^huge_file"
 IMAGE_ROOTFS_SIZE = "65536"
 IMAGE_OVERHEAD_FACTOR = "1.0" 
 
