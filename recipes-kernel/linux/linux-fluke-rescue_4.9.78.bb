@@ -22,6 +22,12 @@ KERNEL_PACKAGE_NAME = "fluke-rescue-kernel"
 #so we don't need to generate the device tree in this recipe.
 KERNEL_DEVICETREE = ""
 
+#add our kernel config customization
+FILESEXTRAPATHS_prepend := "${THISDIR}/linux-fluke-rescue:"
+SRC_URI_append = "\
+    file://linux-fluke-rescue.cfg \
+"
+
 require recipes-kernel/linux/linux-altera.inc
 
 #FILESEXTRAPATHS_prepend := "${THISDIR}/config:"
