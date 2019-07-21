@@ -3,6 +3,6 @@
 # The root FS is located in the first ext4 partition and a backup of the 
 # original factory root FS in the second.
 
-part / --source rootfs --ondisk mmcblk0 --fstype=ext4 -F -i 4096" --label root --align 4 --overhead-factor 1.0
-part /mnt/factory_fs --source rootfs --ondisk mmcblk0 --fstype=ext4 --fsoptions "ro" -F -i 4096" --label factory --align 4 --overhead-factor 1.0
+part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --mkfs-extraopts="-F -i 4096" --label root --align 4 --overhead-factor 1.0
+part /mnt/factory_fs --source rootfs --ondisk mmcblk0 --fstype=ext4 --fsoptions "ro" --mkfs-extraopts="-F -i 4096" --label factory --align 4 --overhead-factor 1.0
 part swap --size 512 --ondisk mmcblk0 --fstype=swap --label swap --align 4 --overhead-factor 1.0
