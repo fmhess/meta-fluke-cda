@@ -40,4 +40,3 @@ fluke_initrd_image_postprocess_common() {
 }
 
 ROOTFS_POSTPROCESS_COMMAND_append = " fluke_initrd_image_postprocess_common; "
-
