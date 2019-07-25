@@ -5,6 +5,7 @@ require recipes-images/angstrom/console-base-image.bb
 DEPENDS += "lighttpd \
 	iproute2 \
 	linux-gpib-user \
+	linux-gpib-kernel \
     ttf-roboto \
 "
 DEPENDS_append_fluke-cda-nighthawk = " \
@@ -28,6 +29,8 @@ IMAGE_INSTALL_append = " \
 	lighttpd \
 	iproute2 \
 	linux-gpib-user \
+	kernel-module-fluke-gpib \
+	kernel-module-fmh-gpib \
 "
 
 IMAGE_INSTALL_append_fluke-cda-nighthawk = " \
