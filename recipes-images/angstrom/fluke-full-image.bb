@@ -21,8 +21,15 @@ export IMAGE_BASENAME = "fluke-full-image"
 
 fluke_full_image_postprocess_common() {
 }
+fluke_full_image_postprocess_nighthawk() {
+	#modify gpib board type to use fmh_gpib driver
+	sed -i 's/^[[:blank:]]*board_type.*/	board_type = "fmh_gpib"/' ${IMAGE_ROOTFS}${sysconfdir}/gpib.conf
+	sed -i '/board_type.*=.*"fluke_hybrid"/d' ${IMAGE_ROOTFS}${sysconfdir}/gpib.conf
+	sed -i '/board_type.*=.*"fluke_unaccel"/d' ${IMAGE_ROOTFS}${sysconfdir}/gpib.conf
+}
 
 ROOTFS_POSTPROCESS_COMMAND_append = " fluke_full_image_postprocess_common; "
+ROOTFS_POSTPROCESS_COMMAND_append_fluke-cda-nighthawk = " fluke_full_image_postprocess_nighthawk; "
 
 # we do the following using SORT_PASSWD_POSTPROCESS_COMMAND instead of
 # ROOTFS_POSTPROCESS_COMMAND to avoid having our multiple root accounts 
