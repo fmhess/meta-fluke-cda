@@ -1,0 +1,13 @@
+# short-description: Create an SD card image for fluke-cda-nighthawk
+# long-description: Create an SD card image for fluke-cda-nighthawk.
+# The boot FS is located in the first ext4 partition and 
+# the root FS is located in the second ext4 partition.  Backups of the
+# boot and root partitions are in third and fourth partitions.
+
+part /boot --source rootfs --rootfs-dir=${IMAGE_ROOTFS}/boot --ondisk mmcblk0 --fstype=ext4 --mkfs-extraopts="-i 4096" --label boot --align 1024 --fixed-size 8M
+part / --source rootfs --exclude-path=boot/ --ondisk mmcblk0 --fstype=ext4 --mkfs-extraopts="-i 4096" --label root --align 1024 --fixed-size 256M
+part /mnt/factory_boot --source rootfs --rootfs-dir=${IMAGE_ROOTFS}/boot --ondisk mmcblk0 --fstype=ext4 --fsoptions "ro" --mkfs-extraopts="-i 4096" --label factory_boot --align 1024 --fixed-size 8M
+part /mnt/factory_root --source rootfs --exclude-path=boot/ --ondisk mmcblk0 --fstype=ext4 --fsoptions "ro" --mkfs-extraopts="-i 4096" --label factory_root --align 1024 --fixed-size 256M
+part swap --size 512M --overhead-factor 1.0 --ondisk mmcblk0 --fstype=swap --label swap --align 1024
+
+bootloader --ptable gpt
