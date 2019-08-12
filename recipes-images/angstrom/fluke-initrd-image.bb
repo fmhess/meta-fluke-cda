@@ -32,18 +32,6 @@ IMAGE_OVERHEAD_FACTOR = "1.0"
 export IMAGE_BASENAME = "fluke-initrd-image"
 
 fluke_initrd_image_postprocess_common() {
-	#create device files
-	mknod -m 600 ${IMAGE_ROOTFS}/dev/console c 5 1
-	mknod -m 666 ${IMAGE_ROOTFS}/dev/tty c 5 0
-	mknod -m 620 ${IMAGE_ROOTFS}/dev/tty0 c 4 0
-	mknod -m 620 ${IMAGE_ROOTFS}/dev/tty1 c 4 1
-	mknod -m 660 ${IMAGE_ROOTFS}/dev/ram0 b 1 0
-	
-	#mkdir directory where we will mount production boot partition
-	install -d ${IMAGE_ROOTFS}/mnt/target_boot
-	
-	#make rescue.target the default systemd target
-	#ln -srf ${IMAGE_ROOTFS}${systemd_system_unitdir}/rescue.target ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/default.target
 }
 
 ROOTFS_POSTPROCESS_COMMAND_append = " fluke_initrd_image_postprocess_common; "

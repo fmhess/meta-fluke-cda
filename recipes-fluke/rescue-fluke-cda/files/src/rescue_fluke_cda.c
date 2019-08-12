@@ -24,8 +24,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 const char * const mount_cmd = "mount -o ro /dev/mmcblk0p1 /mnt/target_boot";
 const char * const kexec_load_cmd = "kexec --load /mnt/target_boot/zImage "
-	"--append \"console=ttyS0,115200 vt.global_cursor_default=0 vt.cur_default=1 coherent_pool=256K isolcpus=1 root=/dev/mmcblk0p2 rw rootwait rootfstype=ext4\""
-const char * const kexec_exec_cmd = "kexec --exec"
+	"--append \"console=ttyS0,115200 vt.global_cursor_default=0 vt.cur_default=1 coherent_pool=256K isolcpus=1 root=/dev/mmcblk0p2 rw rootwait rootfstype=ext4\"";
+const char * const kexec_exec_cmd = "kexec --exec";
 
 int system_wrapper(const char *command)
 {

@@ -9,8 +9,11 @@ SRC_URI = "file://src/"
 S = "${WORKDIR}/src/"
 PR = "r0"
 
+FILES_${PN} += "/mnt/target_boot"
+
 EXTRA_OEMAKE = "'CC=${CC}' 'CFLAGS=${CFLAGS}'"
 
 do_install () {
-	oe_runmake install DESTDIR=${D} prefix=${prefix} exec_prefix=${exec_prefix}
+	oe_runmake install DESTDIR=${D} prefix=${prefix} exec_prefix=${exec_prefix} sbindir=${base_sbindir}
+	install -d ${D}${root_prefix}/mnt/target_boot
 }

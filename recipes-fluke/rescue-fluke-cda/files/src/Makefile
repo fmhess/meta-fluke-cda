@@ -17,3 +17,4 @@ clean:
 .PHONY: install
 install: rescue_fluke_cda
 	$(INSTALL_PROGRAM) -D rescue_fluke_cda $(DESTDIR)$(sbindir)/rescue_fluke_cda
+	$(INSTALL_PROGRAM) -D rescue_fluke_cda_init.sh $(DESTDIR)$(sbindir)/rescue_fluke_cda_init.sh
