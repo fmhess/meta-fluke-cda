@@ -30,6 +30,9 @@ const char * const mount_cmd = "mount -o ro /dev/mmcblk0p1 /mnt/target_boot";
 const char * const kexec_load_cmd = "kexec --load /mnt/target_boot/zImage "
 	"--append \"console=ttyS0,115200 vt.global_cursor_default=0 vt.cur_default=1 coherent_pool=256K isolcpus=1 root=/dev/mmcblk0p2 rw rootwait rootfstype=ext4\"";
 const char * const kexec_exec_cmd = "kexec --exec";
+const char * const dd_boot_cmd = "dd if=/dev/mmcblk0p3 of=/dev/mmcblk0p1 bs=1M conv=fsync";
+const char * const dd_root_cmd = "dd if=/dev/mmcblk0p4 of=/dev/mmcblk0p2 bs=1M conv=fsync";
+const char * const dry_run_preamble = "The following commands will be executed in order to continue the boot process:\n\n";
 
 int system_wrapper(const char *command, int verbose, int dry_run)
 {
@@ -75,6 +78,25 @@ int do_boot(int verbose, int dry_run)
 		return result;
 	}
 	
+	return 0;
+}
+
+int do_restore_filesystems(int verbose, int dry_run)
+{
+	int result;
+	
+	result = system_wrapper(dd_boot_cmd, verbose, dry_run);
+	if(result)
+	{
+		return result;
+	}
+	
+	result = system_wrapper(dd_root_cmd, verbose, dry_run);
+	if(result)
+	{
+		return result;
+	}
+
 	return 0;
 }
 
@@ -124,14 +146,13 @@ int wait_for_keypress_timeout(int *timed_out)
 	return 0;
 }
 
-int do_interactive_boot()
+int confirm_selection(int *confirmed)
 {
 	char *buffer;
 	size_t n;
 	ssize_t retval;
 	
-	printf("The following commands will be executed in order to continue the boot process:\n\n");
-	do_boot(1, 1);
+	*confirmed = 0;
 
 	printf("\nEnter \"y\" or \"1\" to confirm and execute commands > ");
 	buffer = NULL;
@@ -140,6 +161,7 @@ int do_interactive_boot()
 	if(retval < 0)
 	{
 		fprintf(stderr, "getline returned error, errno=%d\n", errno);
+		return -1;
 	}else if(retval >= 1)
 	{
 		switch(buffer[0])
@@ -149,7 +171,7 @@ int do_interactive_boot()
 		case 'y':
 			// fall-through
 		case 'Y':
-			return do_boot(1, 0);
+			*confirmed = 1;
 			break;
 		default:
 			printf("Execution NOT confirmed.\n");
@@ -164,6 +186,32 @@ int do_interactive_boot()
 	return 0;
 }
 
+int do_interactive_boot()
+{
+	int confirmed;
+	int retval;
+	
+	printf( dry_run_preamble );
+	do_boot(1, 1);
+
+	retval = confirm_selection( &confirmed );
+	if(retval < 0) return retval;
+	else return do_boot(1, 0);
+}
+
+int do_interactive_restore_filesystems()
+{
+	int confirmed;
+	int retval;
+	
+	printf( dry_run_preamble );
+	do_restore_filesystems(1, 1);
+
+	retval = confirm_selection( &confirmed );
+	if(retval < 0) return retval;
+	else return do_restore_filesystems(1, 0);
+}
+
 int prompt_interactively()
 {
 	char *buffer;
@@ -175,6 +223,7 @@ int prompt_interactively()
 		
 		printf("Select one of the following actions by number:\n"
 			"1) Exit rescue program and continue normal boot process.\n"
+			"2) Restore filesystems to factory state.\n"
 			"> "
 		);
 		buffer = NULL;
@@ -193,6 +242,8 @@ int prompt_interactively()
 				case 1:
 					do_interactive_boot();
 					break;
+				case 2:
+					do_interactive_restore_filesystems();
 				default:
 					printf("Invalid selection.\n");
 					break;
