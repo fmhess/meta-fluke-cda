@@ -9,14 +9,53 @@ inherit image
 DEPENDS += " \
 	kexec-tools \
 	rescue-fluke-cda \
+	mtd-utils \
 "
 
 IMAGE_INSTALL_append = " \
 	kexec \
 	rescue-fluke-cda \
+	mtd-utils \
 "
 
+# remove some stuff we don't need, we want to get the compressed image size below 16M
+DEPENDS_remove = " \
+	systemd \
+	pam \
+"
 IMAGE_INSTALL_remove = " \
+	busybox-udhcpc \
+	busybox-syslogd \
+	systemd \
+	systemd-compat-units \
+	systemd-vconsole-setup \
+	systemd-extra-utils \
+	systemd-container \
+	systemd-serialgetty \
+	dbus-1 \
+	pam-plugin-keyinit \
+	pam-plugin-loginuid \
+	shadow \
+	pam-plugin-shells \
+	pam-plugin-faildelay \
+	pam-plugin-limits \
+	pam-plugin-lastlog \
+	pam-plugin-env \
+	pam-plugin-nologin \
+	libpam-runtime \
+	pam-plugin-rootok \
+	pam-plugin-motd \
+	shadow-base \
+	pam-plugin-securetty \
+	pam-plugin-group \
+	pam-plugin-mail \
+	pam-plugin-unix \
+	pam-plugin-deny \
+	pam-plugin-permit \
+	pam-plugin-warn \
+	libpam \
+	iptables \
+	libcurl4 \
 "
 
 #EXTRA_IMAGE_FEATURES = "dbg-pkgs debug-tweaks "
