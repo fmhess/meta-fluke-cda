@@ -16,6 +16,7 @@ IMAGE_INSTALL_append = " \
 	kexec \
 	rescue-fluke-cda \
 	mtd-utils \
+	base-files \
 "
 
 # remove some stuff we don't need, we want to get the compressed image size below 16M
@@ -56,6 +57,7 @@ IMAGE_INSTALL_remove = " \
 	libpam \
 	iptables \
 	libcurl4 \
+	udev \
 "
 
 #EXTRA_IMAGE_FEATURES = "dbg-pkgs debug-tweaks "
