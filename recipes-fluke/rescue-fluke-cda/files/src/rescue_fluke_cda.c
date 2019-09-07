@@ -32,7 +32,9 @@ const char * const kexec_load_cmd = "kexec --load /mnt/target_boot/zImage "
 const char * const kexec_exec_cmd = "kexec --exec";
 const char * const dd_boot_cmd = "dd if=/dev/mmcblk0p3 of=/dev/mmcblk0p1 bs=1M conv=fsync";
 const char * const dd_root_cmd = "dd if=/dev/mmcblk0p4 of=/dev/mmcblk0p2 bs=1M conv=fsync";
-const char * const dry_run_preamble = "The following commands will be executed in order to continue the boot process:\n\n";
+const char * const dd_device_tree_cmd = "dd if=/dev/mtd8 of=/tmp/mtd8 bs=1M";
+const char * const flashcp_device_tree_cmd = "flashcp /tmp/mtd8 /dev/mtd2";
+const char * const dry_run_preamble = "The following commands will be executed:\n\n";
 
 int system_wrapper(const char *command, int verbose, int dry_run)
 {
@@ -100,49 +102,78 @@ int do_restore_filesystems(int verbose, int dry_run)
 	return 0;
 }
 
+int do_restore_device_tree(int verbose, int dry_run)
+{
+	int result;
+	
+	result = system_wrapper(dd_device_tree_cmd, verbose, dry_run);
+	if(result)
+	{
+		return result;
+	}
+
+	result = system_wrapper(flashcp_device_tree_cmd, verbose, dry_run);
+	if(result)
+	{
+		return result;
+	}
+	
+	return 0;
+}
+
 /* Wait for user to hit magic key to go into interactive recovery mode.
  */
 int wait_for_keypress_timeout(int *timed_out)
 {
 	int retval;
 	fd_set read_descriptors;
-	struct timeval timeout;
+	struct timeval one_second_timeval;
+	const int timeout_seconds = 10;
+	int i;
 	char buffer[2];
 	const char magic_key = '\n';
 	
-	FD_ZERO(&read_descriptors);
-	FD_SET(STDIN_FILENO, &read_descriptors);
+	*timed_out = 0;
 
-	timeout.tv_sec = 2;
-	timeout.tv_usec = 0;
-	
-	do
+	for (i = timeout_seconds; i > 0; --i)
 	{
-		retval = select(1, &read_descriptors, NULL, NULL, &timeout);
-		if(retval < 0)
+		// print a countdown
+		printf("\r%i ", i);
+		fflush(stdout);
+		
+		one_second_timeval.tv_sec = 1;
+		one_second_timeval.tv_usec = 0;	
+		do
 		{
-			fprintf(stderr, "select error, errno=%d\n", errno);
-			return retval;
-		}else if(retval == 0)
-		{
-			*timed_out = 1;
-			return 0;
-		}else
-		{
-			ssize_t read_retval;
-			read_retval = read(STDIN_FILENO, buffer, 1);
-			if(read_retval < 0)
-			{
-				fprintf(stderr, "read error, errno=%d\n", errno);
-				return read_retval;
-			}else if(buffer[0] == magic_key)
-			{
-				*timed_out = 0;
-				return 0;
-			}
-		}
-	}while (retval);
+			FD_ZERO(&read_descriptors);
+			FD_SET(STDIN_FILENO, &read_descriptors);
 
+			retval = select(1, &read_descriptors, NULL, NULL, &one_second_timeval);
+			if(retval < 0)
+			{
+				fprintf(stderr, "select error, errno=%d\n", errno);
+				return retval;
+			}else if(retval == 0)
+			{
+				break;
+			}else
+			{
+				ssize_t read_retval;
+				read_retval = read(STDIN_FILENO, buffer, 1);
+				if(read_retval < 0)
+				{
+					fprintf(stderr, "read error, errno=%d\n", errno);
+					return read_retval;
+				}else if(buffer[0] == magic_key)
+				{
+					return 0;
+				}
+			}
+		}while (retval);
+	}
+
+	*timed_out = 1;
+	
 	return 0;
 }
 
@@ -191,12 +222,21 @@ int do_interactive_boot()
 	int confirmed;
 	int retval;
 	
+	printf("You have selected to continue normal boot process.\n");
 	printf( dry_run_preamble );
 	do_boot(1, 1);
 
 	retval = confirm_selection( &confirmed );
-	if(retval < 0) return retval;
-	else return do_boot(1, 0);
+	if(retval < 0)
+	{
+		return retval;
+	} else if (confirmed) 
+	{
+		return do_boot(1, 0);
+	} else 
+	{
+		return 0;
+	}
 }
 
 int do_interactive_restore_filesystems()
@@ -204,12 +244,43 @@ int do_interactive_restore_filesystems()
 	int confirmed;
 	int retval;
 	
+	printf("You have selected to restore filesystems.\n");
 	printf( dry_run_preamble );
 	do_restore_filesystems(1, 1);
 
 	retval = confirm_selection( &confirmed );
-	if(retval < 0) return retval;
-	else return do_restore_filesystems(1, 0);
+	if(retval < 0) 
+	{
+		return retval;
+	} else if (confirmed)
+	{
+		return do_restore_filesystems(1, 0);
+	} else 
+	{
+		return 0;
+	}
+}
+
+int do_interactive_restore_device_tree()
+{
+	int confirmed;
+	int retval;
+	
+	printf("You have selected to restore flattened device tree.\n");
+	printf( dry_run_preamble );
+	do_restore_device_tree(1, 1);
+
+	retval = confirm_selection( &confirmed );
+	if(retval < 0)
+	{
+		return retval;
+	} else if (confirmed) 
+	{
+		return do_restore_device_tree(1, 0);
+	} else 
+	{
+		return 0;
+	}
 }
 
 int prompt_interactively()
@@ -224,6 +295,7 @@ int prompt_interactively()
 		printf("Select one of the following actions by number:\n"
 			"1) Exit rescue program and continue normal boot process.\n"
 			"2) Restore filesystems to factory state.\n"
+			"3) Restore flattened device tree to factory state.\n"
 			"> "
 		);
 		buffer = NULL;
@@ -244,6 +316,10 @@ int prompt_interactively()
 					break;
 				case 2:
 					do_interactive_restore_filesystems();
+					break;
+				case 3:
+					do_interactive_restore_device_tree();
+					break;
 				default:
 					printf("Invalid selection.\n");
 					break;
