@@ -73,6 +73,7 @@ IMAGE_OVERHEAD_FACTOR = "1.0"
 export IMAGE_BASENAME = "fluke-initrd-image"
 
 fluke_initrd_image_postprocess_common() {
+	ln -sr ${IMAGE_ROOTFS}${base_sbindir}/rescue_fluke_cda_init.sh ${IMAGE_ROOTFS}${base_sbindir}/init
 }
 
 ROOTFS_POSTPROCESS_COMMAND_append = " fluke_initrd_image_postprocess_common; "
