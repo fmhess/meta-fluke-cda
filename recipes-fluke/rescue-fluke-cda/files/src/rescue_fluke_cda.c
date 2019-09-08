@@ -32,9 +32,21 @@ const char * const kexec_load_cmd = "kexec --load /mnt/target_boot/zImage "
 const char * const kexec_exec_cmd = "kexec --exec";
 const char * const dd_boot_cmd = "dd if=/dev/mmcblk0p3 of=/dev/mmcblk0p1 bs=1M conv=fsync";
 const char * const dd_root_cmd = "dd if=/dev/mmcblk0p4 of=/dev/mmcblk0p2 bs=1M conv=fsync";
-const char * const dd_device_tree_cmd = "dd if=/dev/mtd8 of=/tmp/mtd8 bs=1M";
-const char * const flashcp_device_tree_cmd = "flashcp /tmp/mtd8 /dev/mtd2";
+const char * const dd_mtd_to_tmp_cmd = "dd if=/dev/mtd%d of=/tmp/mtdX bs=1M";
+const char * const flashcp_tmp_to_mtd_cmd = "flashcp /tmp/mtdX /dev/mtd%d";
 const char * const dry_run_preamble = "The following commands will be executed:\n\n";
+const int uboot_partition = 0;
+const int uboot_environment_partition = 1;
+const int device_tree_partition = 2;
+const int kernel_partition = 3;
+const int fpga_partition = 4;
+const int initrd_partition = 5;
+const int uboot_backup_partition = 6;
+const int uboot_environment_backup_partition = 7;
+const int device_tree_backup_partition = 8;
+const int kernel_backup_partition = 9;
+const int fpga_backup_partition = 10;
+const int initrd_backup_partition = 11;
 
 int system_wrapper(const char *command, int verbose, int dry_run)
 {
@@ -55,6 +67,34 @@ int system_wrapper(const char *command, int verbose, int dry_run)
 	{
 		result = 0;
 	}
+	return result;
+}
+
+int system_dd_mtd_to_tmp(int source_mtd_partition, int verbose, int dry_run)
+{
+	const size_t command_size = 0x1000;
+	char * const command = malloc(command_size);
+	int result;
+	
+	if (command == NULL) return -1;
+	
+	snprintf(command, command_size, dd_mtd_to_tmp_cmd, source_mtd_partition);
+	result = system_wrapper(command, verbose, dry_run);
+	free(command);
+	return result;
+}
+
+int system_flashcp_tmp_to_mtd(int destination_mtd_partition, int verbose, int dry_run)
+{
+	const size_t command_size = 0x1000;
+	char * const command = malloc(command_size);
+	int result;
+	
+	if (command == NULL) return -1;
+	
+	snprintf(command, command_size, flashcp_tmp_to_mtd_cmd, destination_mtd_partition);
+	result = system_wrapper(command, verbose, dry_run);
+	free(command);
 	return result;
 }
 
@@ -102,17 +142,17 @@ int do_restore_filesystems(int verbose, int dry_run)
 	return 0;
 }
 
-int do_restore_device_tree(int verbose, int dry_run)
+int do_restore_mtd_partition(int backup_mtd_partition, int destination_mtd_partition, int verbose, int dry_run)
 {
 	int result;
 	
-	result = system_wrapper(dd_device_tree_cmd, verbose, dry_run);
+	result = system_dd_mtd_to_tmp(backup_mtd_partition, verbose, dry_run);
 	if(result)
 	{
 		return result;
 	}
 
-	result = system_wrapper(flashcp_device_tree_cmd, verbose, dry_run);
+	result = system_flashcp_tmp_to_mtd(destination_mtd_partition, verbose, dry_run);
 	if(result)
 	{
 		return result;
@@ -128,7 +168,7 @@ int wait_for_keypress_timeout(int *timed_out)
 	int retval;
 	fd_set read_descriptors;
 	struct timeval one_second_timeval;
-	const int timeout_seconds = 10;
+	const int timeout_seconds = 8;
 	int i;
 	char buffer[2];
 	const char magic_key = '\n';
@@ -261,14 +301,14 @@ int do_interactive_restore_filesystems()
 	}
 }
 
-int do_interactive_restore_device_tree()
+int do_interactive_restore_mtd_partition(int backup_partition, int destination_partition, const char *partition_description)
 {
 	int confirmed;
 	int retval;
 	
-	printf("You have selected to restore flattened device tree.\n");
+	printf("You have selected to restore %s.\n", partition_description);
 	printf( dry_run_preamble );
-	do_restore_device_tree(1, 1);
+	do_restore_mtd_partition(backup_partition, destination_partition, 1, 1);
 
 	retval = confirm_selection( &confirmed );
 	if(retval < 0)
@@ -276,7 +316,52 @@ int do_interactive_restore_device_tree()
 		return retval;
 	} else if (confirmed) 
 	{
-		return do_restore_device_tree(1, 0);
+		return do_restore_mtd_partition(backup_partition, destination_partition, 1, 0);
+	} else 
+	{
+		return 0;
+	}
+}
+
+int do_interactive_restore_device_tree()
+{
+	return do_interactive_restore_mtd_partition(device_tree_backup_partition, device_tree_partition, "flattened device tree");
+}
+
+int do_interactive_restore_fpga()
+{
+	return do_interactive_restore_mtd_partition(fpga_backup_partition, fpga_backup_partition, "FPGA RBF image");
+}
+
+int do_interactive_restore_uboot()
+{
+	return do_interactive_restore_mtd_partition(uboot_backup_partition, uboot_partition, "U-Boot with SPL");
+}
+
+int do_interactive_restore_uboot_environment()
+{
+	return do_interactive_restore_mtd_partition(uboot_environment_backup_partition, uboot_environment_partition, "U-Boot environment");
+}
+
+int do_interactive_restore_rescue()
+{
+	int confirmed;
+	int retval;
+	
+	printf("You have selected to restore rescue kernel and initrd.\n");
+	printf( dry_run_preamble );
+	do_restore_mtd_partition(kernel_backup_partition, kernel_partition, 1, 1);
+	do_restore_mtd_partition(initrd_backup_partition, initrd_partition, 1, 1);
+
+	retval = confirm_selection( &confirmed );
+	if(retval < 0)
+	{
+		return retval;
+	} else if (confirmed) 
+	{
+		retval = do_restore_mtd_partition(kernel_backup_partition, kernel_partition, 1, 0);
+		if (retval) return retval;
+		return do_restore_mtd_partition(initrd_backup_partition, initrd_partition, 1, 0);
 	} else 
 	{
 		return 0;
@@ -296,6 +381,10 @@ int prompt_interactively()
 			"1) Exit rescue program and continue normal boot process.\n"
 			"2) Restore filesystems to factory state.\n"
 			"3) Restore flattened device tree to factory state.\n"
+			"4) Restore FPGA RBF image to factory state.\n"
+			"5) Restore U-Boot with SPL to factory state.\n"
+			"6) Restore U-Boot environment to factory state.\n"
+			"7) Restore rescue kernel and initrd to factory state.\n"
 			"> "
 		);
 		buffer = NULL;
@@ -319,6 +408,18 @@ int prompt_interactively()
 					break;
 				case 3:
 					do_interactive_restore_device_tree();
+					break;
+				case 4:
+					do_interactive_restore_fpga();
+					break;
+				case 5:
+					do_interactive_restore_uboot();
+					break;
+				case 6:
+					do_interactive_restore_uboot_environment();
+					break;
+				case 7:
+					do_interactive_restore_rescue();
 					break;
 				default:
 					printf("Invalid selection.\n");
