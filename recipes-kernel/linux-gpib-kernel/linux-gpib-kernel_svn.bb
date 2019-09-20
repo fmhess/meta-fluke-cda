@@ -20,7 +20,7 @@ S = "${WORKDIR}/trunk/linux-gpib-kernel"
 # The inherit of module.bbclass will automatically name module packages with
 # "kernel-module-" prefix as required by the oe-core build environment.
 
-RPROVIDES_${PN} += "linux-gpib"
+RPROVIDES_${PN} += "linux-gpib-kernel"
 
 EXTRA_OEMAKE += "LINUX_SRCDIR=${STAGING_KERNEL_DIR}"
 
