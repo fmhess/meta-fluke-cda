@@ -67,7 +67,7 @@ IMAGE_INSTALL_remove = " \
 #we only need a compressed ext4 image for the initrd
 IMAGE_FSTYPES_remove = "ubi tar.xz wic.gz"
 IMAGE_FSTYPES_append = " ext4.gz"
-IMAGE_ROOTFS_SIZE = "65536"
+IMAGE_ROOTFS_SIZE = "32768"
 IMAGE_OVERHEAD_FACTOR = "1.0" 
 
 export IMAGE_BASENAME = "fluke-initrd-image"
