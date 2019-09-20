@@ -2,7 +2,10 @@ DESCRIPTION = "Fluke rescue program"
 DEPENDS = ""
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
-RDEPENDS_${PN} = "busybox"
+RDEPENDS_${PN} = "\
+	busybox \
+	mtd-utils \
+"
 
 SRC_URI = "file://src/"
 
