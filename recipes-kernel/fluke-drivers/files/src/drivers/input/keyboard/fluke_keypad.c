@@ -107,8 +107,8 @@ static ssize_t fluke_keypad_read(struct file *filp, char __user *buf,
 		
 	if(count < 8)
 	{
-		printk("fluke_keypad%d: read requires at least 8 byte buffer, got %d\n",
-				kb_data.minor, count);
+		printk("fluke_keypad%d: read requires at least 8 byte buffer, got %lu\n",
+				kb_data.minor, (unsigned long)count);
 		return -EIO;
 	}
     
