@@ -104,8 +104,8 @@ static ssize_t fluke_keypad_read(struct file *filp, char __user *buf,
 		
 	if(count < 8)
 	{
-		printk("fluke_keypad%d: read requires at least 8 byte buffer, got %lu\n",
-				kb_data.minor, (unsigned long)count);
+		printk("fluke_keypad%d: read requires at least 8 byte buffer, got %zu\n",
+				kb_data.minor, count);
 		return -EIO;
 	}
     
@@ -273,11 +273,11 @@ static int fluke_keypad_probe(struct platform_device *pdev)
     // printk("FLUKE KEYPAD PROBE Assigning address (FDT) %x to minor %x\n", res.start, 0);
 
     if (!request_mem_region(res.start, (res.end - res.start + 1), "fluke_keypad")) {
-        printk (KERN_INFO "fluke_keypad: can't get memory region %ud for fkeypd%d\n", res.start, 0);
+        printk (KERN_INFO "fluke_keypad: can't get memory region %pa for fkeypd%d\n", &res.start, 0);
         // release_ports();
         return -ENODEV;
     }
-    kb_data.mapbase = (unsigned long)ioremap_nocache(res.start, (res.end - res.start + 1));
+    kb_data.mapbase = ioremap_nocache(res.start, (res.end - res.start + 1));
 
     irq = irq_of_parse_and_map(pdev->dev.of_node, 0);
     // printk("FLUKE KEYPAD PROBE: irq_of_parse_and_map returned irq number %d\n", irq);
@@ -384,3 +384,5 @@ static void fluke_keypad_exit(void)
 
 module_init(fluke_keypad_init);
 module_exit(fluke_keypad_exit);
+
+MODULE_LICENSE("GPL");
