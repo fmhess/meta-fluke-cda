@@ -24,11 +24,10 @@
 #include <linux/cdev.h>
 #include <linux/wait.h>
 #include <linux/sched.h>
+// #include <linux/sched/signal.h>
 #include <linux/preempt.h>
-// #include <asm/semaphore.h>
-#include <asm/uaccess.h>
-#include <asm/io.h>
-// #include <asm/irq.h>
+#include <linux/uaccess.h>
+#include <linux/io.h>
 #include <linux/of_irq.h>
 #include <linux/of_device.h>
 #include <linux/of_address.h>
