@@ -40,10 +40,8 @@ static int FLUKE_KEYPAD_MAJOR = FLUKE_5X5_KEYPAD_MAJOR;
 static struct class  *fluke_keypad_class;
 static struct device *fkpd_device = NULL;
 
-static unsigned int base_address = 0x00;
-
 struct fluke_keypad_data {
-    unsigned int mapbase;
+    void *mapbase;
 	int irq;
 	int minor;
     int test;
@@ -204,7 +202,7 @@ static irq_handler_t fluke_keypad_handler(int irq, void *dev_id, struct pt_regs 
     }
     */
 
-    kpd_reg = *((unsigned int*)kb_data.mapbase);
+    kpd_reg = readl(kb_data.mapbase);
 
 	/* read the keypad code, clears the interrupt */
     for (i = 0; i < NUM_REGISTERS; i++) {
@@ -215,7 +213,7 @@ static irq_handler_t fluke_keypad_handler(int irq, void *dev_id, struct pt_regs 
                 goto ADD_TO_BUFF;
             }
         }
-        kpd_reg = *((int*)(kb_data.mapbase + 4));
+        kpd_reg = readl(kb_data.mapbase + 4);
         // printk("interrupt routine kpd_register1 = %d\n", kpd_reg);
     }
     // printk ("fkpad: adding 0 to keypad buffer, could not find key\n");
@@ -280,7 +278,6 @@ static int fluke_keypad_probe(struct platform_device *pdev)
         return -ENODEV;
     }
     kb_data.mapbase = (unsigned long)ioremap_nocache(res.start, (res.end - res.start + 1));
-    base_address = kb_data.mapbase;  //AJD GET RID OF THIS
 
     irq = irq_of_parse_and_map(pdev->dev.of_node, 0);
     // printk("FLUKE KEYPAD PROBE: irq_of_parse_and_map returned irq number %d\n", irq);
