@@ -41,9 +41,9 @@ static struct device *fkpd_device = NULL;
 
 struct fluke_keypad_data {
     void *mapbase;
+	struct resource iomem_resource;
 	int irq;
 	int minor;
-    int test;
 	unsigned int open_count;
 	unsigned int buffer[FLUKE_KEYPAD_BUF_SIZE];
 	unsigned int head;
@@ -52,8 +52,6 @@ struct fluke_keypad_data {
 	struct semaphore sem;
 	struct cdev cdev;
 };
-
-static struct fluke_keypad_data kb_data;
 
 static int fluke_keypad_open(struct inode* inode, struct file *filp)
 {
@@ -64,21 +62,21 @@ static int fluke_keypad_open(struct inode* inode, struct file *filp)
 	filp->private_data = drv_data;
 
 	preempt_disable();
-	if (kb_data.open_count != 0) {
-		kb_data.open_count++;
+	if (drv_data->open_count != 0) {
+		drv_data->open_count++;
 		preempt_enable();
 		return 0;
 	}
 
 	/* Initialize buffer, queue and semaphore */
-	kb_data.head = 0;
-	kb_data.tail = 0;
+	drv_data->head = 0;
+	drv_data->tail = 0;
     /*
-	init_waitqueue_head(&kb_data.queue);
-    sema_init(&kb_data.sem, 1);
+	init_waitqueue_head(&drv_data->queue);
+    sema_init(&drv_data->sem, 1);
     */
 	
-	kb_data.open_count++;
+	drv_data->open_count++;
 	preempt_enable();
     // printk("fluke_keypad_open returning success\n");
 	return 0;
@@ -86,10 +84,10 @@ static int fluke_keypad_open(struct inode* inode, struct file *filp)
 
 static int fluke_keypad_release(struct inode *inode, struct file *filp)
 {
-	// struct fluke_keypad_data *drv_data = (struct fluke_keypad_data*)filp->private_data;
+	struct fluke_keypad_data *drv_data = (struct fluke_keypad_data*)filp->private_data;
 
 	preempt_disable();
-	kb_data.open_count--;
+	drv_data->open_count = 0;
 	preempt_enable();
 
 	return 0;
@@ -99,26 +97,26 @@ static ssize_t fluke_keypad_read(struct file *filp, char __user *buf,
 		size_t count, loff_t *f_pos)
 {
 	size_t total, int_count;
-	// struct fluke_keypad_data *drv_data = (struct fluke_keypad_data*)filp->private_data;
+	struct fluke_keypad_data *drv_data = (struct fluke_keypad_data*)filp->private_data;
 		
 	if(count < 8)
 	{
 		printk("fluke_keypad%d: read requires at least 8 byte buffer, got %zu\n",
-				kb_data.minor, count);
+				drv_data->minor, count);
 		return -EIO;
 	}
     
 	// printk("fluke_keypad_read: entry\n");
 
 
-	if (down_interruptible(&kb_data.sem)) {
+	if (down_interruptible(&drv_data->sem)) {
 		// printk("fluke_keypad: down_interruptible\n");
 		return -ERESTARTSYS;
     }
 
-	while (kb_data.head == kb_data.tail) {
+	while (drv_data->head == drv_data->tail) {
 		DEFINE_WAIT(wait);
-		up(&kb_data.sem);
+		up(&drv_data->sem);
 		if (filp->f_flags & O_NONBLOCK) {
             // printk("O_NONBLOCK\n");
 			return -EAGAIN;
@@ -126,36 +124,36 @@ static ssize_t fluke_keypad_read(struct file *filp, char __user *buf,
 
 		/* In all cases but a pointer wrap, only one process is needed
 		   to clear the buffer, so just wake one at a time with "exclusive" */
-		prepare_to_wait_exclusive(&kb_data.queue, &wait, TASK_INTERRUPTIBLE);
-		if(kb_data.head == kb_data.tail)
+		prepare_to_wait_exclusive(&drv_data->queue, &wait, TASK_INTERRUPTIBLE);
+		if(drv_data->head == drv_data->tail)
 			schedule();
-		finish_wait(&kb_data.queue, &wait);
-		if (down_interruptible(&kb_data.sem)) {
+		finish_wait(&drv_data->queue, &wait);
+		if (down_interruptible(&drv_data->sem)) {
             // printk("down_interruptible again\n");
 			return -ERESTARTSYS;
         }
 	}
 	
 	int_count = count / 4;
-	if( kb_data.head > kb_data.tail ) {
-		total = min(int_count, (size_t)(kb_data.head - kb_data.tail));
+	if( drv_data->head > drv_data->tail ) {
+		total = min(int_count, (size_t)(drv_data->head - drv_data->tail));
 	} else {
 		/* pointers wrapped, copy from tail to the end of the buffer */
-		total = min(int_count, (size_t)(FLUKE_KEYPAD_BUF_SIZE - kb_data.tail));
+		total = min(int_count, (size_t)(FLUKE_KEYPAD_BUF_SIZE - drv_data->tail));
 	}
 	
-	if(copy_to_user(buf, &kb_data.buffer[kb_data.tail], total * 4)) {
-		up(&kb_data.sem);
+	if(copy_to_user(buf, &drv_data->buffer[drv_data->tail], total * 4)) {
+		up(&drv_data->sem);
         // printk(KERN_WARNING "COPY TO USER \n");
         // printk("COPY TO USER \n");
 		return -EFAULT;
 	}
 
-	kb_data.tail += total;
-	if( kb_data.tail >= FLUKE_KEYPAD_BUF_SIZE)
-		kb_data.tail -= FLUKE_KEYPAD_BUF_SIZE;
+	drv_data->tail += total;
+	if( drv_data->tail >= FLUKE_KEYPAD_BUF_SIZE)
+		drv_data->tail -= FLUKE_KEYPAD_BUF_SIZE;
 
-	up(&kb_data.sem);
+	up(&drv_data->sem);
 	// printk("fluke_keypad_read: read %d bytes\n", total);
 	return total;
 }
@@ -170,8 +168,8 @@ static struct file_operations fluke_keypad_fops = {
 static irq_handler_t fluke_keypad_handler(int irq, void *dev_id, struct pt_regs *regs)
 {
 
-    // struct device *dev = (struct device *)dev_id;
-    // struct fluke_keypad_data *drv_data = &kb_data;
+    struct device *dev = (struct device *)dev_id;
+    struct fluke_keypad_data *drv_data = dev_get_drvdata(dev);
     unsigned int keycode = 0x00;
     unsigned int kpd_reg = 0x00;
     unsigned char i;
@@ -196,7 +194,7 @@ static irq_handler_t fluke_keypad_handler(int irq, void *dev_id, struct pt_regs 
     }
     */
 
-    kpd_reg = readl(kb_data.mapbase);
+    kpd_reg = readl(drv_data->mapbase);
 
 	/* read the keypad code, clears the interrupt */
     for (i = 0; i < NUM_REGISTERS; i++) {
@@ -207,7 +205,7 @@ static irq_handler_t fluke_keypad_handler(int irq, void *dev_id, struct pt_regs 
                 goto ADD_TO_BUFF;
             }
         }
-        kpd_reg = readl(kb_data.mapbase + 4);
+        kpd_reg = readl(drv_data->mapbase + 4);
         // printk("interrupt routine kpd_register1 = %d\n", kpd_reg);
     }
     // printk ("fkpad: adding 0 to keypad buffer, could not find key\n");
@@ -217,19 +215,19 @@ static irq_handler_t fluke_keypad_handler(int irq, void *dev_id, struct pt_regs 
     // printk ("fkpad: adding%d to keypad buffer\n", keycode);
 
 	/* add it to the buffer if the device is open */
-	if (kb_data.open_count != 0)
+	if (drv_data->open_count != 0)
 	{
 		// if the buffer is full we discard the input (ugly to avoid % in irq)
-		if(!(((kb_data.head + 1) == kb_data.tail) ||
-				((kb_data.head == (FLUKE_KEYPAD_BUF_SIZE-1)) &&
-				 (kb_data.tail == 0)))) {
-			kb_data.buffer[kb_data.head] = keycode;
-			kb_data.head++;
-			if (kb_data.head == FLUKE_KEYPAD_BUF_SIZE)
-				kb_data.head = 0;
+		if(!(((drv_data->head + 1) == drv_data->tail) ||
+				((drv_data->head == (FLUKE_KEYPAD_BUF_SIZE-1)) &&
+				 (drv_data->tail == 0)))) {
+			drv_data->buffer[drv_data->head] = keycode;
+			drv_data->head++;
+			if (drv_data->head == FLUKE_KEYPAD_BUF_SIZE)
+				drv_data->head = 0;
 		}
 	}
-	wake_up_interruptible(&(kb_data.queue));
+	wake_up_interruptible(&(drv_data->queue));
     return (irq_handler_t) IRQ_HANDLED;
 }
 
@@ -246,9 +244,7 @@ static int fluke_keypad_probe(struct platform_device *pdev)
     int devno;
     int rc = 0;
     int irq;
-    struct resource res;
-
-	struct fluke_keypad_data *drv_data;  //AJD GOES AWAY
+	struct fluke_keypad_data *drv_data;
 
     devno = MKDEV(FLUKE_KEYPAD_MAJOR, 0);
     fkpd_device = device_create(fluke_keypad_class, NULL, devno, NULL, "fkeypd%d", 0);
@@ -258,20 +254,25 @@ static int fluke_keypad_probe(struct platform_device *pdev)
         return PTR_ERR(fkpd_device);
     }
 
-    kb_data.minor = 0;
+    drv_data = kzalloc(sizeof(struct fluke_keypad_data), GFP_KERNEL);
+	if (drv_data == NULL) return -ENOMEM;
+    dev_set_drvdata(&pdev->dev, drv_data);
 
-    rc = of_address_to_resource(pdev->dev.of_node, 0, &res);
+	drv_data->minor = 0;
+
+    rc = of_address_to_resource(pdev->dev.of_node, 0, &drv_data->iomem_resource);
     if (rc) {
-        printk("FLUKE KEYPAD PROBE Can't get address of resource\n");
+		printk("FLUKE KEYPAD PROBE Can't get address of resource\n");
+		return rc;
     }
     // printk("FLUKE KEYPAD PROBE Assigning address (FDT) %x to minor %x\n", res.start, 0);
 
-    if (!request_mem_region(res.start, (res.end - res.start + 1), "fluke_keypad")) {
-        printk (KERN_INFO "fluke_keypad: can't get memory region %pa for fkeypd%d\n", &res.start, 0);
+    if (!request_mem_region(drv_data->iomem_resource.start, resource_size(&drv_data->iomem_resource), "fluke_keypad")) {
+        printk (KERN_INFO "fluke_keypad: can't get memory region %pa for fkeypd%d\n", &drv_data->iomem_resource.start, 0);
         // release_ports();
         return -ENODEV;
     }
-    kb_data.mapbase = ioremap_nocache(res.start, (res.end - res.start + 1));
+    drv_data->mapbase = ioremap_nocache(drv_data->iomem_resource.start, resource_size(&drv_data->iomem_resource));
 
     irq = irq_of_parse_and_map(pdev->dev.of_node, 0);
     // printk("FLUKE KEYPAD PROBE: irq_of_parse_and_map returned irq number %d\n", irq);
@@ -287,24 +288,16 @@ static int fluke_keypad_probe(struct platform_device *pdev)
     }
 
 
-    cdev_init(&kb_data.cdev, &fluke_keypad_fops);
+    cdev_init(&drv_data->cdev, &fluke_keypad_fops);
 
-    sema_init(&kb_data.sem, 1);
+    sema_init(&drv_data->sem, 1);
+	
+    drv_data->cdev.owner = THIS_MODULE;
+    drv_data->cdev.ops   = &fluke_keypad_fops;
 
-    kb_data.cdev.owner = THIS_MODULE;
-    kb_data.cdev.ops   = &fluke_keypad_fops;
-    kb_data.test = 0x13;
+    result = cdev_add(&drv_data->cdev, devno, 1);
 
-    result = cdev_add(&kb_data.cdev, devno, 1);
-
-    dev_set_drvdata(&pdev->dev, ((void *)&kb_data));
-
-	drv_data = dev_get_drvdata(&pdev->dev);  //AJD goes away
-
-    // printk("\n\n FLUKE KEYPAD PROBE test = %d\n\n", drv_data->test); 
-    
-	init_waitqueue_head(&kb_data.queue);
-    sema_init(&kb_data.sem, 1);
+	init_waitqueue_head(&drv_data->queue);
 
     if(result)
         printk (KERN_INFO "fluke_keypad: Error %d adding fkeypd%d\n", result, 0);
@@ -319,11 +312,23 @@ static int fluke_keypad_remove(struct platform_device *pdev)
 	dev_t dev_num;
 
 	if(drv_data) {
-		//FIXME: fails to unmap or release io memory
 		cdev_del(&drv_data->cdev);
+		if (drv_data->irq)
+		{
+			free_irq(drv_data->irq, &pdev->dev);
+		}
+		if (drv_data->mapbase != NULL)
+		{
+			iounmap(drv_data->mapbase);
+		}
+		if (drv_data->iomem_resource.start != 0)
+		{
+			release_mem_region(drv_data->iomem_resource.start, resource_size(&drv_data->iomem_resource));
+		}
+		
 		dev_num = MKDEV(FLUKE_KEYPAD_MAJOR, drv_data->minor);
-		unregister_chrdev_region(dev_num, 1);
-		free_irq(drv_data->irq, &pdev->dev);
+		device_destroy (fluke_keypad_class, dev_num);
+
 		kfree(drv_data);
 	}
 	
@@ -373,8 +378,15 @@ static int __init fluke_keypad_init (void) {
 
 static void fluke_keypad_exit(void)
 {
+	dev_t dev;
+	
     // release_ports();
-	return platform_driver_unregister(&fkeypd_platform_driver);
+	platform_driver_unregister(&fkeypd_platform_driver);
+	
+    dev = MKDEV(FLUKE_KEYPAD_MAJOR, 0);
+	unregister_chrdev_region(dev, 1);
+	
+	class_destroy(fluke_keypad_class);
 }
 
 module_init(fluke_keypad_init);
