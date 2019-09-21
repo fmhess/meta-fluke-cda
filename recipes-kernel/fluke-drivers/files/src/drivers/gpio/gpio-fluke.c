@@ -35,8 +35,8 @@
 #include <linux/of_address.h>
 #include <linux/interrupt.h>
 #include <linux/signal.h>
-#include <asm/uaccess.h>
-#include <asm/io.h>
+#include <linux/uaccess.h>
+#include <linux/io.h>
 #include "fgpio-dev.h"
 #include "gpio-fluke.h"
 
@@ -166,7 +166,7 @@ static ssize_t hw_read (struct file *filp, char __user *buf, size_t count, loff_
     }
 
     if (copy_to_user(buf, tbuf, count)) {
-        printk (KERN_INFO "fgpio: read function FAILED! addr = %x\n", fgpiop->mapbase);
+        printk (KERN_INFO "fgpio: read function FAILED! addr = %p\n", fgpiop->mapbase);
         retval = -EFAULT; 
     }
     else 
@@ -196,7 +196,7 @@ static ssize_t hw_write (struct file *filp, const char __user *buf, size_t count
     }
 
     if (copy_from_user(tbuf, buf, count)) {
-        printk (KERN_INFO "fgpio: write function FAILED! addr = %x\n", fgpiop->mapbase);
+        printk (KERN_INFO "fgpio: write function FAILED! addr = %p\n", fgpiop->mapbase);
         retval = -EFAULT; 
     }
     else {
@@ -311,8 +311,16 @@ static inline void release_ports (void) {
     int i;
 
     for (i = 0; i < NR_DEVICES; i++) {
-        iounmap ((void __iomem *) fgpio_ports[i].mapbase);
-        release_mem_region (fgpio_ports[i].mapbase, NR_PORTS);
+		if (fgpio_ports[i].mapbase != NULL)
+		{
+			iounmap (fgpio_ports[i].mapbase);
+			fgpio_ports[i].mapbase = NULL;
+		}
+		if (fgpio_ports[i].iomem_resource.start != 0)
+		{
+			release_mem_region (fgpio_ports[i].iomem_resource.start, resource_size(&fgpio_ports[i].iomem_resource));
+			memset(&fgpio_ports[i].iomem_resource, 0, sizeof(struct resource));
+		}
     }
 }
 
@@ -330,7 +338,6 @@ static int fluke_gpio_probe(struct platform_device *pdev) {
     int rc = 0;
 //    unsigned int x;
 //    unsigned int configured_bits;
-    struct resource res;
 //    void *ptr_configured_bits;
 
     devno = MKDEV(FGPIO_MAJOR, i); 
@@ -350,18 +357,19 @@ static int fluke_gpio_probe(struct platform_device *pdev) {
 
     //AJD The old way fgpio_ports[i].mapbase   = (unsigned long)ioremap_nocache(platp->mapbase, NR_PORTS);
 
-    rc = of_address_to_resource(pdev->dev.of_node, 0, &res);
+    rc = of_address_to_resource(pdev->dev.of_node, 0, &fgpio_ports[i].iomem_resource);
     if (rc) {
         printk("GPIO PROBE Can't get address of resource\n");
+		return rc;
     }
     // printk("GPIO PROBE Assigning address (FDT) %x to minor %x\n", res.start, i);
 
-    if (!request_mem_region(res.start, (res.end - res.start + 1), "fluke_gpio")) {
-        printk (KERN_INFO "fluke_gpio: can't get memory region %ud for fgpio%d\n",fgpio_ports[i].mapbase, i);
+    if (!request_mem_region(fgpio_ports[i].iomem_resource.start, resource_size(&fgpio_ports[i].iomem_resource), "fluke_gpio")) {
+        printk (KERN_INFO "fluke_gpio: can't get memory region %pa for fgpio%d\n", &fgpio_ports[i].iomem_resource.start, i);
         release_ports();
         return -ENODEV;
     }
-    fgpio_ports[i].mapbase = (unsigned long)ioremap_nocache(res.start, (res.end - res.start + 1));
+    fgpio_ports[i].mapbase = ioremap_nocache(fgpio_ports[i].iomem_resource.start, resource_size(&fgpio_ports[i].iomem_resource));
     fgpio_ports[i].bits = 0xff;
 /*
     ptr_configured_bits = of_get_property(pdev->dev.of_node, "flk,gpio-bank-width", NULL);

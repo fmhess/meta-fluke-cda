@@ -36,7 +36,8 @@ struct interrupt_data {
 };
 
 struct fgpio_port {
-    unsigned int mapbase;
+    void *mapbase;
+	struct resource iomem_resource;
     unsigned int irq;
     unsigned int bits;
     unsigned int direction;

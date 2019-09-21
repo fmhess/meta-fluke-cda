@@ -325,6 +325,7 @@ static int fluke_keypad_remove(struct platform_device *pdev)
 	dev_t dev_num;
 
 	if(drv_data) {
+		//FIXME: fails to unmap or release io memory
 		cdev_del(&drv_data->cdev);
 		dev_num = MKDEV(FLUKE_KEYPAD_MAJOR, drv_data->minor);
 		unregister_chrdev_region(dev_num, 1);
