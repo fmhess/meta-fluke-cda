@@ -33,11 +33,11 @@
 #include <linux/of_gpio.h>
 #include <linux/of_device.h>
 #include <linux/of_address.h>
-#include <linux/fgpio-dev.h>
 #include <linux/interrupt.h>
 #include <linux/signal.h>
 #include <asm/uaccess.h>
 #include <asm/io.h>
+#include "fgpio-dev.h"
 #include "gpio-fluke.h"
 
 #define NR_PORTS	6	
