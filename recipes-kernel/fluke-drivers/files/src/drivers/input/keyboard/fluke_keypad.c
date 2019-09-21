@@ -24,7 +24,6 @@
 #include <linux/cdev.h>
 #include <linux/wait.h>
 #include <linux/sched.h>
-// #include <linux/sched/signal.h>
 #include <linux/preempt.h>
 #include <linux/uaccess.h>
 #include <linux/io.h>
@@ -131,11 +130,6 @@ static ssize_t fluke_keypad_read(struct file *filp, char __user *buf,
 		if(kb_data.head == kb_data.tail)
 			schedule();
 		finish_wait(&kb_data.queue, &wait);
-		if (signal_pending(current)) {
-            // printk("ignal_pending current\n");
-			return -ERESTARTSYS;
-        }
-
 		if (down_interruptible(&kb_data.sem)) {
             // printk("down_interruptible again\n");
 			return -ERESTARTSYS;
