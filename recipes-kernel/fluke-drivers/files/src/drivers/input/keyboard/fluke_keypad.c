@@ -34,16 +34,16 @@
 
 static int fluke_keypad_remove(struct platform_device *pdev);
 
-#define FLUKE_KEYBOARD_NUM_REGISTERS 2
-#define FLUKE_KEYBOARD_NUM_BITS_PER_REGISTER 32
-#define FLUKE_KEYBOARD_KEYMAP_SIZE (FLUKE_KEYBOARD_NUM_REGISTERS * FLUKE_KEYBOARD_NUM_BITS_PER_REGISTER)
+#define FLUKE_KEYPAD_NUM_REGISTERS 2
+#define FLUKE_KEYPAD_NUM_BITS_PER_REGISTER 32
+#define FLUKE_KEYPAD_KEYMAP_SIZE (FLUKE_KEYPAD_NUM_REGISTERS * FLUKE_KEYPAD_NUM_BITS_PER_REGISTER)
 
 struct fluke_keypad_data {
     void *mapbase;
 	struct resource iomem_resource;
 	int irq;
 	struct input_dev *input_dev;
-	unsigned char keycode[FLUKE_KEYBOARD_KEYMAP_SIZE];
+	unsigned char keycode[FLUKE_KEYPAD_KEYMAP_SIZE];
 };
 
 static irqreturn_t fluke_keypad_handler(int irq, void *dev_id)
@@ -64,12 +64,12 @@ static irqreturn_t fluke_keypad_handler(int irq, void *dev_id)
 
 
 	/* read the keypad code, clears the interrupt */
-	for (i = 0; i < FLUKE_KEYBOARD_NUM_REGISTERS; ++i) {
+	for (i = 0; i < FLUKE_KEYPAD_NUM_REGISTERS; ++i) {
 		kpd_reg = readl(drv_data->mapbase + 4 * i);
 		// printk("interrupt routine kpd_register1 = %d\n", kpd_reg);
-		for (j = 0; j < FLUKE_KEYBOARD_NUM_BITS_PER_REGISTER; ++j) {
+		for (j = 0; j < FLUKE_KEYPAD_NUM_BITS_PER_REGISTER; ++j) {
 			input_report_key(drv_data->input_dev, 
-				drv_data->keycode[i * FLUKE_KEYBOARD_NUM_BITS_PER_REGISTER + j], 
+				drv_data->keycode[i * FLUKE_KEYPAD_NUM_BITS_PER_REGISTER + j], 
 				kpd_reg & (0x1 << j));
 		}
 	}
@@ -96,7 +96,7 @@ static int fluke_keypad_probe(struct platform_device *pdev)
 	drv_data = kzalloc(sizeof(struct fluke_keypad_data), GFP_KERNEL);
 	if (drv_data == NULL) return -ENOMEM;
 	dev_set_drvdata(&pdev->dev, drv_data);
-	for (i = 0; i < FLUKE_KEYBOARD_KEYMAP_SIZE; ++i)
+	for (i = 0; i < FLUKE_KEYPAD_KEYMAP_SIZE; ++i)
 	{
 		drv_data->keycode[i] = i + 1;
 	}
@@ -114,8 +114,8 @@ static int fluke_keypad_probe(struct platform_device *pdev)
 	input_dev->id.version	= 0x0001;
 	input_dev->keycode = drv_data->keycode;
 	input_dev->keycodesize = sizeof(unsigned char);
-	input_dev->keycodemax = FLUKE_KEYBOARD_KEYMAP_SIZE;
-	for (i = 0; i < FLUKE_KEYBOARD_KEYMAP_SIZE; i++) 
+	input_dev->keycodemax = FLUKE_KEYPAD_KEYMAP_SIZE;
+	for (i = 0; i < FLUKE_KEYPAD_KEYMAP_SIZE; i++) 
 	{
 		input_set_capability(input_dev, EV_KEY, drv_data->keycode[i]);
 	}
