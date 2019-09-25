@@ -86,13 +86,13 @@ static ssize_t hw_read (struct file *filp, char __user *buf, size_t count, loff_
     }
 
     for (i = 0; i < count; i++) {
-        tbuf[i] = ioread32((int*)(inttimerp->mapbase + 4));
+        tbuf[i] = ioread32(inttimerp->mapbase + 4);
         rmb();
     }
     count = i;
 
     if (copy_to_user(buf, tbuf, count)) {
-        printk (KERN_INFO "int timer: read function FAILED! addr = %x\n", inttimerp->mapbase);
+        printk (KERN_INFO "int timer: read function FAILED! addr = %p\n", inttimerp->mapbase);
         retval = -EFAULT; 
     }
     else 
@@ -122,14 +122,14 @@ static ssize_t hw_write (struct file *filp, const char __user *buf, size_t count
     }
 
     if (copy_from_user(tbuf, buf, count)) {
-        printk (KERN_INFO "int timer: write function FAILED! addr = %x\n", inttimerp->mapbase);
+        printk (KERN_INFO "int timer: write function FAILED! addr = %p\n", inttimerp->mapbase);
         retval = -EFAULT; 
     }
     else {
         CountVal = BEEPER_COUNTER_FREQ/(2*note);
         for (i = 0; i < count; i++) {
-            iowrite32(tbuf[i], (int*)(inttimerp->mapbase + 0x04));
-            // iowrite32(0x06, (int*)(inttimerp->mapbase + 0x04));
+            iowrite32(tbuf[i], inttimerp->mapbase + 0x04);
+            // iowrite32(0x06, inttimerp->mapbase + 0x04);
         }
         retval = count;
     }
@@ -146,7 +146,7 @@ static long hw_ioctl (struct file *filp, unsigned int cmd, unsigned long arg) {
     int data = 0x00;
     struct inttimer_port *inttimerp = filp->private_data;
 
-    // printk ("inttimer/ioctl: %8x\n", inttimerp->mapbase);
+    // printk ("inttimer/ioctl: %p\n", inttimerp->mapbase);
     down(&inttimerp->sem);
 
     if (_IOC_TYPE(cmd) != INTTIMER_IOC_MAGIC_NUMBER)  return -ENOTTY;
@@ -160,23 +160,23 @@ static long hw_ioctl (struct file *filp, unsigned int cmd, unsigned long arg) {
 
     switch(cmd) {
     case INTTIMER_READ_REG0:
-        // printk (KERN_INFO "fgpio/ioctl: returning Data register: %8x\n", inttimerp->mapbase);
+        // printk (KERN_INFO "fgpio/ioctl: returning Data register: %p\n", inttimerp->mapbase);
         if (access_ok(VERIFY_WRITE, (const void *)arg, sizeof(unsigned int))) {
-            *((unsigned int *)arg) = ioread32((unsigned int*)(inttimerp->mapbase));
+            *((unsigned int *)arg) = ioread32(inttimerp->mapbase);
         }
         break;
     case INTTIMER_WRITE_FREQL:
         data = (arg & 0x0ffff);
-        printk (KERN_INFO "fgpio/ioctl: Writing freq Low Data <%04x, to register: %8x\n",data, (inttimerp->mapbase + 0x08));
+        printk (KERN_INFO "fgpio/ioctl: Writing freq Low Data <%04x, to register: %p\n",data, (inttimerp->mapbase + 0x08));
         if (access_ok(VERIFY_READ, (const void *)arg, sizeof(unsigned int))) {
-            iowrite32(data, (int*)(inttimerp->mapbase + 0x08));         // Counter Freq Low
+            iowrite32(data, inttimerp->mapbase + 0x08);         // Counter Freq Low
         }
         break;
     case INTTIMER_WRITE_FREQH:
         data = (arg & 0x0ffff);
-        printk (KERN_INFO "fgpio/ioctl: Writing freq High Data <%04x, to register: %8x\n",data, (inttimerp->mapbase + 0x08));
+        printk (KERN_INFO "fgpio/ioctl: Writing freq High Data <%04x, to register: %p\n",data, (inttimerp->mapbase + 0x08));
         if (access_ok(VERIFY_READ, (const void *)arg, sizeof(unsigned int))) {
-            iowrite32(data, (int*)(inttimerp->mapbase + 0x0c)); // Counter Freq Hi
+            iowrite32(data, inttimerp->mapbase + 0x0c); // Counter Freq Hi
         }
         break;
     default:
@@ -200,8 +200,9 @@ static inline void release_ports (void) {
     int i;
 
     for (i = 0; i < NR_DEVICES; i++) {
-        iounmap ((void __iomem *) inttimer_ports[i].mapbase);
-        release_mem_region (inttimer_ports[i].mapbase, NR_PORTS);
+        iounmap (inttimer_ports[i].mapbase);
+		//FIXME passing wrong arg to release_mem_region
+        //release_mem_region (inttimer_ports[i].mapbase, NR_PORTS);
     }
 }
 
@@ -236,11 +237,11 @@ static int alt_inttimer_probe(struct platform_device *pdev) {
 
     // if (!request_mem_region (res.start, NR_PORTS, "fluke_gpio")) {
     if (!request_mem_region(res.start, (res.end - res.start + 1), "alt_interval_timer")) {
-        printk (KERN_INFO "alt_inttimer: can't get memory region %ud for alttimer%d\n", inttimer_ports[i].mapbase, i);
+        printk (KERN_INFO "alt_inttimer: can't get memory region %pa for alttimer%d\n", &res.start, i);
         release_ports();
         return -ENODEV;
     }
-    inttimer_ports[i].mapbase = (unsigned long)ioremap_nocache(res.start, (res.end - res.start + 1));
+    inttimer_ports[i].mapbase = ioremap_nocache(res.start, (res.end - res.start + 1));
 
     cdev_init(&inttimer_ports[i].cdev, &hw_fops);
 

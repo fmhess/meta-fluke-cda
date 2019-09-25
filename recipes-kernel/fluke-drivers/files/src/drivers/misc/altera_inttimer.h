@@ -29,7 +29,7 @@
 
 
 struct inttimer_port {
-    unsigned int mapbase;
+    void *mapbase;
     unsigned int minor;
     struct       semaphore sem;
     struct       cdev cdev;
