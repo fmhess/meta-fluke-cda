@@ -24,6 +24,7 @@
 #include <linux/kernel.h>	/* printk() */
 #include <linux/fs.h>		/* everything... */
 #include <linux/errno.h>	/* error codes */
+#include <linux/idr.h>
 #include <linux/ioport.h>
 #include <linux/types.h> 
 #include <linux/kdev_t.h>
@@ -39,6 +40,7 @@
 #include "altera_inttimer.h"
 
 #define NR_PORTS	6	
+#define MAX_INTTIMER_DEVICES 0x100
 
 MODULE_AUTHOR ("Alex j. Dorchak");
 MODULE_DESCRIPTION("Driver for Altera Interval Timer Core");
@@ -47,6 +49,7 @@ MODULE_LICENSE("GPL");
 static struct class *alt_intervaltimer_class;
 static unsigned major_number;
 static const int BEEPER_COUNTER_FREQ = 60000000;
+static DEFINE_IDA(minor_allocator);
 
 static int hw_open (struct inode *inode, struct file *filp) {
 
@@ -224,6 +227,11 @@ static int alt_inttimer_remove(struct platform_device *pdev) {
             device_destroy(alt_intervaltimer_class, inttimerp->dev->devt);
         }
         
+        if (inttimerp->minor >= 0)
+        {
+            ida_simple_remove(&minor_allocator, inttimerp->minor);
+        }
+        
         kfree (inttimerp);
     }
     return 0;
@@ -242,9 +250,16 @@ static int alt_inttimer_probe(struct platform_device *pdev) {
         return -ENOMEM;
     }
     sema_init(&inttimerp->sem, 1);
+    inttimerp->minor = -1;
     dev_set_drvdata(&pdev->dev, inttimerp);
-    
-    devno = MKDEV(major_number, 0); 
+
+    inttimerp->minor = ida_simple_get(&minor_allocator, 0, MAX_INTTIMER_DEVICES, GFP_KERNEL);
+    if (inttimerp->minor < 0)
+    {
+        alt_inttimer_remove(pdev);
+        return inttimerp->minor;
+    }
+    devno = MKDEV(major_number, inttimerp->minor); 
     inttimerp->dev = device_create(alt_intervaltimer_class, NULL, devno, NULL, "alttimer%d", MINOR(devno));
     if (IS_ERR(inttimerp->dev)) {
         printk ("fgpio: can't create alt_inttimer_device %x\n", MINOR(devno));
@@ -278,7 +293,7 @@ static int alt_inttimer_probe(struct platform_device *pdev) {
     if(result)
         printk (KERN_INFO "alt_timer: Error %d adding alttimer%d\n", result, MINOR(devno));
     else
-        printk (KERN_INFO "alt_timer: Registering alttimer%d on Major %d, Minor %d\n", 0, major_number, MINOR(devno));
+        printk (KERN_INFO "alt_timer: Registering alttimer%d on Major %d, Minor %d\n", MINOR(devno), major_number, MINOR(devno));
     return result;
 }
 
@@ -303,7 +318,7 @@ static int __init inttimer_init (void) {
     }
 
     /* First, let's get the devices we need /dev/alttimer0 - /dev/alttimerN */
-    result = alloc_chrdev_region(&devt, 0, 1, "alttimer");
+    result = alloc_chrdev_region(&devt, 0, MAX_INTTIMER_DEVICES, "alttimer");
     if (result < 0) {
         printk (KERN_INFO "inttimer_init: can't register alttimer devices /dev/alttimerX\n");
         class_destroy(alt_intervaltimer_class);
@@ -324,7 +339,7 @@ static int __init inttimer_init (void) {
 
 static void __exit inttimer_exit(void) {
     platform_driver_unregister(&inttimer_platform_driver);
-    unregister_chrdev_region(MKDEV(major_number, 0), 1);
+    unregister_chrdev_region(MKDEV(major_number, 0), MAX_INTTIMER_DEVICES);
     class_destroy(alt_intervaltimer_class);
 }
 

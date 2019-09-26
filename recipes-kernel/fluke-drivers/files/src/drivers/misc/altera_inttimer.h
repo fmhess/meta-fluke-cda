@@ -34,6 +34,7 @@ struct inttimer_port {
     struct       semaphore sem;
     struct       cdev cdev;
     struct device* dev;
+	int minor;
     int cdev_added : 1;
 };
 
