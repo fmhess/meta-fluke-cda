@@ -461,7 +461,7 @@ static int __init fgpio_init (void) {
     result = alloc_chrdev_region(&dev, 0, NR_DEVICES, "fgpio");
     if (result < 0) {
         printk (KERN_INFO "fgpio: can't register FGPIO devices /dev/fgpioX\n");
-        // release_ports();
+        class_destroy(fluke_gpio_class);
         return result;
     }
     fgpio_major = MAJOR(dev);
@@ -469,7 +469,8 @@ static int __init fgpio_init (void) {
     result = platform_driver_register(&fgpio_platform_driver);
     if (result) {
         printk (KERN_INFO "fgpio: platform_register failed!\n");
-        release_ports();
+        unregister_chrdev_region(MKDEV(fgpio_major, 0), NR_DEVICES);
+        class_destroy(fluke_gpio_class);
         return result;
     }
 
@@ -477,8 +478,9 @@ static int __init fgpio_init (void) {
 }
 
 static void __exit fgpio_exit(void) {
-    release_ports();
+    platform_driver_unregister(&fgpio_platform_driver);
     unregister_chrdev_region(MKDEV(fgpio_major, 0), NR_DEVICES);
+    class_destroy(fluke_gpio_class);
 }
 
 module_init(fgpio_init);
