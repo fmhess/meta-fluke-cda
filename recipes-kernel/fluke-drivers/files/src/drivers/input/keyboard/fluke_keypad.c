@@ -137,6 +137,7 @@ static int fluke_keypad_probe(struct platform_device *pdev)
 	// printk("FLUKE KEYPAD PROBE Assigning address (FDT) %x to minor %x\n", res.start, 0);
 
 	if (!request_mem_region(drv_data->iomem_resource.start, resource_size(&drv_data->iomem_resource), "fluke_keypad")) {
+		drv_data->iomem_resource.start = 0; // zero start so fluke_keypad_remove  knows the mem region was not obtained
 		printk (KERN_INFO "fluke_keypad: can't get memory region %pa for fkeypd%d\n", &drv_data->iomem_resource.start, 0);
 		fluke_keypad_remove(pdev);
 		return -ENODEV;
