@@ -329,7 +329,7 @@ static int __init inttimer_init (void) {
     result = platform_driver_register(&inttimer_platform_driver);
     if (result) {
         printk (KERN_INFO "inttimer_init: platform_register failed!\n");
-        unregister_chrdev_region(MKDEV(major_number, 0), 1);
+        unregister_chrdev_region(MKDEV(major_number, 0), MAX_INTTIMER_DEVICES);
         class_destroy(alt_intervaltimer_class);
         return result;
     }
