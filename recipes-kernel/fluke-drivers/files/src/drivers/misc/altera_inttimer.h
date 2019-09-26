@@ -30,9 +30,11 @@
 
 struct inttimer_port {
     void *mapbase;
-    unsigned int minor;
+    struct resource iomem_resource;
     struct       semaphore sem;
     struct       cdev cdev;
+    struct device* dev;
+    int cdev_added : 1;
 };
 
 

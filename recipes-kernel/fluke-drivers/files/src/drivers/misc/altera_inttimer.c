@@ -39,17 +39,14 @@
 #include "altera_inttimer.h"
 
 #define NR_PORTS	6	
-#define INTTIMER_MAJOR    94	
-#define NR_DEVICES      8
 
 MODULE_AUTHOR ("Alex j. Dorchak");
 MODULE_DESCRIPTION("Driver for Altera Interval Timer Core");
 MODULE_LICENSE("GPL");
 
 static struct class *alt_intervaltimer_class;
-static struct device* inttimer_device = NULL;
+static unsigned major_number;
 static const int BEEPER_COUNTER_FREQ = 60000000;
-static struct inttimer_port inttimer_ports[NR_DEVICES];
 
 static int hw_open (struct inode *inode, struct file *filp) {
 
@@ -196,73 +193,98 @@ static struct file_operations hw_fops = {
 	.release         = hw_release,
 };
 
-static inline void release_ports (void) {
-    int i;
-
-    for (i = 0; i < NR_DEVICES; i++) {
-        iounmap (inttimer_ports[i].mapbase);
-		//FIXME passing wrong arg to release_mem_region
-        //release_mem_region (inttimer_ports[i].mapbase, NR_PORTS);
-    }
-}
-
 static struct of_device_id altera_inttimer_of_match[] = {
     { .compatible = "altr,cntr-1.0", },
     {},
 };
 MODULE_DEVICE_TABLE(of, altera_inttimer_of_match);
 
+static int alt_inttimer_remove(struct platform_device *pdev) {
+    struct inttimer_port *inttimerp = dev_get_drvdata(&pdev->dev);
+
+    if (inttimerp != NULL)
+    {
+        if (inttimerp->cdev_added)
+        {
+            cdev_del (&inttimerp->cdev);
+        }
+        
+        if (inttimerp->mapbase != NULL)
+        {
+            iounmap(inttimerp->mapbase);
+        }
+
+        if (inttimerp->iomem_resource.start != 0)
+        {
+            release_mem_region (inttimerp->iomem_resource.start, resource_size(&inttimerp->iomem_resource));
+        }
+        
+        if (!IS_ERR(inttimerp->dev))
+        {
+            device_destroy(alt_intervaltimer_class, inttimerp->dev->devt);
+        }
+        
+        kfree (inttimerp);
+    }
+    return 0;
+}
+
 static int alt_inttimer_probe(struct platform_device *pdev) {
 
-    static int i = 0;
     int result;
-    int devno;
+    dev_t devno;
     int rc = 0;
-    struct resource res;
+    struct inttimer_port *inttimerp;
 
-    devno = MKDEV(INTTIMER_MAJOR, i); 
-    inttimer_device = device_create(alt_intervaltimer_class, NULL, devno, NULL, "alttimer%d", i);
-    if (IS_ERR(inttimer_device)) {
-        printk ("fgpio: can't create alt_inttimer_device %x\n", i);
-        // release_ports();
-        return PTR_ERR(inttimer_device);
+    inttimerp = kzalloc(sizeof(struct inttimer_port), GFP_KERNEL);
+    if (inttimerp == NULL)
+    {
+        return -ENOMEM;
+    }
+    sema_init(&inttimerp->sem, 1);
+    dev_set_drvdata(&pdev->dev, inttimerp);
+    
+    devno = MKDEV(major_number, 0); 
+    inttimerp->dev = device_create(alt_intervaltimer_class, NULL, devno, NULL, "alttimer%d", MINOR(devno));
+    if (IS_ERR(inttimerp->dev)) {
+        printk ("fgpio: can't create alt_inttimer_device %x\n", MINOR(devno));
+        alt_inttimer_remove(pdev);
+        return PTR_ERR(inttimerp->dev);
     }
 
-    inttimer_ports[i].minor     = i; 
-    rc = of_address_to_resource(pdev->dev.of_node, 0, &res);
+    rc = of_address_to_resource(pdev->dev.of_node, 0, &inttimerp->iomem_resource);
     if (rc) {
         printk("GPIO PROBE Can't get address of resource\n");
+        alt_inttimer_remove(pdev);
+        return rc;
     }
     // printk("alt_inttimer PROBE Assigning address (FDT) %x to minor %x\n", res.start, i);
 
     // if (!request_mem_region (res.start, NR_PORTS, "fluke_gpio")) {
-    if (!request_mem_region(res.start, (res.end - res.start + 1), "alt_interval_timer")) {
-        printk (KERN_INFO "alt_inttimer: can't get memory region %pa for alttimer%d\n", &res.start, i);
-        release_ports();
+    if (!request_mem_region(inttimerp->iomem_resource.start, resource_size(&inttimerp->iomem_resource), "alt_interval_timer")) {
+        inttimerp->iomem_resource.start = 0; // zero start so alt_inttimer_remove knows iomem was not obtained
+        printk (KERN_INFO "alt_inttimer: can't get memory region %pa for alttimer%d\n", &inttimerp->iomem_resource, MINOR(devno));
+        alt_inttimer_remove(pdev);
         return -ENODEV;
     }
-    inttimer_ports[i].mapbase = ioremap_nocache(res.start, (res.end - res.start + 1));
-
-    cdev_init(&inttimer_ports[i].cdev, &hw_fops);
-
-    sema_init(&inttimer_ports[i].sem, 1);
     
-    inttimer_ports[i].cdev.owner = THIS_MODULE;
-    inttimer_ports[i].cdev.ops   = &hw_fops;
+    inttimerp->mapbase = ioremap_nocache(inttimerp->iomem_resource.start, resource_size(&inttimerp->iomem_resource));
 
-    result = cdev_add(&inttimer_ports[i].cdev, devno, 1);
-
+    cdev_init(&inttimerp->cdev, &hw_fops);
+    inttimerp->cdev.owner = THIS_MODULE;
+    result = cdev_add(&inttimerp->cdev, devno, 1);
+    inttimerp->cdev_added = result == 0;
+    
     if(result)
-        printk (KERN_INFO "alt_timer: Error %d adding alttimer%d\n", result, i);
+        printk (KERN_INFO "alt_timer: Error %d adding alttimer%d\n", result, MINOR(devno));
     else
-        printk (KERN_INFO "alt_timer: Registering alttimer%d on Major %d, Minor %d\n", i, INTTIMER_MAJOR, i);
-    i++;
+        printk (KERN_INFO "alt_timer: Registering alttimer%d on Major %d, Minor %d\n", 0, major_number, MINOR(devno));
     return result;
 }
 
 static struct platform_driver inttimer_platform_driver = {
     .probe = alt_inttimer_probe,
-//    .remove = alt_inttimer_remove,
+    .remove = alt_inttimer_remove,
     .driver = {
                   .name = "altera_inttimer",
                   .owner = THIS_MODULE,
@@ -272,8 +294,8 @@ static struct platform_driver inttimer_platform_driver = {
 
 static int __init inttimer_init (void) {
     int result;
-    dev_t dev;
-
+    dev_t devt;
+    
     alt_intervaltimer_class = class_create(THIS_MODULE, "altera-int-timer");    // Create the sys/class entry
     if (IS_ERR(alt_intervaltimer_class)) {
         printk ("inttimer_init: can't create alt_intervaltimer_class\n");
@@ -281,18 +303,19 @@ static int __init inttimer_init (void) {
     }
 
     /* First, let's get the devices we need /dev/alttimer0 - /dev/alttimerN */
-    dev = MKDEV(INTTIMER_MAJOR, 0); 
-    result = register_chrdev_region(dev, NR_DEVICES, "alttimer");
+    result = alloc_chrdev_region(&devt, 0, 1, "alttimer");
     if (result < 0) {
         printk (KERN_INFO "inttimer_init: can't register alttimer devices /dev/alttimerX\n");
-        // release_ports();
+        class_destroy(alt_intervaltimer_class);
         return result;
     }
+    major_number = MAJOR(devt);
 
     result = platform_driver_register(&inttimer_platform_driver);
     if (result) {
         printk (KERN_INFO "inttimer_init: platform_register failed!\n");
-        release_ports();
+        unregister_chrdev_region(MKDEV(major_number, 0), 1);
+        class_destroy(alt_intervaltimer_class);
         return result;
     }
 
@@ -300,8 +323,9 @@ static int __init inttimer_init (void) {
 }
 
 static void __exit inttimer_exit(void) {
-    release_ports();
-    unregister_chrdev_region(MKDEV(INTTIMER_MAJOR, 0), NR_DEVICES);
+    platform_driver_unregister(&inttimer_platform_driver);
+    unregister_chrdev_region(MKDEV(major_number, 0), 1);
+    class_destroy(alt_intervaltimer_class);
 }
 
 module_init(inttimer_init);
