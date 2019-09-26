@@ -41,7 +41,6 @@
 #include "gpio-fluke.h"
 
 #define NR_PORTS	6	
-#define FGPIO_MAJOR    92	
 
 #if defined(CONFIG_FLUKE_A9_MTV)
 #define NR_DEVICES      8
@@ -63,7 +62,7 @@ static struct device* fgpio_device = NULL;
 
 static struct fgpio_port fgpio_ports[NR_DEVICES];
 static struct Queue      Q[NR_DEVICES];
-
+static unsigned fgpio_major;
 
 static int q_full(struct Queue *Q) {
     // printk(KERN_INFO "q_full: Size = %d, Capacity = %d\n", Q->Size, Q->Capacity);
@@ -340,7 +339,7 @@ static int fluke_gpio_probe(struct platform_device *pdev) {
 //    unsigned int configured_bits;
 //    void *ptr_configured_bits;
 
-    devno = MKDEV(FGPIO_MAJOR, i); 
+    devno = MKDEV(fgpio_major, i); 
     fgpio_device = device_create(fluke_gpio_class, NULL, devno, NULL, "fgpio%d", i);
     if (IS_ERR(fgpio_device)) {
         printk ("fgpio: can't create fluke_gpio_device %x\n", i);
@@ -432,7 +431,7 @@ static int fluke_gpio_probe(struct platform_device *pdev) {
     if(result)
         printk (KERN_INFO "fgpio: Error %d adding fgpio%d\n", result, i);
     else
-        printk (KERN_INFO "fgpio: Registering fgpio%d on Major %d, Minor %d\n", i, FGPIO_MAJOR, i);
+        printk (KERN_INFO "fgpio: Registering fgpio%d on Major %d, Minor %d\n", i, fgpio_major, i);
     i++;
     return result;
 }
@@ -459,13 +458,13 @@ static int __init fgpio_init (void) {
     printk (KERN_INFO "fgpio: registered fluke_gpio_class.\n");
 
     /* First, let's get the devices we need /dev/fgpio0 - /dev/fgpio7 */
-    dev = MKDEV(FGPIO_MAJOR, 0); 
-    result = register_chrdev_region(dev, NR_DEVICES, "fgpio");
+    result = alloc_chrdev_region(&dev, 0, NR_DEVICES, "fgpio");
     if (result < 0) {
         printk (KERN_INFO "fgpio: can't register FGPIO devices /dev/fgpioX\n");
         // release_ports();
         return result;
     }
+    fgpio_major = MAJOR(dev);
 
     result = platform_driver_register(&fgpio_platform_driver);
     if (result) {
@@ -479,7 +478,7 @@ static int __init fgpio_init (void) {
 
 static void __exit fgpio_exit(void) {
     release_ports();
-    unregister_chrdev_region(MKDEV(FGPIO_MAJOR, 0), NR_DEVICES);
+    unregister_chrdev_region(MKDEV(fgpio_major, 0), NR_DEVICES);
 }
 
 module_init(fgpio_init);
