@@ -250,7 +250,6 @@ static int alt_inttimer_probe(struct platform_device *pdev) {
         return -ENOMEM;
     }
     sema_init(&inttimerp->sem, 1);
-    inttimerp->minor = -1;
     dev_set_drvdata(&pdev->dev, inttimerp);
 
     inttimerp->minor = ida_simple_get(&minor_allocator, 0, MAX_INTTIMER_DEVICES, GFP_KERNEL);

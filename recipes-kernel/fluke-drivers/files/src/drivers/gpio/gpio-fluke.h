@@ -35,20 +35,6 @@ struct interrupt_data {
     unsigned char irq_count;
 };
 
-struct fgpio_port {
-    void *mapbase;
-	struct resource iomem_resource;
-    unsigned int irq;
-    unsigned int bits;
-    unsigned int direction;
-    unsigned int edge;
-    unsigned int minor;
-    unsigned int q_events;
-    struct       interrupt_data irqd; /* set by handler on interrupt */
-    struct       semaphore sem;
-    struct       cdev cdev;
-};
-
 struct Queue {
     int Capacity;
     int Front;
@@ -57,5 +43,21 @@ struct Queue {
     unsigned int Array[Q_SIZE];
 };
 
+struct fgpio_port {
+    void *mapbase;
+    struct resource iomem_resource;
+    unsigned int irq;
+    unsigned int bits;
+    unsigned int direction;
+    unsigned int edge;
+    int minor;
+    unsigned int q_events;
+    struct       interrupt_data irqd; /* set by handler on interrupt */
+    struct       semaphore sem;
+    struct       cdev cdev;
+    struct device *dev;
+    struct Queue      Q;
+    unsigned cdev_added : 1;
+};
 
 #endif /* gpio_fluke_h */

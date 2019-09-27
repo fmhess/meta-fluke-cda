@@ -41,28 +41,15 @@
 #include "gpio-fluke.h"
 
 #define NR_PORTS	6	
-
-#if defined(CONFIG_FLUKE_A9_MTV)
-#define NR_DEVICES      8
-
-#elif defined(CONFIG_FLUKE_BLACKHAWK)
-#define NR_DEVICES     13 
-
-#else
-#define NR_DEVICES     20 
-
-#endif
+#define NR_DEVICES     0x100 
 
 MODULE_AUTHOR ("Alex j. Dorchak");
 MODULE_DESCRIPTION("Fluke Custom Driver for Altera GPIO");
 MODULE_LICENSE("GPL");
 
 static struct class *fluke_gpio_class;
-static struct device* fgpio_device = NULL;
-
-static struct fgpio_port fgpio_ports[NR_DEVICES];
-static struct Queue      Q[NR_DEVICES];
 static unsigned fgpio_major;
+static DEFINE_IDA(minor_allocator);
 
 static int q_full(struct Queue *Q) {
     // printk(KERN_INFO "q_full: Size = %d, Capacity = %d\n", Q->Size, Q->Capacity);
@@ -147,7 +134,7 @@ static ssize_t hw_read (struct file *filp, char __user *buf, size_t count, loff_
 
     if(fgpiop->irq) {    /* if we're in IRQ mode use the Q */
         for (i = 0; i < count; i++) {
-            tbuf[i] = q_dequeue(&Q[fgpiop->minor]);
+            tbuf[i] = q_dequeue(&fgpiop->Q);
             if (tbuf[i] == 0) {
                 break;
             }
@@ -259,7 +246,7 @@ static long hw_ioctl (struct file *filp, unsigned int cmd, unsigned long arg) {
         break;
     case FGPIO_FLUSH_QUEUE:
         // printk (KERN_INFO "fgpio/ioctl: Flushing Queue (minor)%d\n", fgpiop->minor);
-        q_init(&Q[fgpiop->minor]);
+        q_init(&fgpiop->Q);
         break;
     case FGPIO_READ_REG0:
         // printk (KERN_INFO "fgpio/ioctl: returning Data register: %8x\n", fgpiop->mapbase);
@@ -286,9 +273,9 @@ irqreturn_t fgpio_irq(int irq, void *dev_id, struct pt_regs *regs) {
 
     buf = (ioread32((int*)(fgpiop->mapbase + (4 * 3))) & fgpiop->bits & ~fgpiop->direction);
     rmb();
-    if (q_enqueue(buf, &Q[fgpiop->minor])) {
+    if (q_enqueue(buf, &fgpiop->Q)) {
         printk (KERN_INFO "fgpio: IRQ function! QUEUE FULL ERROR: Q[%x], data = %x, Cap = %d\n", 
-                fgpiop->minor, (buf & fgpiop->bits), Q[fgpiop->minor].Capacity);
+                fgpiop->minor, (buf & fgpiop->bits), fgpiop->Q.Capacity);
     }
     iowrite32(0xff, (int*)(fgpiop->mapbase + (4 * 3)));
 
@@ -306,70 +293,98 @@ static struct file_operations hw_fops = {
 	.release         = hw_release,
 };
 
-static inline void release_ports (void) {
-    int i;
-
-    for (i = 0; i < NR_DEVICES; i++) {
-		if (fgpio_ports[i].mapbase != NULL)
-		{
-			iounmap (fgpio_ports[i].mapbase);
-			fgpio_ports[i].mapbase = NULL;
-		}
-		if (fgpio_ports[i].iomem_resource.start != 0)
-		{
-			release_mem_region (fgpio_ports[i].iomem_resource.start, resource_size(&fgpio_ports[i].iomem_resource));
-			memset(&fgpio_ports[i].iomem_resource, 0, sizeof(struct resource));
-		}
-    }
-}
-
 static struct of_device_id fluke_gpio_of_match[] = {
     { .compatible = "flk,fgpio-1.0", },
     {},
 };
 MODULE_DEVICE_TABLE(of, fluke_gpio_of_match);
 
-static int fluke_gpio_probe(struct platform_device *pdev) {
+static int fluke_gpio_remove(struct platform_device *pdev) {
+    struct fgpio_port *fgpio_port = dev_get_drvdata (&pdev->dev);
 
-    static int i = 0;
+    if (fgpio_port)
+    {
+        if (fgpio_port->cdev_added)
+        {
+            cdev_del(&fgpio_port->cdev);
+        }
+        
+        if (fgpio_port->mapbase)
+        {
+            iounmap(fgpio_port->mapbase);
+        }
+        
+        if (fgpio_port->iomem_resource.start)
+        {
+            release_mem_region(fgpio_port->iomem_resource.start, resource_size(&fgpio_port->iomem_resource));
+        }
+        
+        if (!IS_ERR(fgpio_port->dev))
+        {
+            device_destroy(fluke_gpio_class, fgpio_port->dev->devt);
+        }
+        
+        if (fgpio_port->minor >= 0)
+        {
+            ida_simple_remove(&minor_allocator, fgpio_port->minor);
+        }
+        
+        kfree (fgpio_port);
+    }
+    return 0;
+}
+
+static int fluke_gpio_probe (struct platform_device *pdev) {
     int result;
     int devno;
     int rc = 0;
+    struct fgpio_port *fgpio_port;
 //    unsigned int x;
 //    unsigned int configured_bits;
 //    void *ptr_configured_bits;
 
-    devno = MKDEV(fgpio_major, i); 
-    fgpio_device = device_create(fluke_gpio_class, NULL, devno, NULL, "fgpio%d", i);
-    if (IS_ERR(fgpio_device)) {
-        printk ("fgpio: can't create fluke_gpio_device %x\n", i);
-        // release_ports();
-        return PTR_ERR(fgpio_device);
+    fgpio_port = kzalloc (sizeof (struct fgpio_port), GFP_KERNEL);
+    if(fgpio_port == NULL) return -ENOMEM;
+    sema_init(&fgpio_port->sem, 1);
+/*AJD hardwire direction edge etc for now */
+    fgpio_port->direction = 0x100;                // All I/O
+    fgpio_port->edge      = 0x00;
+    fgpio_port->bits = 0xff;
+    q_init (&fgpio_port->Q);
+/*AJD END hardwire direction edge etc for now */
+    dev_set_drvdata (&pdev->dev, fgpio_port);
+
+    fgpio_port->minor = ida_simple_get(&minor_allocator, 0, NR_DEVICES, GFP_KERNEL);
+    if (fgpio_port->minor < 0)
+    {
+        fluke_gpio_remove(pdev);
+        return fgpio_port->minor;
     }
 
-    fgpio_ports[i].minor     = i; 
+    devno = MKDEV(fgpio_major, fgpio_port->minor); 
+    fgpio_port->dev = device_create(fluke_gpio_class, NULL, devno, NULL, "fgpio%d", fgpio_port->minor);
+    if (IS_ERR(fgpio_port->dev)) {
+        printk ("fgpio: can't create fluke_gpio_device %x\n", fgpio_port->minor);
+        fluke_gpio_remove(pdev);
+        return PTR_ERR(fgpio_port->dev);
+    }
 
-/*AJD hardwire direction edge etc for now */
-    fgpio_ports[i].direction = 0x100;                // All I/O
-    fgpio_ports[i].edge      = 0x00;
-/*AJD END hardwire direction edge etc for now */
-
-    //AJD The old way fgpio_ports[i].mapbase   = (unsigned long)ioremap_nocache(platp->mapbase, NR_PORTS);
-
-    rc = of_address_to_resource(pdev->dev.of_node, 0, &fgpio_ports[i].iomem_resource);
+    rc = of_address_to_resource(pdev->dev.of_node, 0, &fgpio_port->iomem_resource);
     if (rc) {
         printk("GPIO PROBE Can't get address of resource\n");
-		return rc;
+        fluke_gpio_remove(pdev);
+        return rc;
     }
     // printk("GPIO PROBE Assigning address (FDT) %x to minor %x\n", res.start, i);
 
-    if (!request_mem_region(fgpio_ports[i].iomem_resource.start, resource_size(&fgpio_ports[i].iomem_resource), "fluke_gpio")) {
-        printk (KERN_INFO "fluke_gpio: can't get memory region %pa for fgpio%d\n", &fgpio_ports[i].iomem_resource.start, i);
-        release_ports();
+    if (!request_mem_region(fgpio_port->iomem_resource.start, resource_size(&fgpio_port->iomem_resource), "fluke_gpio")) {
+        printk (KERN_INFO "fluke_gpio: can't get memory region %pa for fgpio%d\n", &fgpio_port->iomem_resource.start, fgpio_port->minor);
+        fgpio_port->iomem_resource.start = 0;  // zero resource start so fluke_gpio_remove doesn't try to release region
+        fluke_gpio_remove(pdev);
         return -ENODEV;
     }
-    fgpio_ports[i].mapbase = ioremap_nocache(fgpio_ports[i].iomem_resource.start, resource_size(&fgpio_ports[i].iomem_resource));
-    fgpio_ports[i].bits = 0xff;
+    
+    fgpio_port->mapbase = ioremap_nocache(fgpio_port->iomem_resource.start, resource_size(&fgpio_port->iomem_resource));
 /*
     ptr_configured_bits = of_get_property(pdev->dev.of_node, "flk,gpio-bank-width", NULL);
     if (!ptr_configured_bits) {
@@ -402,14 +417,10 @@ static int fluke_gpio_probe(struct platform_device *pdev) {
     fgpio_ports[i].edge      = platp->is_edge;
     */
 
-    cdev_init(&fgpio_ports[i].cdev, &hw_fops);
-
-    sema_init(&fgpio_ports[i].sem, 1);
-    
-    fgpio_ports[i].cdev.owner = THIS_MODULE;
-    fgpio_ports[i].cdev.ops   = &hw_fops;
-
-    result = cdev_add(&fgpio_ports[i].cdev, devno, 1);
+    cdev_init(&fgpio_port->cdev, &hw_fops);
+    fgpio_port->cdev.owner = THIS_MODULE;
+    result = cdev_add(&fgpio_port->cdev, devno, 1);
+    fgpio_port->cdev_added = result == 0;
     /*  
     if (platp->irq) {
 
@@ -429,16 +440,15 @@ static int fluke_gpio_probe(struct platform_device *pdev) {
     }
     */
     if(result)
-        printk (KERN_INFO "fgpio: Error %d adding fgpio%d\n", result, i);
+        printk (KERN_INFO "fgpio: Error %d adding fgpio%d\n", result, fgpio_port->minor);
     else
-        printk (KERN_INFO "fgpio: Registering fgpio%d on Major %d, Minor %d\n", i, fgpio_major, i);
-    i++;
+        printk (KERN_INFO "fgpio: Registering fgpio%d on Major %d, Minor %d\n", fgpio_port->minor, fgpio_major, fgpio_port->minor);
     return result;
 }
 
 static struct platform_driver fgpio_platform_driver = {
     .probe = fluke_gpio_probe,
-//    .remove = fluke_gpio_remove,
+    .remove = fluke_gpio_remove,
     .driver = {
                   .name = "fluke_gpio",
                   .owner = THIS_MODULE,
