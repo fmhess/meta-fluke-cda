@@ -7,7 +7,9 @@ DEPENDS += "lighttpd \
 	linux-gpib-user \
 	linux-gpib-kernel \
     ttf-roboto \
+    fluke-drivers \
 "
+
 DEPENDS_append_fluke-cda-nighthawk = " \
 	e2fsprogs \
 "
@@ -15,7 +17,9 @@ DEPENDS_append_fluke-cda-nighthawk = " \
 DEPENDS_append_fluke-cda-vanquish = " \
 	libnrp \
 	librsnrpz \
+	nrpzmodule \
 "
+
 IMAGE_INSTALL_append = " \
 	qtbase qtbase-tools qtbase-plugins freetype fontconfig fontconfig-utils \
 	ttf-roboto \
@@ -31,17 +35,31 @@ IMAGE_INSTALL_append = " \
 	linux-gpib-user \
 	kernel-module-fluke-gpib \
 	kernel-module-fmh-gpib \
+	kernel-module-gpio-fluke \
+"
+IMAGE_INSTALL_append_fluke-cda-caldera = " \
+	kernel-module-fluke-keypad \
+	kernel-module-altera-inttimer \
 "
 
 IMAGE_INSTALL_append_fluke-cda-nighthawk = " \
 	e2fsprogs \
 	e2fsprogs-resize2fs \
+	kernel-module-altera-inttimer \
+"
+
+IMAGE_INSTALL_append_fluke-cda-triclamp = " \
+	kernel-module-fluke-keypad \
+	kernel-module-altera-inttimer \
 "
 
 IMAGE_INSTALL_append_fluke-cda-vanquish = " \
 	libnrp \
 	librsnrpz \
 	packagegroup-fonts-truetype \
+	kernel-module-nrpzmodule \
+	kernel-module-fluke-fn-fast-uart \
+	kernel-module-altera-inttimer \
 "
 
 #IMAGE_INSTALL += "fcgi \
