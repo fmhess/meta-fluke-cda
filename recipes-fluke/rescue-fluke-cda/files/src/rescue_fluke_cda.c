@@ -168,7 +168,7 @@ int wait_for_keypress_timeout(int *timed_out)
 	int retval;
 	fd_set read_descriptors;
 	struct timeval one_second_timeval;
-	const int timeout_seconds = 8;
+	const int timeout_seconds = 4;
 	int i;
 	char buffer[2];
 	const char magic_key = '\n';
