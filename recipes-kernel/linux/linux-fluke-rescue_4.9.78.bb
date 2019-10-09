@@ -5,7 +5,7 @@
 PR = "r1"
 LINUX_VERSION = "4.9.78"
 KERNEL_REPO = "git://github.com/fmhess/linux-socfpga.git"
-LINUX_VERSION_SUFFIX = "-ltsi-${MACHINE}"
+LINUX_VERSION_SUFFIX = "-ltsi-fluke-cda-all"
 SRCREV = "${AUTOREV}"
 
 #We have to set KERNEL_PACKAGE_NAME to something other than the
@@ -26,6 +26,7 @@ KERNEL_DEVICETREE = ""
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-fluke-rescue:"
 SRC_URI_append = "\
     file://linux-fluke-rescue.cfg \
+    file://${MACHINE}.cfg \
 "
 
 require recipes-kernel/linux/linux-altera.inc

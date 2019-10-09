@@ -1,6 +1,6 @@
 PR = "r254"
 KERNEL_REPO = "git://github.com/fmhess/linux-socfpga.git"
-LINUX_VERSION_SUFFIX = "-ltsi-${MACHINE}"
+LINUX_VERSION_SUFFIX = "-ltsi-fluke-cda-all"
 SRCREV = "${AUTOREV}"
 
 KERNEL_DEVICETREE_fluke-cda-vanquish = "Vanquish_soc.dtb Vanquish_soc_overlay.dtb"
@@ -13,16 +13,5 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI_append = "\
     file://fluke-cda.cfg \
-"
-
-SRC_URI_append_fluke-cda-caldera = "\
-    file://fluke-cda-caldera.cfg \
-"
-
-SRC_URI_append_fluke-cda-nighthawk = "\
-    file://fluke-cda-nighthawk.cfg \
-"
-
-SRC_URI_append_fluke-cda-triclamp = "\
-    file://fluke-cda-triclamp.cfg \
+    file://${MACHINE}.cfg \
 "
