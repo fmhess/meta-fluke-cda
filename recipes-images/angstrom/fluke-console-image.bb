@@ -89,6 +89,9 @@ fluke_console_image_postprocess_common() {
 	ln -sr ${IMAGE_ROOTFS}${base_prefix}/dev/null ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/systemd-timedated.service
 	ln -sr ${IMAGE_ROOTFS}${base_prefix}/dev/null ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/systemd-networkd.service
 
+	# turn off logging to disk
+	echo Storage=volatile >> ${IMAGE_ROOTFS}${sysconfdir}/systemd/journald.conf
+	
 	#Prevent front panel display from being allocated as a virtual terminal by logind
 	echo NAutoVTs=0 >> ${IMAGE_ROOTFS}${sysconfdir}/systemd/logind.conf
 	echo ReserveVT=0 >> ${IMAGE_ROOTFS}${sysconfdir}/systemd/logind.conf
