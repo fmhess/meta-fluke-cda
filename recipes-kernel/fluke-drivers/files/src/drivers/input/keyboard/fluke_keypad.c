@@ -35,8 +35,8 @@
 static int fluke_keypad_remove(struct platform_device *pdev);
 
 #define FLUKE_KEYPAD_NUM_REGISTERS 2
-#define FLUKE_KEYPAD_NUM_BITS_PER_REGISTER 32
-#define FLUKE_KEYPAD_KEYMAP_SIZE (FLUKE_KEYPAD_NUM_REGISTERS * FLUKE_KEYPAD_NUM_BITS_PER_REGISTER)
+#define FLUKE_KEYPAD_AXIS_LENGTH 8
+#define FLUKE_KEYPAD_KEYMAP_SIZE (FLUKE_KEYPAD_AXIS_LENGTH * FLUKE_KEYPAD_AXIS_LENGTH)
 
 struct fluke_keypad_data {
     void *mapbase;
@@ -44,6 +44,7 @@ struct fluke_keypad_data {
 	int irq;
 	struct input_dev *input_dev;
 	unsigned char keycode[FLUKE_KEYPAD_KEYMAP_SIZE];
+	int active[FLUKE_KEYPAD_NUM_REGISTERS];
 };
 
 static irqreturn_t fluke_keypad_handler(int irq, void *dev_id)
@@ -53,7 +54,6 @@ static irqreturn_t fluke_keypad_handler(int irq, void *dev_id)
 	unsigned int kpd_reg;
 	unsigned i;
 	unsigned j;
-
 
 	if (!dev_id) {
 		// printk("interrupt routine NULL DEVICE YIKES\n");
@@ -67,14 +67,32 @@ static irqreturn_t fluke_keypad_handler(int irq, void *dev_id)
 	for (i = 0; i < FLUKE_KEYPAD_NUM_REGISTERS; ++i) {
 		kpd_reg = readl(drv_data->mapbase + 4 * i);
 		// printk("interrupt routine kpd_register1 = %d\n", kpd_reg);
-		for (j = 0; j < FLUKE_KEYPAD_NUM_BITS_PER_REGISTER; ++j) {
-			input_report_key(drv_data->input_dev, 
-				drv_data->keycode[i * FLUKE_KEYPAD_NUM_BITS_PER_REGISTER + j], 
-				kpd_reg & (0x1 << j));
+		for (j = 0; j < FLUKE_KEYPAD_AXIS_LENGTH; ++j) {
+			if (kpd_reg & (0x1 << j))
+			{
+				drv_data->active[i] = j;
+			}
 		}
 	}
-	input_sync(drv_data->input_dev);
-
+	
+	if(drv_data->active[0] < 0 && drv_data->active[1] < 0)
+	{
+		return IRQ_NONE;
+	}
+	
+	if(drv_data->active[0] >= 0 && drv_data->active[1] >= 0)
+	{
+		input_report_key(drv_data->input_dev, 
+			drv_data->keycode[drv_data->active[0] * FLUKE_KEYPAD_AXIS_LENGTH + drv_data->active[1]], 
+			1);
+		input_sync(drv_data->input_dev);
+		input_report_key(drv_data->input_dev, 
+			drv_data->keycode[drv_data->active[0] * FLUKE_KEYPAD_AXIS_LENGTH + drv_data->active[1]], 
+			0);
+		input_sync(drv_data->input_dev);
+		drv_data->active[0] = drv_data->active[1] = -1;
+	}
+	
 	return IRQ_HANDLED;
 }
 
@@ -95,11 +113,13 @@ static int fluke_keypad_probe(struct platform_device *pdev)
 
 	drv_data = kzalloc(sizeof(struct fluke_keypad_data), GFP_KERNEL);
 	if (drv_data == NULL) return -ENOMEM;
-	dev_set_drvdata(&pdev->dev, drv_data);
 	for (i = 0; i < FLUKE_KEYPAD_KEYMAP_SIZE; ++i)
 	{
 		drv_data->keycode[i] = i + 1;
 	}
+	drv_data->active[0] = -1;
+	drv_data->active[1] = -1;
+	dev_set_drvdata(&pdev->dev, drv_data);
 	
 	input_dev = input_allocate_device();
 	if (input_dev == NULL)
