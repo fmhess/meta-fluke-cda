@@ -65,7 +65,7 @@ IMAGE_INSTALL_remove = " \
 #IMAGE_INSTALL := "${@oe_filter_out('gcc', '${IMAGE_INSTALL}', d)}"
 
 #we only need a compressed ext4 image for the initrd
-IMAGE_FSTYPES_remove = "ubi tar.xz wic.gz"
+IMAGE_FSTYPES_remove = "tar.xz"
 IMAGE_FSTYPES_append = " ext4.gz"
 IMAGE_ROOTFS_SIZE = "32768"
 IMAGE_OVERHEAD_FACTOR = "1.0" 
