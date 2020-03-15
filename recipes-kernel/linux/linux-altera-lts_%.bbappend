@@ -1,6 +1,7 @@
-PR = "r254"
+PR = "r1"
 KERNEL_REPO = "git://github.com/fmhess/linux-socfpga.git"
-LINUX_VERSION_SUFFIX = "-ltsi-fluke-cda-all"
+LINUX_VERSION = "5.4.13"
+LINUX_VERSION_SUFFIX = "-lts-fluke-cda"
 SRCREV = "${AUTOREV}"
 
 KERNEL_DEVICETREE_fluke-cda-vanquish = "Vanquish_soc.dtb Vanquish_soc_overlay.dtb"
