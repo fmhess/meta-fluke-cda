@@ -1,6 +1,7 @@
 
 #require recipes-images/angstrom/small-image.bb
-require recipes-images/angstrom/console-base-image.bb
+#require recipes-images/angstrom/console-base-image.bb
+require recipes-images/angstrom/angstrom-image.bb
 
 DEPENDS += "lighttpd \
 	iproute2 \
