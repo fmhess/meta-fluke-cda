@@ -3,9 +3,9 @@
 #rescue boot.  This file is based on the meta-altera kernel recipe for linux-altera-ltsi.
 
 PR = "r1"
-LINUX_VERSION = "4.9.78"
+LINUX_VERSION = "5.4.13"
 KERNEL_REPO = "git://github.com/fmhess/linux-socfpga.git"
-LINUX_VERSION_SUFFIX = "-ltsi-fluke-cda-all"
+LINUX_VERSION_SUFFIX = "-lts-fluke-cda"
 SRCREV = "${AUTOREV}"
 
 #We have to set KERNEL_PACKAGE_NAME to something other than the
