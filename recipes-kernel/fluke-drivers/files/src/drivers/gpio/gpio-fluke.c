@@ -213,9 +213,9 @@ static long hw_ioctl (struct file *filp, unsigned int cmd, unsigned long arg) {
     if (_IOC_NR(cmd)   >= FGPIO_IOC_MAXNUMBER) return -ENOTTY;
 
     if (_IOC_DIR(cmd) & _IOC_READ)
-        error = !access_ok(VERIFY_WRITE, (void __user *)arg, _IOC_SIZE(cmd));
+        error = !access_ok(/*VERIFY_WRITE, */(void __user *)arg, _IOC_SIZE(cmd));
     else
-        error = !access_ok(VERIFY_READ, (void __user *)arg, _IOC_SIZE(cmd));
+        error = !access_ok(/*VERIFY_READ, */(void __user *)arg, _IOC_SIZE(cmd));
     if (error) return -EFAULT; 
 
     switch(cmd) {
@@ -227,7 +227,7 @@ static long hw_ioctl (struct file *filp, unsigned int cmd, unsigned long arg) {
         break;
     case FGPIO_GETINT_MASK:
         // printk (KERN_INFO "fgpio/ioctl: returning interrupt mask at addr: %8x\n", fgpiop->mapbase);
-        if (access_ok(VERIFY_WRITE, (const void *)arg, sizeof(unsigned int))) {
+        if (access_ok(/*VERIFY_WRITE, */(const void *)arg, sizeof(unsigned int))) {
             if(fgpiop->irq) {    /* if we're in IRQ mode */
                 *((unsigned int *)arg) = ioread32((unsigned int*)(fgpiop->mapbase + (4 * 2)));
             }
@@ -238,7 +238,7 @@ static long hw_ioctl (struct file *filp, unsigned int cmd, unsigned long arg) {
         printk (KERN_INFO "fgpio/ioctl: setting interrupt mask (%x) at addr: %8x\n", 
                 (unsigned int)arg, fgpiop->mapbase);
         */
-        if (access_ok(VERIFY_READ, (const void *)arg, sizeof(unsigned int))) {
+        if (access_ok(/*VERIFY_READ, */(const void *)arg, sizeof(unsigned int))) {
             if(fgpiop->irq) {    /* if we're in IRQ mode */
                 iowrite32(arg, (int*)(fgpiop->mapbase + (4 * 2)));
             }
@@ -250,7 +250,7 @@ static long hw_ioctl (struct file *filp, unsigned int cmd, unsigned long arg) {
         break;
     case FGPIO_READ_REG0:
         // printk (KERN_INFO "fgpio/ioctl: returning Data register: %8x\n", fgpiop->mapbase);
-        if (access_ok(VERIFY_WRITE, (const void *)arg, sizeof(unsigned int))) {
+        if (access_ok(/*VERIFY_WRITE, */(const void *)arg, sizeof(unsigned int))) {
             *((unsigned int *)arg) = ioread32((unsigned int*)(fgpiop->mapbase));
         }
         break;
