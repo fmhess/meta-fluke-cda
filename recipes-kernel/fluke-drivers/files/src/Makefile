@@ -9,9 +9,9 @@ all:
 		M="$(EXT_MODULE_SRCDIR)/drivers"
 
 clean:
-	-$(MAKE) -C $(LINUX_SRCDIR) V=$(VERBOSE) clean \
+	$(MAKE) -C $(LINUX_SRCDIR) V=$(VERBOSE) clean \
 		M="$(EXT_MODULE_SRCDIR)/drivers"
 
 install:
-	-$(MAKE) -C $(LINUX_SRCDIR) V=$(VERBOSE) modules_install \
+	$(MAKE) -C $(LINUX_SRCDIR) V=$(VERBOSE) modules_install \
 		M="$(EXT_MODULE_SRCDIR)/drivers"
