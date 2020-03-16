@@ -1,11 +1,11 @@
 # Makefile
 
-EXT_MODULE_SRCDIR ?= $$PWD
+EXT_MODULE_SRCDIR ?= $(CURDIR)
 LINUX_SRCDIR ?= /lib/modules/`uname -r`/build
 VERBOSE ?= 0
 
 all:
-	-$(MAKE) -C $(LINUX_SRCDIR) V=$(VERBOSE) modules \
+	$(MAKE) -C $(LINUX_SRCDIR) V=$(VERBOSE) modules \
 		M="$(EXT_MODULE_SRCDIR)/drivers"
 
 clean:
