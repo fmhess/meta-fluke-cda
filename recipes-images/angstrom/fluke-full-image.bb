@@ -19,8 +19,8 @@ IMAGE_INSTALL_append_fluke-cda-caldera = " \
 
 export IMAGE_BASENAME = "fluke-full-image"
 
+IMAGE_FSTYPES = " wic.gz ubi"
 IMAGE_FSTYPES_remove = "tar.xz"
-IMAGE_FSTYPES_append = " wic.gz ubi"
 UBI_VOLNAME = "root-fs"
 
 fluke_full_image_postprocess_common() {
