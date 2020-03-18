@@ -7,6 +7,7 @@ LINUX_VERSION = "5.4.13"
 KERNEL_REPO = "git://github.com/fmhess/linux-socfpga.git"
 LINUX_VERSION_SUFFIX = "-lts-fluke-cda"
 SRCREV = "${AUTOREV}"
+LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
 #We have to set KERNEL_PACKAGE_NAME to something other than the
 #default of "kernel" or yocto will disable this package, only allowing the
