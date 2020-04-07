@@ -76,4 +76,4 @@ fluke_initrd_image_postprocess_common() {
 	ln -sr ${IMAGE_ROOTFS}${base_sbindir}/rescue_fluke_cda_init.sh ${IMAGE_ROOTFS}${base_sbindir}/init
 }
 
-ROOTFS_POSTPROCESS_COMMAND_append = " fluke_initrd_image_postprocess_common; "
+IMAGE_PREPROCESS_COMMAND_append = " fluke_initrd_image_postprocess_common; "

@@ -102,4 +102,4 @@ fluke_console_image_postprocess_common() {
 	echo ReserveVT=0 >> ${IMAGE_ROOTFS}${sysconfdir}/systemd/logind.conf
 }
 
-ROOTFS_POSTPROCESS_COMMAND_append = " fluke_console_image_postprocess_common; "
+IMAGE_PREPROCESS_COMMAND_append = " fluke_console_image_postprocess_common; "
