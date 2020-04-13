@@ -21,6 +21,7 @@ export IMAGE_BASENAME = "fluke-full-image"
 
 IMAGE_FSTYPES = " ubi"
 IMAGE_FSTYPES_append_fluke-cda-nighthawk = " wic.gz"
+IMAGE_FSTYPES_remove_fluke-cda-nighthawk = "ubi"
 IMAGE_FSTYPES_remove = "tar.xz"
 UBI_VOLNAME = "root-fs"
 
