@@ -129,6 +129,7 @@ static ssize_t hw_read (struct file *filp, char __user *buf, size_t count, loff_
         return -ERESTARTSYS;
     
     if (!(tbuf = kmalloc(count, GFP_ATOMIC))) {
+        up(&fgpiop->sem);
         return -ENOMEM;
     }
 
@@ -178,6 +179,7 @@ static ssize_t hw_write (struct file *filp, const char __user *buf, size_t count
 
     if (!(tbuf = kmalloc(count, GFP_ATOMIC))) {
         printk("fgpio: write, kmalloc failed!\n");
+        up(&fgpiop->sem);
         return -ENOMEM;
     }
 
@@ -207,7 +209,6 @@ static long hw_ioctl (struct file *filp, unsigned int cmd, unsigned long arg) {
     struct fgpio_port *fgpiop = filp->private_data;
 
     // printk ("fgpio/ioctl: %8x\n", fgpiop->mapbase);
-    down(&fgpiop->sem);
 
     if (_IOC_TYPE(cmd) != FGPIO_IOC_MAGIC_NUMBER)  return -ENOTTY;
     if (_IOC_NR(cmd)   >= FGPIO_IOC_MAXNUMBER) return -ENOTTY;
@@ -217,6 +218,8 @@ static long hw_ioctl (struct file *filp, unsigned int cmd, unsigned long arg) {
     else
         error = !access_ok(/*VERIFY_READ, */(void __user *)arg, _IOC_SIZE(cmd));
     if (error) return -EFAULT; 
+
+    if(down_interruptible(&fgpiop->sem)) return -ERESTARTSYS;
 
     switch(cmd) {
     case FGPIO_INTS_OFF:
