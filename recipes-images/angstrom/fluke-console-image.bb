@@ -81,6 +81,7 @@ fluke_console_image_postprocess_common() {
 	rm -f ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/network-online.target.wants/systemd-networkd-wait-online.service
 	rm -f ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/multi-user.target.wants/systemd-networkd.service
 	rm -f ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/multi-user.target.wants/busybox-syslog.service
+	rm -f ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/multi-user.target.wants/rngd.service
 	rm -f ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/syslog.service
 	rm -f ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/multi-user.target.wants/busybox-klogd.service
 	rm -f ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/sysinit.target.wants/systemd-timesyncd.service
@@ -92,6 +93,9 @@ fluke_console_image_postprocess_common() {
 	ln -sr ${IMAGE_ROOTFS}${base_prefix}/dev/null ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/systemd-timedated.service
 	ln -sr ${IMAGE_ROOTFS}${base_prefix}/dev/null ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/systemd-networkd.service
 	ln -sr ${IMAGE_ROOTFS}${base_prefix}/dev/null ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/busybox-syslog.service
+	# We don't have a hardware random number generator, so rngd is useless.  Mask it to prevent it from hogging
+	# the cpu at startup
+	ln -sr ${IMAGE_ROOTFS}${base_prefix}/dev/null ${IMAGE_ROOTFS}${sysconfdir}/systemd/system/rngd.service
 
 	# turn off logging to disk
 	echo Storage=volatile >> ${IMAGE_ROOTFS}${sysconfdir}/systemd/journald.conf
