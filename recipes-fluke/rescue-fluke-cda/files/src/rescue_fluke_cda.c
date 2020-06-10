@@ -393,7 +393,7 @@ int prompt_interactively()
 			selection = strtol(buffer, NULL, 0);
 			if(selection > 0 && selection <= num_main_menu_options)
 			{
-				printf("You have selected \"%s\".\n", main_menu_options[selection - 1]);
+				printf("\nYou have selected \"%s\".\n", main_menu_options[selection - 1]);
 			}
 			switch(selection)
 			{
