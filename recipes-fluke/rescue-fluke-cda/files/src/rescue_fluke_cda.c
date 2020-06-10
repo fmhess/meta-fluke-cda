@@ -28,13 +28,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 const char * const mount_cmd = "mount -o ro /dev/mmcblk0p1 /mnt/target_boot";
 const char * const kexec_load_cmd = "kexec --load /mnt/target_boot/zImage "
-	"--append \"console=ttyS0,115200 vt.global_cursor_default=0 vt.cur_default=1 coherent_pool=256K isolcpus=1 root=/dev/mmcblk0p2 rw rootwait rootfstype=ext4\"";
+	"--append \"console=ttyS0,115200 vt.global_cursor_default=0 vt.cur_default=1 coherent_pool=256K isolcpus=1 root=/dev/mmcblk0p2 rw rootwait rootfstype=ext4 2>/dev/null\"";
 const char * const kexec_exec_cmd = "kexec --exec";
 const char * const dd_boot_cmd = "dd if=/dev/mmcblk0p3 of=/dev/mmcblk0p1 bs=1M conv=fsync";
 const char * const dd_root_cmd = "dd if=/dev/mmcblk0p4 of=/dev/mmcblk0p2 bs=1M conv=fsync";
 const char * const dd_mtd_to_tmp_cmd = "dd if=/dev/mtd%d of=/tmp/mtdX bs=1M";
 const char * const flashcp_tmp_to_mtd_cmd = "flashcp /tmp/mtdX /dev/mtd%d";
-const char * const dry_run_preamble = "The following commands will be executed:\n\n";
 const int uboot_partition = 0;
 const int uboot_environment_partition = 1;
 const int device_tree_partition = 2;
@@ -47,6 +46,17 @@ const int device_tree_backup_partition = 8;
 const int kernel_backup_partition = 9;
 const int fpga_backup_partition = 10;
 const int initrd_backup_partition = 11;
+const char * const main_menu_options[] = 
+{
+	"Exit rescue program and continue normal boot process",
+	"Restore filesystems to factory state",
+	"Restore flattened device tree to factory state",
+	"Restore FPGA RBF image to factory state",
+	"Restore U-Boot with SPL to factory state",
+	"Restore U-Boot environment to factory state",
+	"Restore rescue kernel and initrd to factory state",
+	NULL
+};
 
 int system_wrapper(const char *command, int verbose, int dry_run)
 {
@@ -225,7 +235,7 @@ int confirm_selection(int *confirmed)
 	
 	*confirmed = 0;
 
-	printf("\nEnter \"y\" or \"1\" to confirm and execute commands > ");
+	printf("Enter \"y\" or \"1\" to confirm and execute commands > ");
 	buffer = NULL;
 	n = 0;
 	retval = getline(&buffer, &n, stdin);
@@ -262,17 +272,13 @@ int do_interactive_boot()
 	int confirmed;
 	int retval;
 	
-	printf("You have selected to continue normal boot process.\n");
-	printf( dry_run_preamble );
-	do_boot(1, 1);
-
 	retval = confirm_selection( &confirmed );
 	if(retval < 0)
 	{
 		return retval;
 	} else if (confirmed) 
 	{
-		return do_boot(1, 0);
+		return do_boot(0, 0);
 	} else 
 	{
 		return 0;
@@ -284,17 +290,13 @@ int do_interactive_restore_filesystems()
 	int confirmed;
 	int retval;
 	
-	printf("You have selected to restore filesystems.\n");
-	printf( dry_run_preamble );
-	do_restore_filesystems(1, 1);
-
 	retval = confirm_selection( &confirmed );
 	if(retval < 0) 
 	{
 		return retval;
 	} else if (confirmed)
 	{
-		return do_restore_filesystems(1, 0);
+		return do_restore_filesystems(0, 0);
 	} else 
 	{
 		return 0;
@@ -306,17 +308,13 @@ int do_interactive_restore_mtd_partition(int backup_partition, int destination_p
 	int confirmed;
 	int retval;
 	
-	printf("You have selected to restore %s.\n", partition_description);
-	printf( dry_run_preamble );
-	do_restore_mtd_partition(backup_partition, destination_partition, 1, 1);
-
 	retval = confirm_selection( &confirmed );
 	if(retval < 0)
 	{
 		return retval;
 	} else if (confirmed) 
 	{
-		return do_restore_mtd_partition(backup_partition, destination_partition, 1, 0);
+		return do_restore_mtd_partition(backup_partition, destination_partition, 0, 0);
 	} else 
 	{
 		return 0;
@@ -348,20 +346,15 @@ int do_interactive_restore_rescue()
 	int confirmed;
 	int retval;
 	
-	printf("You have selected to restore rescue kernel and initrd.\n");
-	printf( dry_run_preamble );
-	do_restore_mtd_partition(kernel_backup_partition, kernel_partition, 1, 1);
-	do_restore_mtd_partition(initrd_backup_partition, initrd_partition, 1, 1);
-
 	retval = confirm_selection( &confirmed );
 	if(retval < 0)
 	{
 		return retval;
 	} else if (confirmed) 
 	{
-		retval = do_restore_mtd_partition(kernel_backup_partition, kernel_partition, 1, 0);
+		retval = do_restore_mtd_partition(kernel_backup_partition, kernel_partition, 0, 0);
 		if (retval) return retval;
-		return do_restore_mtd_partition(initrd_backup_partition, initrd_partition, 1, 0);
+		return do_restore_mtd_partition(initrd_backup_partition, initrd_partition, 0, 0);
 	} else 
 	{
 		return 0;
@@ -372,32 +365,36 @@ int prompt_interactively()
 {
 	char *buffer;
 	size_t n;
-	
 	do
 	{
 		ssize_t retval;
+		int i;
+		int num_main_menu_options; 
 		
-		printf("Select one of the following actions by number:\n"
-			"1) Exit rescue program and continue normal boot process.\n"
-			"2) Restore filesystems to factory state.\n"
-			"3) Restore flattened device tree to factory state.\n"
-			"4) Restore FPGA RBF image to factory state.\n"
-			"5) Restore U-Boot with SPL to factory state.\n"
-			"6) Restore U-Boot environment to factory state.\n"
-			"7) Restore rescue kernel and initrd to factory state.\n"
-			"> "
-		);
+		printf("\nSelect one of the following actions by number:\n");
+		for(i = 0; main_menu_options[i] != NULL; ++i)
+		{
+			printf("%d) %s.\n", i + 1, main_menu_options[i]);
+		}
+		num_main_menu_options = i;
+		printf("> ");
+		
 		buffer = NULL;
 		n = 0;
 		retval = getline(&buffer, &n, stdin);
 		if(retval < 0)
 		{
+			free(buffer);  // according to getline docs, buffer should be freed even on failure
 			fprintf(stderr, "getline returned error, errno=%d\n", errno);
 		}else
 		{
 			long selection;
 			
 			selection = strtol(buffer, NULL, 0);
+			if(selection > 0 && selection <= num_main_menu_options)
+			{
+				printf("You have selected \"%s\".\n", main_menu_options[selection - 1]);
+			}
 			switch(selection)
 			{
 				case 1:
