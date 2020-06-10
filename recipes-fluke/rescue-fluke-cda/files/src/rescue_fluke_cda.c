@@ -133,6 +133,11 @@ int do_boot(int verbose, int dry_run)
 	return 0;
 }
 
+void print_success()
+{
+	printf("Operation completed successfully.\n");
+}
+
 int do_restore_filesystems(int verbose, int dry_run)
 {
 	int result;
@@ -149,6 +154,7 @@ int do_restore_filesystems(int verbose, int dry_run)
 		return result;
 	}
 
+	print_success();
 	return 0;
 }
 
@@ -168,6 +174,7 @@ int do_restore_mtd_partition(int backup_mtd_partition, int destination_mtd_parti
 		return result;
 	}
 	
+	print_success();
 	return 0;
 }
 
