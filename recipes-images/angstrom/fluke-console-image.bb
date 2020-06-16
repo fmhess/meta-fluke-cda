@@ -9,6 +9,7 @@ DEPENDS += "lighttpd \
 	linux-gpib-kernel \
     ttf-roboto \
     fluke-drivers \
+    libgpiod \
 "
 
 DEPENDS_append_fluke-cda-nighthawk = " \
@@ -37,6 +38,8 @@ IMAGE_INSTALL_append = " \
 	kernel-module-fluke-gpib \
 	kernel-module-fmh-gpib \
 	kernel-module-gpio-fluke \
+	libgpiod \
+	libgpiod-tools \
 "
 IMAGE_INSTALL_append_fluke-cda-caldera = " \
 	kernel-module-fluke-keypad \
