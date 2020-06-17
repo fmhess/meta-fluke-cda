@@ -10,6 +10,7 @@ RDEPENDS_${PN} = " \
     linux-gpib-user \
     libusb-compat \
     tslib \
+    libgpiod-dev \
 "
 
 RDEPENDS_${PN}_append_fluke-cda-vanquish = " \
