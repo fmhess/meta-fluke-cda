@@ -34,6 +34,10 @@ FILES_${PN} += " \
 	${datadir}/usb/* \
 "
 
+do_configure_prepend() {
+	touch ${S}/ChangeLog
+}
+
 do_install_append() {
 	install -m 0644 ${WORKDIR}/extra_files/etc/gpib.conf ${D}${sysconfdir}/gpib.conf
 	
