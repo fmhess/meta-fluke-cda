@@ -3,18 +3,22 @@ require recipes-images/angstrom/fluke-console-image.bb
 
 DEPENDS_append_fluke-cda-nighthawk = " \
 	customization-${MACHINE} \
+	fluke-run-once \
 "
 DEPENDS_append_fluke-cda-caldera = " \
 	customization-${MACHINE} \
+	fluke-run-once \
 "
 
 IMAGE_INSTALL_append_fluke-cda-nighthawk = " \
 	customization-${MACHINE} \
 	kernel-devicetree \
+	fluke-run-once \
 "
 IMAGE_INSTALL_append_fluke-cda-caldera = " \
 	customization-${MACHINE} \
 	kernel-devicetree \
+	fluke-run-once \
 "
 
 export IMAGE_BASENAME = "fluke-full-image"
