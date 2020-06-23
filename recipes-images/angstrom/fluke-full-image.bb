@@ -37,6 +37,10 @@ fluke_full_image_postprocess_nighthawk() {
 IMAGE_PREPROCESS_COMMAND_append = " fluke_full_image_postprocess_common; "
 IMAGE_PREPROCESS_COMMAND_append_fluke-cda-nighthawk = " fluke_full_image_postprocess_nighthawk; "
 
+IMAGE_INSTALL_append = " \
+    sqlite3 \
+    libsqlite3-dev \
+"
 # we do the following using SORT_PASSWD_POSTPROCESS_COMMAND instead of
 # ROOTFS_POSTPROCESS_COMMAND to avoid having our multiple root accounts 
 # getting sorted by username in the passwd file (we want the one named 
