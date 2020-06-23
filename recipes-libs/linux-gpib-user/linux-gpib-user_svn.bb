@@ -11,7 +11,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 DEPENDS += "bison-native flex-native"
 
 #SRCREV = "${AUTOREV}"
-SRCREV = "1877"
+SRCREV = "1914"
 PV = "svnr${SRCREV}"
 PR = "r0"
 
