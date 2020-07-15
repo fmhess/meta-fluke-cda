@@ -11,6 +11,7 @@ RDEPENDS_${PN} = " \
     libusb-compat \
     tslib \
     libgpiod-dev \
+    fontconfig \
 "
 
 RDEPENDS_${PN}_append_fluke-cda-vanquish = " \
