@@ -45,6 +45,15 @@ IMAGE_INSTALL_append = " \
     sqlite3 \
     libsqlite3-dev \
 "
+
+IMAGE_INSTALL_append = " \
+    x11vnc \
+"
+
+IMAGE_INSTALL_append = " \
+    python3 \
+"
+
 # we do the following using SORT_PASSWD_POSTPROCESS_COMMAND instead of
 # ROOTFS_POSTPROCESS_COMMAND to avoid having our multiple root accounts 
 # getting sorted by username in the passwd file (we want the one named 
