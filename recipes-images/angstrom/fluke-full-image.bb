@@ -2,6 +2,7 @@
 require recipes-images/angstrom/fluke-console-image.bb
 
 DEPENDS_append_fluke-cda-nighthawk = " \
+	noto-sans-display-hinted \
 	customization-${MACHINE} \
 	fluke-run-once \
 "
@@ -11,13 +12,14 @@ DEPENDS_append_fluke-cda-caldera = " \
 "
 
 IMAGE_INSTALL_append = " \
-    sqlite3 \
-    libsqlite3-dev \
-    x11vnc \
-    python3 \
+	sqlite3 \
+	libsqlite3-dev \
+	x11vnc \
+	python3 \
 "
 
 IMAGE_INSTALL_append_fluke-cda-nighthawk = " \
+	noto-sans-display-hinted-regular \
 	customization-${MACHINE} \
 	kernel-devicetree \
 	fluke-run-once \
