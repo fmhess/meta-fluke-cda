@@ -10,6 +10,13 @@ DEPENDS_append_fluke-cda-caldera = " \
 	fluke-run-once \
 "
 
+IMAGE_INSTALL_append = " \
+    sqlite3 \
+    libsqlite3-dev \
+    x11vnc \
+    python3 \
+"
+
 IMAGE_INSTALL_append_fluke-cda-nighthawk = " \
 	customization-${MACHINE} \
 	kernel-devicetree \
@@ -40,19 +47,6 @@ fluke_full_image_postprocess_nighthawk() {
 
 IMAGE_PREPROCESS_COMMAND_append = " fluke_full_image_postprocess_common; "
 IMAGE_PREPROCESS_COMMAND_append_fluke-cda-nighthawk = " fluke_full_image_postprocess_nighthawk; "
-
-IMAGE_INSTALL_append = " \
-    sqlite3 \
-    libsqlite3-dev \
-"
-
-IMAGE_INSTALL_append = " \
-    x11vnc \
-"
-
-IMAGE_INSTALL_append = " \
-    python3 \
-"
 
 # we do the following using SORT_PASSWD_POSTPROCESS_COMMAND instead of
 # ROOTFS_POSTPROCESS_COMMAND to avoid having our multiple root accounts 
