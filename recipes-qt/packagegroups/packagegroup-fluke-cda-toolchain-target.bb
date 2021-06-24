@@ -12,7 +12,10 @@ RDEPENDS_${PN} = " \
     tslib \
     libgpiod-dev \
     fontconfig \
-    gtest \
+    googletest-staticdev \
+    googletest-dbg \
+    googletest-dev \
+    googletest \
 "
 
 RDEPENDS_${PN}_append_fluke-cda-vanquish = " \
