@@ -6,6 +6,9 @@
 #require recipes-core/images/core-image-minimal.bb
 inherit image
 
+#don't included packages that are merely recommended (like license packages)
+NO_RECOMMENDATIONS_pn-fluke-initrd-image = "1"
+
 DEPENDS += " \
 	kexec-tools \
 	rescue-fluke-cda \
@@ -69,6 +72,7 @@ IMAGE_FSTYPES = " ext4.gz"
 IMAGE_FSTYPES_remove = "tar.xz wic.gz"
 IMAGE_ROOTFS_SIZE = "32768"
 IMAGE_OVERHEAD_FACTOR = "1.0" 
+IMAGE_FEATURES_remove = "package-management"
 
 export IMAGE_BASENAME = "fluke-initrd-image"
 
