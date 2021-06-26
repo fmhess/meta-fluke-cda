@@ -5,7 +5,7 @@ SECTION = ""
 HOMEPAGE = ""
 
 LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=f19e4f8ee79c4b8ff1fbb449f7e56c54"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=ae270d4118d7e64218492af5b3f3249b"
 
 #PR = "r0"
 
