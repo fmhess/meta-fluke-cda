@@ -19,7 +19,6 @@ SRC_URI = "git://github.com/FlukeCorp/cia-sw-src.git;protocol=https;branch=fmhes
 	git://github.com/FlukeCorp/cia-sw-utils.git;protocol=https;branch=develop;destsuffix=git/cia/utils;name=ciautils \
 	git://github.com/FlukeCorp/cia-sw-thirdparty.git;protocol=https;branch=develop;destsuffix=git/cia/thirdparty;name=ciathirdparty \
 	file://extra_files/LICENSE \
-	file://git/CMakeLists.txt \
 	file://git/cia/CMakeLists.txt \
 "
 SRCREV_FORMAT = "ciasrc_ciautils_ciathirdparty"
@@ -27,7 +26,7 @@ SRCREV ?= "${AUTOREV}"
 PV = "git_${SRCREV}"
 PR = "r0"
 
-S = "${WORKDIR}/git"
+S = "${WORKDIR}/git/cia"
 
 inherit cmake
 

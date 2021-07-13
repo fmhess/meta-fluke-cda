@@ -16,6 +16,8 @@ cmake_minimum_required(VERSION 3.0)
 
 project(CIA)
 
+include(GNUInstallDirs)
+
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -48,6 +50,24 @@ else()
     set(BUILD_UPDATER ON CACHE BOOL "Build updater module")
     set(CIA_BIN_DIR "${CIA_DIR}/bin/cda-arm")
 endif()
+
+# Define add_deployment_file so build doesn't break, I don't think
+# we need it to do anything though.
+macro(add_deployment_file SRC DEST)
+#    file(APPEND "${CMAKE_SOURCE_DIR}/QtCreatorDeployment.txt" "${SRC}:${DEST}\n")
+endmacro()
+
+set(CIA_BIN_DIR "${CIA_DIR}/bin/cda-arm")
+# CIA cmake build should not in any way depend on nighthawk variables, but it does...
+set(NIGHTHAWK_BIN_DIR "${CMAKE_SOURCE_DIR}/bin/cda-arm")
+set(NIGHTHAWK_BIN_DIR_TARGET "/home/Nighthawk/bin")
+set(NIGHTHAWK_TEMP_DIR_TARGET "/tmp")
+
+add_definitions(-DTARGET_BUILD)
+
+install(FILES "${CIA_DIR}/src/ogsrc/error/cia_error.json" DESTINATION ${CMAKE_INSTALL_PREFIX}/Nighthawk/bin/error)
+install(FILES "${CIA_DIR}/src/ogsrc/remote/remote_error.json" DESTINATION ${CMAKE_INSTALL_PREFIX}/Nighthawk/bin/error)
+install(FILES "${CIA_DIR}/src/ogsrc/settings/systemsettings.json" DESTINATION ${CMAKE_INSTALL_PREFIX}/Nighthawk/bin/settingsNV)
 
 add_subdirectory(thirdparty)
 add_subdirectory(src)
