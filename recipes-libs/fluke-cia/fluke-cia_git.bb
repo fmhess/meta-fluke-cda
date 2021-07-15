@@ -17,7 +17,7 @@ DEPENDS += "freetype \
 
 SRC_URI = "git://github.com/FlukeCorp/cia-sw-src.git;protocol=https;branch=fmhess-develop;destsuffix=git/cia/src;name=ciasrc \
 	git://github.com/FlukeCorp/cia-sw-utils.git;protocol=https;branch=develop;destsuffix=git/cia/utils;name=ciautils \
-	git://github.com/FlukeCorp/cia-sw-thirdparty.git;protocol=https;branch=develop;destsuffix=git/cia/thirdparty;name=ciathirdparty \
+	git://github.com/FlukeCorp/cia-sw-thirdparty.git;protocol=https;branch=fmhess-develop;destsuffix=git/cia/thirdparty;name=ciathirdparty \
 	file://extra_files/LICENSE \
 	file://git/cia/CMakeLists.txt \
 "
@@ -31,7 +31,13 @@ S = "${WORKDIR}/git/cia"
 inherit cmake
 
 EXTRA_OECMAKE += " \
+    -DBUILD_SHARED_LIBS=ON \
 "
+#    -DCMAKE_INSTALL_PREFIX:PATH=/opt/cia \
+#
 
+#FIXME: need more specific FILES to specify which subpackage the files go in?
 FILES_${PN} += " \
 "
+#    /opt/cia \
+#
