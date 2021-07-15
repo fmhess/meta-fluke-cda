@@ -65,10 +65,6 @@ set(NIGHTHAWK_TEMP_DIR_TARGET "/tmp")
 
 add_definitions(-DTARGET_BUILD)
 
-install(FILES "${CIA_DIR}/src/ogsrc/error/cia_error.json" DESTINATION ${CMAKE_INSTALL_PREFIX}/Nighthawk/bin/error)
-install(FILES "${CIA_DIR}/src/ogsrc/remote/remote_error.json" DESTINATION ${CMAKE_INSTALL_PREFIX}/Nighthawk/bin/error)
-install(FILES "${CIA_DIR}/src/ogsrc/settings/systemsettings.json" DESTINATION ${CMAKE_INSTALL_PREFIX}/Nighthawk/bin/settingsNV)
-
 add_subdirectory(thirdparty)
 add_subdirectory(src)
 
