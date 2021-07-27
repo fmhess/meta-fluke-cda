@@ -1,0 +1,51 @@
+SUMMARY = "Fluke Nighthawk application"
+DESCRIPTION = "Fluke Nighthawk application"
+HOMEPAGE = "https://https://github.com/FlukeCorp/nighthawk-sw-src"
+SECTION = "libs"
+LICENSE = "Proprietary"
+LIC_FILES_CHKSUM = "file://${WORKDIR}/extra_files/LICENSE;md5=fce4b53e0185d2bc7e836efefa539090"
+
+FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+
+DEPENDS += " \
+    fluke-cia \
+	qtbase \
+	qtdeclarative \
+"
+RDEPENDS_${PN} += " \
+	qtquickcontrols2-qmlplugins \
+	systemd \
+"
+
+SRC_URI = "git://github.com/FlukeCorp/nighthawk-sw-src.git;protocol=https;branch=fmhess-develop;destsuffix=git/;name=nighthawksrc \
+ 	git://github.com/FlukeCorp/cia-sw-utils.git;protocol=https;branch=develop;destsuffix=git/cia/utils;name=ciautils \
+	file://extra_files/LICENSE \
+"
+# 	git://github.com/FlukeCorp/nighthawk-sw-utils.git;protocol=https;branch=develop;destsuffix=git/cia/utils;name=nighthawkutils \
+# 	git://github.com/FlukeCorp/nighthawk-sw-thirdparty.git;protocol=https;branch=fmhess-develop;destsuffix=git/cia/thirdparty;name=nighthawkthirdparty \
+#
+#SRCREV_FORMAT = "nighthawksrc_nighthawkutils_nighthawkthirdparty"
+SRCREV_FORMAT = "nighthawksrc_ciautils"
+SRCREV ?= "${AUTOREV}"
+PV = "git_${SRCREV}"
+PR = "r0"
+
+S = "${WORKDIR}/git/"
+
+inherit cmake
+inherit cmake_qt5
+
+OECMAKE_C_FLAGS_append = " -Wno-psabi "
+OECMAKE_CXX_FLAGS_append = " -Wno-psabi "
+EXTRA_OECMAKE += " \
+	-DBUILD_SHARED_LIBS=ON \
+	-DLINK_PREBUILT_CIA_LIBS:BOOL=ON \
+"
+#    -DCMAKE_INSTALL_PREFIX:PATH=/opt/cia \
+#
+
+#FIXME: need more specific FILES to specify which subpackage the files go in?
+FILES_${PN} += " \
+"
+#    /opt/cia \
+#
