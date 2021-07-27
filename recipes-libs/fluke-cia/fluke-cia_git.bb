@@ -30,6 +30,8 @@ S = "${WORKDIR}/git/cia"
 
 inherit cmake
 
+OECMAKE_C_FLAGS_append = " -Wno-psabi "
+OECMAKE_CXX_FLAGS_append = " -Wno-psabi "
 EXTRA_OECMAKE += " \
     -DBUILD_SHARED_LIBS=ON \
 "
