@@ -44,8 +44,17 @@ EXTRA_OECMAKE += " \
 #    -DCMAKE_INSTALL_PREFIX:PATH=/opt/cia \
 #
 
-#FIXME: need more specific FILES to specify which subpackage the files go in?
-FILES_${PN} += " \
+
+#adjusted.json shouldn't be overwritten if it already exists, so put it in CONFFILES
+CONFFILES_${PN} += " \
+    ${localstatedir}/caldata/adjusted.json \
 "
-#    /opt/cia \
-#
+
+FILES_${PN} += " \
+    ${datadir}/caldata/ \
+    ${datadir}/error/ \
+    ${datadir}/procdata/ \
+    ${datadir}/range/ \
+    ${datadir}/seq/ \
+    ${datadir}/settingsNV/ \
+"
