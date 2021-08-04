@@ -12,6 +12,7 @@ DEPENDS_append_fluke-cda-caldera = " \
 "
 
 IMAGE_INSTALL_append = " \
+	fbgrab \
 	sqlite3 \
 	libsqlite3-dev \
 	x11vnc \
