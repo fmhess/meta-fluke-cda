@@ -32,18 +32,23 @@ PR = "r0"
 
 S = "${WORKDIR}/git/"
 
+FLUKE_CIA_DIR = "/opt/fluke-cia"
+prefix = "${FLUKE_CIA_DIR}"
+#for now, mangle stuff to match how things are currently done for Nighthawk
+localstatedir = "${bindir}"
+datadir = "${bindir}"
+libexecdir = "${bindir}"
+
 inherit cmake
 inherit cmake_qt5
 
-OECMAKE_C_FLAGS_append = " -Wno-psabi "
-OECMAKE_CXX_FLAGS_append = " -Wno-psabi "
+OECMAKE_C_FLAGS_append = " -Wno-psabi -I${STAGING_DIR_TARGET}${FLUKE_CIA_DIR}/include"
+OECMAKE_CXX_FLAGS_append = " -Wno-psabi -I${STAGING_DIR_TARGET}${FLUKE_CIA_DIR}/include"
+OECMAKE_RPATH = "${libdir}"
 EXTRA_OECMAKE += " \
 	-DBUILD_SHARED_LIBS=ON \
 	-DLINK_PREBUILT_CIA_LIBS:BOOL=ON \
 "
-#    -DCMAKE_INSTALL_PREFIX:PATH=/opt/cia \
-#
-
 
 #adjusted.json shouldn't be overwritten if it already exists, so put it in CONFFILES
 CONFFILES_${PN} += " \

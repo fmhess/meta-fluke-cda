@@ -28,18 +28,21 @@ PR = "r0"
 
 S = "${WORKDIR}/git/cia"
 
+prefix = "/opt/fluke-cia"
+#for now, mangle stuff to match how things are currently done for Nighthawk
+localstatedir = "${bindir}"
+datadir = "${bindir}"
+libexecdir = "${bindir}"
+
 inherit cmake
 
 OECMAKE_C_FLAGS_append = " -Wno-psabi "
 OECMAKE_CXX_FLAGS_append = " -Wno-psabi "
+OECMAKE_RPATH = "${libdir}"
 EXTRA_OECMAKE += " \
     -DBUILD_SHARED_LIBS=ON \
 "
-#    -DCMAKE_INSTALL_PREFIX:PATH=/opt/cia \
-#
 
-#FIXME: need more specific FILES to specify which subpackage the files go in?
 FILES_${PN} += " \
+    ${datadir} \
 "
-#    /opt/cia \
-#
