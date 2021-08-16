@@ -32,12 +32,12 @@ PR = "r0"
 
 S = "${WORKDIR}/git/"
 
-FLUKE_CIA_DIR = "/opt/fluke-cia"
+FLUKE_CIA_DIR = "/opt/fluke/cia"
 prefix = "${FLUKE_CIA_DIR}"
-#for now, mangle stuff to match how things are currently done for Nighthawk
-localstatedir = "${bindir}"
-datadir = "${bindir}"
-libexecdir = "${bindir}"
+#Linux FHS special case weirdness
+localstatedir = "/var${prefix}"
+sysconfdir = "/etc${prefix}"
+runstatedir = "/run${prefix}"
 
 inherit cmake
 inherit cmake_qt5
