@@ -32,7 +32,9 @@ prefix = "/opt/fluke/cia"
 #Linux FHS special case weirdness
 localstatedir = "/var${prefix}"
 sysconfdir = "/etc${prefix}"
-runstatedir = "/run${prefix}"
+#runstatedir is not something yocto handles, so we have to set CMAKE_INSTALL_RUNSTATEDIR
+#later ourselves
+#runstatedir = "/run${prefix}"
 
 inherit cmake
 
@@ -41,6 +43,7 @@ OECMAKE_CXX_FLAGS_append = " -Wno-psabi "
 OECMAKE_RPATH = "${libdir}"
 EXTRA_OECMAKE += " \
     -DBUILD_SHARED_LIBS=ON \
+	-DCMAKE_INSTALL_RUNSTATEDIR=/run${prefix} \
 "
 
 FILES_${PN} += " \

@@ -37,7 +37,9 @@ prefix = "${FLUKE_CIA_DIR}"
 #Linux FHS special case weirdness
 localstatedir = "/var${prefix}"
 sysconfdir = "/etc${prefix}"
-runstatedir = "/run${prefix}"
+#runstatedir is not something yocto handles, so we have to set CMAKE_INSTALL_RUNSTATEDIR
+#later ourselves
+#runstatedir = "/run${prefix}"
 
 inherit cmake
 inherit cmake_qt5
@@ -48,6 +50,7 @@ OECMAKE_RPATH = "${libdir}"
 EXTRA_OECMAKE += " \
 	-DBUILD_SHARED_LIBS=ON \
 	-DLINK_PREBUILT_CIA_LIBS:BOOL=ON \
+	-DCMAKE_INSTALL_RUNSTATEDIR=/run${prefix} \
 "
 
 #adjusted.json shouldn't be overwritten if it already exists, so put it in CONFFILES
@@ -62,4 +65,5 @@ FILES_${PN} += " \
     ${datadir}/range/ \
     ${datadir}/seq/ \
     ${datadir}/settingsNV/ \
+    ${datadir}/updatedata/ \
 "
