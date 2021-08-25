@@ -45,10 +45,8 @@ set(CIA_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (CMAKE_SYSTEM_PROCESSOR STREQUAL CMAKE_HOST_SYSTEM_PROCESSOR)
     set(BUILD_UPDATER OFF CACHE BOOL "Build updater module")
-    set(CIA_BIN_DIR "${CIA_DIR}/bin/host")
 else()
     set(BUILD_UPDATER ON CACHE BOOL "Build updater module")
-    set(CIA_BIN_DIR "${CIA_DIR}/bin/cda-arm")
 endif()
 
 # Define add_deployment_file so build doesn't break, I don't think
@@ -57,17 +55,33 @@ macro(add_deployment_file SRC DEST)
 #    file(APPEND "${CMAKE_SOURCE_DIR}/QtCreatorDeployment.txt" "${SRC}:${DEST}\n")
 endmacro()
 
-set(CIA_BIN_DIR "${CIA_DIR}/bin/cda-arm")
+set(CIA_BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}/bin/cda-arm")
 # CIA cmake build should not in any way depend on nighthawk variables, but it does...
-set(NIGHTHAWK_BIN_DIR "${CMAKE_SOURCE_DIR}/bin/cda-arm")
+set(NIGHTHAWK_BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}/bin/cda-arm")
 set(NIGHTHAWK_BIN_DIR_TARGET "/home/Nighthawk/bin")
 set(NIGHTHAWK_TEMP_DIR_TARGET "/tmp")
 
 add_definitions(-DTARGET_BUILD)
 
+set(FOUND_LIBCIA_ANALOG CIA::analog CACHE STRING "" FORCE)
+set(FOUND_LIBCIA_GXSERVERS CIA::gxservers CACHE STRING "" FORCE)
+set(FOUND_LIBCIA_TRANSMISSION CIA::transmission CACHE STRING "" FORCE)
+set(FOUND_LIBCIA_UTILS CIA::utils CACHE STRING "" FORCE)
+set(FOUND_LIBCIA_CONNECTORS CIA::connectors CACHE STRING "" FORCE)
+set(FOUND_LIBCIA_ERROR CIA::error CACHE STRING "" FORCE)
+set(FOUND_LIBCIA_LINEARIZE CIA::linearize CACHE STRING "" FORCE)
+set(FOUND_LIBCIA_OPMAN CIA::opman CACHE STRING "" FORCE)
+set(FOUND_LIBCIA_PROCEDURE CIA::procedure CACHE STRING "" FORCE)
+set(FOUND_LIBCIA_REMOTE CIA::remote CACHE STRING "" FORCE)
+set(FOUND_LIBCIA_SETTINGS CIA::settings CACHE STRING "" FORCE)
+set(FOUND_LIBCIA_SHARED CIA::shared CACHE STRING "" FORCE)
+set(FOUND_LIBCIA_STATE CIA::state CACHE STRING "" FORCE)
+set(FOUND_LIBCIA_TRACE CIA::trace CACHE STRING "" FORCE)
+set(FOUND_LIBJSONRPCCPP_SERVER jsonrpccppserver CACHE STRING "" FORCE)
+set(FOUND_LIBJSONRPCCPP_CLIENT jsonrpccppclient CACHE STRING "" FORCE)
+set(FOUND_LIBJSONRPCCPP_COMMON jsonrpccppcommon CACHE STRING "" FORCE)
+set(FOUND_LIBJSONCPP jsoncpp CACHE STRING "" FORCE)
+set(FOUND_LIBUSBTMC usbtmc CACHE STRING "" FORCE)
+
 add_subdirectory(thirdparty)
 add_subdirectory(src)
-
-
-
-
