@@ -33,7 +33,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 # Sources
 #############################################################################
 
-SRC_URI = "git://github.com/google/roboto.git"
+SRC_URI = "git://github.com/google/roboto.git;branch=main"
 
 SRCREV = "ab4876f650a4aeb9b661c83fee47f908c739bb70"
 
