@@ -4,8 +4,7 @@ Description=Perform instrument specific customizations and start!
 
 [Service]
 Type=oneshot
-ExecStart=/home/Nighthawk/config/doDtreeOverlay
-ExecStart=/home/Nighthawk/config/installGadgets
+ExecStart=/usr/sbin/doDtreeOverlay
 ExecStart=/usr/sbin/gpib_config
 
 [Install]
