@@ -2,7 +2,8 @@
 require recipes-images/angstrom/fluke-console-image.bb
 
 DEPENDS_append_fluke-cda-nighthawk = " \
-	noto-sans-display-hinted \
+	noto-sans-hinted \
+	noto-sans-cjk-regular \
 	customization-${MACHINE} \
 	fluke-run-once \
 "
@@ -20,7 +21,8 @@ IMAGE_INSTALL_append = " \
 "
 
 IMAGE_INSTALL_append_fluke-cda-nighthawk = " \
-	noto-sans-display-hinted-regular \
+	noto-sans-hinted-regular \
+	noto-sans-cjk-regular \
 	customization-${MACHINE} \
 	kernel-devicetree \
 	fluke-run-once \
@@ -52,8 +54,8 @@ IMAGE_PREPROCESS_COMMAND_append = " fluke_full_image_postprocess_common; "
 IMAGE_PREPROCESS_COMMAND_append_fluke-cda-nighthawk = " fluke_full_image_postprocess_nighthawk; "
 
 # we do the following using SORT_PASSWD_POSTPROCESS_COMMAND instead of
-# ROOTFS_POSTPROCESS_COMMAND to avoid having our multiple root accounts 
-# getting sorted by username in the passwd file (we want the one named 
+# ROOTFS_POSTPROCESS_COMMAND to avoid having our multiple root accounts
+# getting sorted by username in the passwd file (we want the one named
 # "root" to be first).
 fluke_full_image_postsort_passwd_common() {
 	# add Fluke CDA developer accounts and set root password
