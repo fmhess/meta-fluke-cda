@@ -48,9 +48,11 @@ OECMAKE_C_FLAGS_append = " -Wno-psabi -I${STAGING_DIR_TARGET}${FLUKE_CIA_DIR}/in
 OECMAKE_CXX_FLAGS_append = " -Wno-psabi -I${STAGING_DIR_TARGET}${FLUKE_CIA_DIR}/include"
 OECMAKE_RPATH = "${libdir}"
 EXTRA_OECMAKE += " \
-	-DBUILD_SHARED_LIBS=ON \
+	-DBUILD_SHARED_LIBS:BOOL=ON \
+	-DUSE_CIALEGACY_LOCALSTATEDIR:BOOL=OFF \
 	-DLINK_PREBUILT_CIA_LIBS:BOOL=ON \
 	-DCMAKE_INSTALL_RUNSTATEDIR=/run${prefix} \
+	-DSYSTEMD_SYSTEM_UNITDIR=${systemd_system_unitdir} \
 "
 
 #adjusted.json shouldn't be overwritten if it already exists, so put it in CONFFILES
@@ -66,4 +68,5 @@ FILES_${PN} += " \
     ${datadir}/seq/ \
     ${datadir}/settingsNV/ \
     ${datadir}/updatedata/ \
+    ${systemd_system_unitdir}/ \
 "
