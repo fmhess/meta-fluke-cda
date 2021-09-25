@@ -68,5 +68,6 @@ FILES_${PN} += " \
     ${datadir}/seq/ \
     ${datadir}/settingsNV/ \
     ${datadir}/updatedata/ \
+    ${datadir}/NighthawkSplash.bin \
     ${systemd_system_unitdir}/ \
 "
