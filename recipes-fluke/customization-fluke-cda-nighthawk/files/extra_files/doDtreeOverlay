@@ -1,10 +1,10 @@
 #!/bin/sh
-source /home/setup_environment_target
+export PRODUCT_NAME=Nighthawk
 
 if [ ! -d "/config" ]; then
     mkdir /config
 fi
 mount -t configfs configfs /config
 mkdir /config/device-tree/overlays/$PRODUCT_NAME
-#echo zImage-Nighthawk_soc_overlay.dtb > /config/device-tree/overlays/$PRODUCT_NAME/path
-cat /boot/Nighthawk_soc_overlay.dtb > /config/device-tree/overlays/$PRODUCT_NAME/dtbo
+cat /boot/${PRODUCT_NAME}_soc_overlay.dtb > /config/device-tree/overlays/$PRODUCT_NAME/dtbo
+
