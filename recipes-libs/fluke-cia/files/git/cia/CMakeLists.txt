@@ -27,7 +27,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(THREADS_PTHREAD_ARG "2" CACHE STRING "Forcibly set by CMakeLists.txt." FORCE)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-set(ENABLE_STRIP_DEBUG_INFO ON CACHE BOOL "Strip debug info")
 set(ENABLE_REMOTE_TRACE OFF CACHE BOOL "Enable remote tracing")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -36,8 +35,8 @@ if(NOT WIN32)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated")
 endif()
 
-#find_package(PythonInterp 3)
-set(PYTHON3_EXECUTABLE "/usr/bin/python3")
+find_package (Python3 COMPONENTS Interpreter)
+set(PYTHON3_EXECUTABLE ${Python3_EXECUTABLE} CACHE FILEPATH "")
 
 set(CIA_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 

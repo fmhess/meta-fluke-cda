@@ -17,7 +17,7 @@ RDEPENDS_${PN} += " \
 	systemd \
 "
 
-SRC_URI = "git://github.com/FlukeCorp/nighthawk-sw-src.git;protocol=https;branch=fmhess-develop;destsuffix=git/;name=nighthawksrc \
+SRC_URI = "git://github.com/FlukeCorp/nighthawk-sw-src.git;protocol=https;branch=develop;destsuffix=git/;name=nighthawksrc \
  	git://github.com/FlukeCorp/cia-sw-utils.git;protocol=https;branch=develop;destsuffix=git/cia/utils;name=ciautils \
 	file://extra_files/LICENSE \
 "
@@ -43,6 +43,7 @@ sysconfdir = "/etc${prefix}"
 
 inherit cmake
 inherit cmake_qt5
+inherit python3native
 
 OECMAKE_C_FLAGS_append = " -Wno-psabi -I${STAGING_DIR_TARGET}${FLUKE_CIA_DIR}/include"
 OECMAKE_CXX_FLAGS_append = " -Wno-psabi -I${STAGING_DIR_TARGET}${FLUKE_CIA_DIR}/include"

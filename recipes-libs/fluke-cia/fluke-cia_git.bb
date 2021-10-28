@@ -15,9 +15,9 @@ DEPENDS += "freetype \
 	sqlite3 \
 "
 
-SRC_URI = "git://github.com/FlukeCorp/cia-sw-src.git;protocol=https;branch=fmhess-develop;destsuffix=git/cia/src;name=ciasrc \
+SRC_URI = "git://github.com/FlukeCorp/cia-sw-src.git;protocol=https;branch=develop;destsuffix=git/cia/src;name=ciasrc \
 	git://github.com/FlukeCorp/cia-sw-utils.git;protocol=https;branch=develop;destsuffix=git/cia/utils;name=ciautils \
-	git://github.com/FlukeCorp/cia-sw-thirdparty.git;protocol=https;branch=fmhess-develop;destsuffix=git/cia/thirdparty;name=ciathirdparty \
+	git://github.com/FlukeCorp/cia-sw-thirdparty.git;protocol=https;branch=develop;destsuffix=git/cia/thirdparty;name=ciathirdparty \
 	file://extra_files/LICENSE \
 	file://git/cia/CMakeLists.txt \
 "
@@ -37,6 +37,7 @@ sysconfdir = "/etc${prefix}"
 #runstatedir = "/run${prefix}"
 
 inherit cmake
+inherit python3native
 
 OECMAKE_C_FLAGS_append = " -Wno-psabi "
 OECMAKE_CXX_FLAGS_append = " -Wno-psabi "
