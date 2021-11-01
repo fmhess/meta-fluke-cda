@@ -35,8 +35,8 @@ if(NOT WIN32)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated")
 endif()
 
+set(Python3_FIND_STRATEGY "LOCATION")
 find_package (Python3 COMPONENTS Interpreter)
-set(PYTHON3_EXECUTABLE ${Python3_EXECUTABLE} CACHE FILEPATH "")
 
 set(CIA_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
