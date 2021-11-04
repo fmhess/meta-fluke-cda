@@ -11,6 +11,7 @@ DEPENDS += " \
     fluke-cia \
 	qtbase \
 	qtdeclarative \
+	python3-xlrd-native \
 "
 RDEPENDS_${PN} += " \
 	qtquickcontrols2-qmlplugins \
