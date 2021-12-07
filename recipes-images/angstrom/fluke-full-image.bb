@@ -3,9 +3,7 @@ require recipes-images/angstrom/fluke-console-image.bb
 
 DEPENDS_append_fluke-cda-nighthawk = " \
 	noto-sans-hinted \
-	noto-sans-cjk-medium \
-	noto-sans-cjk-bold \
-	noto-sans-cjk-black \
+	noto-sans-cjk-light \
 	customization-${MACHINE} \
 	fluke-run-once \
 "
@@ -23,12 +21,8 @@ IMAGE_INSTALL_append = " \
 "
 
 IMAGE_INSTALL_append_fluke-cda-nighthawk = " \
-	noto-sans-hinted-medium \
-	noto-sans-hinted-bold \
-	noto-sans-hinted-black \
-	noto-sans-cjk-medium \
-	noto-sans-cjk-bold \
-	noto-sans-cjk-black \
+	noto-sans-hinted-light \
+	noto-sans-cjk-light \
 	customization-${MACHINE} \
 	kernel-devicetree \
 	fluke-run-once \
