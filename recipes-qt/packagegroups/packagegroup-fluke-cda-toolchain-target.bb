@@ -16,6 +16,7 @@ RDEPENDS_${PN} = " \
     googletest-dbg \
     googletest-dev \
     googletest \
+    libeigen-dev \
 "
 
 RDEPENDS_${PN}_append_fluke-cda-vanquish = " \
