@@ -44,7 +44,6 @@ S = "${WORKDIR}/git"
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI_append = "\
 	file://instrument.service \
-	file://launchApp.service \
 	file://extra_files/ \
 "
 
@@ -71,11 +70,11 @@ do_install () {
 	install -d ${D}${systemd_system_unitdir}
 	install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
 	install -m 644 ${WORKDIR}/instrument.service ${D}${systemd_system_unitdir}/
-	#launchApp.service is moving to the nighthawk-sw-src repo, so can be removed in the future
-	install -m 644 ${WORKDIR}/launchApp.service ${D}${systemd_system_unitdir}/
 	install -d ${D}${sbindir}
 	install -m 755 ${WORKDIR}/extra_files/doDtreeOverlay ${D}${sbindir}/
 	ln -sr ${D}${systemd_system_unitdir}/instrument.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
+	# The launchApp.service is installed as part of the application, we are just pre-setting up a symlink for it
+	# to make it start on boot when it gets copied into /lib/systemd/system/ later.
 	ln -sr ${D}${systemd_system_unitdir}/launchApp.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/
 
 	#auto-load kernel modules needed for serial gadget
