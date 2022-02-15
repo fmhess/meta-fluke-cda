@@ -10,7 +10,7 @@ PR = "r0"
 
 SRC_URI = "file://src/"
 
-S = "${WORKDIR}/src/"
+S = "${WORKDIR}/src"
 
 # The inherit of module.bbclass will automatically name module packages with
 # "kernel-module-" prefix as required by the oe-core build environment.

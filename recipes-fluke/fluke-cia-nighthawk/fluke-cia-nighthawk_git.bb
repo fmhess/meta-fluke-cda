@@ -32,7 +32,7 @@ SRCREV ?= "${AUTOREV}"
 PV = "git_${SRCREV}"
 PR = "r0"
 
-S = "${WORKDIR}/git/"
+S = "${WORKDIR}/git"
 
 FLUKE_CIA_DIR = "/opt/fluke/cia"
 prefix = "${FLUKE_CIA_DIR}"

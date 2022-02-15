@@ -9,7 +9,7 @@ RDEPENDS_${PN} = "\
 
 SRC_URI = "file://src/"
 
-S = "${WORKDIR}/src/"
+S = "${WORKDIR}/src"
 PR = "r0"
 
 FILES_${PN} += "/mnt/target_boot"
