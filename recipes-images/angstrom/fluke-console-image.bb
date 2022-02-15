@@ -1,7 +1,6 @@
 
-#require recipes-images/angstrom/small-image.bb
-#require recipes-images/angstrom/console-base-image.bb
-require recipes-images/angstrom/angstrom-image.bb
+#require recipes-images/angstrom/angstrom-image.bb
+inherit core-image
 
 DEPENDS += "lighttpd \
 	iproute2 \
@@ -103,7 +102,7 @@ fluke_console_image_postprocess_common() {
 	# turn off logging to disk
 	echo Storage=volatile >> ${IMAGE_ROOTFS}${sysconfdir}/systemd/journald.conf
 	echo ForwardToSyslog=no >> ${IMAGE_ROOTFS}${sysconfdir}/systemd/journald.conf
-	
+
 	#Prevent front panel display from being allocated as a virtual terminal by logind
 	echo NAutoVTs=0 >> ${IMAGE_ROOTFS}${sysconfdir}/systemd/logind.conf
 	echo ReserveVT=0 >> ${IMAGE_ROOTFS}${sysconfdir}/systemd/logind.conf
