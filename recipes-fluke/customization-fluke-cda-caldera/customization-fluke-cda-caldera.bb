@@ -1,7 +1,7 @@
 SUMMARY = "Fluke CDA customization for Nighthawk"
 DESCRIPTION = "Fluke Caldera application, etc."
 AUTHOR = "Fluke"
-SECTION = ""
+#SECTION = "base"
 HOMEPAGE = ""
 
 LICENSE = "Proprietary"
@@ -59,11 +59,11 @@ do_clean[noexec] = "1"
 do_install () {
 	(
 		cd ${S}/common/extraFiles/target_root/ &&
-			find -type f -exec sh -c 'install -D -m $(stat -c "%a" "$1") "$1" ${D}/"$1"' sh \{\} \; 
+			find -type f -exec sh -c 'install -D -m $(stat -c "%a" "$1") "$1" ${D}/"$1"' sh \{\} \;
 	)
 	(
 		cd ${S}/Caldera/extraFiles/target_root/ &&
-			find -type f -exec sh -c 'install -D -m $(stat -c "%a" "$1") "$1" ${D}/"$1"' sh \{\} \; 
+			find -type f -exec sh -c 'install -D -m $(stat -c "%a" "$1") "$1" ${D}/"$1"' sh \{\} \;
 	)
 	install -d ${D}/home/Test
 	install -d ${D}/home/Proto

@@ -1,7 +1,7 @@
 SUMMARY = "Fluke CDA customization for Nighthawk"
 DESCRIPTION = "Nighthawk application, etc."
 AUTHOR = "Fluke"
-SECTION = ""
+#SECTION = "base"
 HOMEPAGE = ""
 
 LICENSE = "Proprietary"
@@ -13,6 +13,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=ae270d4118d7e64218492af5b3f3249b"
 #linux-gpib-user used by "/home/Nighthawk/bin/remoteapp" executable
 #qtbase, qtdeclarative, qtquickcontrols2-qmlplugins used by "/home/Nighthawk/bin/fp" executable
 DEPENDS = " \
+"
+RDEPENDS_${PN} += " \
 	fontconfig \
 	freetype \
 	libpng \
@@ -20,8 +22,6 @@ DEPENDS = " \
 	linux-gpib-user \
 	qtbase \
 	qtdeclarative \
-"
-RDEPENDS_${PN} += " \
 	qtquickcontrols2-qmlplugins \
 	systemd \
 "

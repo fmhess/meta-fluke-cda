@@ -1,7 +1,7 @@
 SUMMARY = "Fluke CDA customization for Kraken"
 DESCRIPTION = "Kraken application, etc."
 AUTHOR = "Fluke"
-SECTION = ""
+#SECTION = "base"
 HOMEPAGE = ""
 
 LICENSE = "Proprietary"
@@ -24,7 +24,7 @@ FILES_${PN} += " \
 	${base_prefix}/www/* \
 	${base_prefix}/home/* \
 	${base_prefix}/tmp/customization_data/* \
-cd	${base_prefix}${systemd_system_unitdir} \
+	${base_prefix}${systemd_system_unitdir} \
 	${base_prefix}${sysconfdir}/systemd/system/multi-user.target.wants/ \
 "
 
@@ -43,14 +43,14 @@ do_clean[noexec] = "1"
 do_install () {
 	(
 		cd ${S}/common/extraFiles/target_root/ &&
-			find -type f -exec sh -c 'install -D -m $(stat -c "%a" "$1") "$1" ${D}/"$1"' sh \{\} \; 
+			find -type f -exec sh -c 'install -D -m $(stat -c "%a" "$1") "$1" ${D}/"$1"' sh \{\} \;
 	)
 	(
 		cd ${S}/Kraken/extraFiles/target_root/ &&
-			find -type f -exec sh -c 'install -D -m $(stat -c "%a" "$1") "$1" ${D}/"$1"' sh \{\} \; 
+			find -type f -exec sh -c 'install -D -m $(stat -c "%a" "$1") "$1" ${D}/"$1"' sh \{\} \;
 	)
 	#fixup ssh dir permissions
-	chmod 700 ${D}${ROOT_HOME}/.ssh 
+	chmod 700 ${D}${ROOT_HOME}/.ssh
 
 	#install systemd services for starting instrument app
 # 	install -d ${D}${systemd_system_unitdir}
