@@ -8,7 +8,7 @@ RDEPENDS_${PN} = "gptfdisk"
 
 SRC_URI = "file://src/"
 
-S = "${WORKDIR}/src/"
+S = "${WORKDIR}/src"
 PR = "r0"
 
 #pkg_posinst_ontarget should get run once on the first boot if this
