@@ -8,7 +8,6 @@ PACKAGEGROUP_DISABLE_COMPLEMENTARY = "1"
 
 RDEPENDS_${PN} = " \
     linux-gpib-user \
-    libusb-compat \
     tslib \
     libgpiod-dev \
     fontconfig \
