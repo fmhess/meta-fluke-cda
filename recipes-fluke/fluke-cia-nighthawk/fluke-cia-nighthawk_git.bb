@@ -13,6 +13,7 @@ DEPENDS += " \
 	qtdeclarative \
 	python3-xlrd-native \
 	libeigen \
+	libusb1 \
 "
 RDEPENDS_${PN} += " \
 	qtquickcontrols2-qmlplugins \
