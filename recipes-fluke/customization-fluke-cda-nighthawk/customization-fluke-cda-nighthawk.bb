@@ -24,6 +24,14 @@ RDEPENDS_${PN} += " \
 	qtdeclarative \
 	qtquickcontrols2-qmlplugins \
 	systemd \
+	libeigen-lic \
+"
+
+#add dummy packages for libraries provided via cia-sw-thirdparty, so that their license packages get installed
+RDEPENDS_${PN} += " \
+	dummy-cia-usbtmc-lic \
+	dummy-cia-jsoncpp-lic \
+	dummy-cia-jsonrpccpp-lic \
 "
 
 SRC_URI = "git://github.com/ADorchak/sumo-rootfs-extras.git;protocol=https;branch=master"
