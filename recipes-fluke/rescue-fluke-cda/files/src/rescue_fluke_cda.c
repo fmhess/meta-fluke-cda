@@ -28,8 +28,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 const char * const mount_cmd = "mount -o ro /dev/mmcblk0p1 /mnt/target_boot";
 const char * const kexec_load_cmd = "kexec --load /mnt/target_boot/zImage "
-	"--append \"console=ttyS0,115200 vt.global_cursor_default=0 vt.cur_default=1 coherent_pool=256K isolcpus=1 root=/dev/mmcblk0p2 rw rootwait rootfstype=ext4 2>/dev/null\"";
-const char * const kexec_exec_cmd = "kexec --exec";
+	"--append \"console=ttyS0,115200 vt.global_cursor_default=0 vt.cur_default=1 coherent_pool=256K isolcpus=1 root=/dev/mmcblk0p2 rw rootwait rootfstype=ext4\" "
+	"2>/dev/console";
+const char * const kexec_exec_cmd = "kexec --exec 2>/dev/console";
 const char * const dd_boot_cmd = "dd if=/dev/mmcblk0p3 of=/dev/mmcblk0p1 bs=1M conv=fsync";
 const char * const dd_root_cmd = "dd if=/dev/mmcblk0p4 of=/dev/mmcblk0p2 bs=1M conv=fsync";
 const char * const dd_mtd_to_tmp_cmd = "dd if=/dev/mtd%d of=/tmp/mtdX bs=1M";
