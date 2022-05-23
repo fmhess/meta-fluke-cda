@@ -1,4 +1,4 @@
-PR = "r1"
+PR = "r2"
 KERNEL_REPO = "git://github.com/fmhess/linux-socfpga.git"
 LINUX_VERSION = "5.4.13"
 LINUX_VERSION_SUFFIX = "-lts-fluke-cda"
@@ -15,4 +15,9 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI_append = "\
     file://fluke-cda.cfg \
     file://${MACHINE}.cfg \
+"
+
+#add kernel modules needed for iptables support to nighthawk
+SRC_URI_append_fluke-cda-nighthawk = "\
+    file://netfilter.cfg \
 "
