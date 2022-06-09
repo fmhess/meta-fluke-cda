@@ -26,6 +26,7 @@ IMAGE_INSTALL_append_fluke-cda-nighthawk = " \
 	customization-${MACHINE} \
 	kernel-devicetree \
 	fluke-run-once \
+	fluke-cia-nighthawk \
 "
 IMAGE_INSTALL_append_fluke-cda-caldera = " \
 	customization-${MACHINE} \

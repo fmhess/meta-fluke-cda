@@ -1,3 +1,6 @@
+inherit cmake
+inherit python3native
+
 SUMMARY = "Fluke CIA"
 DESCRIPTION = "Fluke Common Instrument Architecture"
 HOMEPAGE = "https://https://github.com/FlukeCorp/cia-sw-src"
@@ -28,26 +31,43 @@ PR = "r0"
 
 S = "${WORKDIR}/git/cia"
 
-prefix = "/opt/fluke/cia"
-#Linux FHS special case weirdness
-localstatedir = "/var${prefix}"
-sysconfdir = "/etc${prefix}"
+# Legacy install
+prefix = "/home/Nighthawk"
+datarootdir = "${prefix}/bin"
+datadir = "${datarootdir}"
+libexecdir = "${prefix}/bin"
+localstatedir = "${prefix}/bin"
+sysconfdir = "${prefix}/bin"
+docdir = "${prefix}/share/doc"
 #runstatedir is not something yocto handles, so we have to set CMAKE_INSTALL_RUNSTATEDIR
 #later ourselves
-#runstatedir = "/run${prefix}"
+#runstatedir = "/tmp"
+EXTRA_OECMAKE += " \
+    -DBUILD_SHARED_LIBS:BOOL=OFF \
+	-DUSE_CIALEGACY_LOCALSTATEDIR:BOOL=ON \
+	-DCMAKE_INSTALL_RUNSTATEDIR=/tmp \
+"
 
-inherit cmake
-inherit python3native
+# # Linux FHS install
+# prefix = "/opt/fluke/cia"
+# #Linux FHS special case weirdness
+# localstatedir = "/var${prefix}"
+# sysconfdir = "/etc${prefix}"
+# #runstatedir is not something yocto handles, so we have to set CMAKE_INSTALL_RUNSTATEDIR
+# #later ourselves
+# #runstatedir = "/run${prefix}"
+# EXTRA_OECMAKE += " \
+#     -DBUILD_SHARED_LIBS:BOOL=ON \
+# 	-DUSE_CIALEGACY_LOCALSTATEDIR:BOOL=OFF \
+# 	-DCMAKE_INSTALL_RUNSTATEDIR=/run${prefix} \
+# "
+# OECMAKE_RPATH = "${libdir}"
 
 OECMAKE_C_FLAGS_append = " -Wno-psabi "
 OECMAKE_CXX_FLAGS_append = " -Wno-psabi "
-OECMAKE_RPATH = "${libdir}"
-EXTRA_OECMAKE += " \
-    -DBUILD_SHARED_LIBS:BOOL=ON \
-	-DUSE_CIALEGACY_LOCALSTATEDIR:BOOL=OFF \
-	-DCMAKE_INSTALL_RUNSTATEDIR=/run${prefix} \
-"
 
+# we add ${prefix} to FILES for the sake of the "legacy install" to /home/Nighthawk
 FILES_${PN} += " \
     ${datadir} \
+    ${prefix} \
 "
