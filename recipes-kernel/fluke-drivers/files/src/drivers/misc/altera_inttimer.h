@@ -22,7 +22,7 @@
 #define alt_inttimer_h
 
 #include <linux/cdev.h>
-#include <linux/semaphore.h>
+#include <linux/mutex.h>
 
 
 #define INTTIMER_IOC_MAXNUMBER    3
@@ -31,7 +31,7 @@
 struct inttimer_port {
     void *mapbase;
     struct resource iomem_resource;
-    struct       semaphore sem;
+    struct mutex lock;
     struct       cdev cdev;
     struct device* dev;
 	int minor;

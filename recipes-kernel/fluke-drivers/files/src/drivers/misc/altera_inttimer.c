@@ -78,13 +78,14 @@ static ssize_t hw_read (struct file *filp, char __user *buf, size_t count, loff_
 
     // printk ("int timer: read function CALLED!\n");
 
-    if (down_interruptible(&inttimerp->sem))
+    if (mutex_lock_interruptible(&inttimerp->lock))
         return -ERESTARTSYS;
-    
-    if (!(tbuf = kmalloc(count, GFP_ATOMIC))) {
+
+    if (!(tbuf = kmalloc(count, GFP_KERNEL))) {
+        mutex_unlock(&inttimerp->lock);
         return -ENOMEM;
     }
-
+    
     for (i = 0; i < count; i++) {
         tbuf[i] = ioread32(inttimerp->mapbase + 4);
         rmb();
@@ -99,7 +100,7 @@ static ssize_t hw_read (struct file *filp, char __user *buf, size_t count, loff_
         retval = count;
 
     kfree(tbuf);
-    up(&inttimerp->sem);
+    mutex_unlock(&inttimerp->lock);
 
     return retval;
 }
@@ -113,11 +114,12 @@ static ssize_t hw_write (struct file *filp, const char __user *buf, size_t count
     
     struct inttimer_port *inttimerp = filp->private_data;
 
-    if (down_interruptible(&inttimerp->sem))
+    if (mutex_lock_interruptible(&inttimerp->lock))
         return -ERESTARTSYS;
 
-    if (!(tbuf = kmalloc(count, GFP_ATOMIC))) {
+    if (!(tbuf = kmalloc(count, GFP_KERNEL))) {
         printk("int timer: write, kmalloc failed!\n");
+        mutex_unlock(&inttimerp->lock);
         return -ENOMEM;
     }
 
@@ -135,7 +137,7 @@ static ssize_t hw_write (struct file *filp, const char __user *buf, size_t count
     }
 
     kfree(tbuf);
-    up(&inttimerp->sem);
+    mutex_unlock(&inttimerp->lock);
     return retval;
 }
 
@@ -147,7 +149,6 @@ static long hw_ioctl (struct file *filp, unsigned int cmd, unsigned long arg) {
     struct inttimer_port *inttimerp = filp->private_data;
 
     // printk ("inttimer/ioctl: %p\n", inttimerp->mapbase);
-    down(&inttimerp->sem);
 
     if (_IOC_TYPE(cmd) != INTTIMER_IOC_MAGIC_NUMBER)  return -ENOTTY;
     if (_IOC_NR(cmd)   >= INTTIMER_IOC_MAXNUMBER) return -ENOTTY;
@@ -157,6 +158,9 @@ static long hw_ioctl (struct file *filp, unsigned int cmd, unsigned long arg) {
     else
         error = !access_ok(/*VERIFY_READ, */(void __user *)arg, _IOC_SIZE(cmd));
     if (error) return -EFAULT; 
+
+    if (mutex_lock_interruptible(&inttimerp->lock))
+        return -ERESTARTSYS;
 
     switch(cmd) {
     case INTTIMER_READ_REG0:
@@ -180,10 +184,10 @@ static long hw_ioctl (struct file *filp, unsigned int cmd, unsigned long arg) {
         }
         break;
     default:
-        up(&inttimerp->sem);
+        mutex_unlock(&inttimerp->lock);
         return -ENOTTY;  // NOTE: can't happen as we already checked against FGPIO_IOC_MAXNUMBER
     }
-    up(&inttimerp->sem);
+    mutex_unlock(&inttimerp->lock);
     return error;
 }
 
@@ -249,7 +253,7 @@ static int alt_inttimer_probe(struct platform_device *pdev) {
     {
         return -ENOMEM;
     }
-    sema_init(&inttimerp->sem, 1);
+    mutex_init(&inttimerp->lock);
     dev_set_drvdata(&pdev->dev, inttimerp);
 
     inttimerp->minor = ida_simple_get(&minor_allocator, 0, MAX_INTTIMER_DEVICES, GFP_KERNEL);
