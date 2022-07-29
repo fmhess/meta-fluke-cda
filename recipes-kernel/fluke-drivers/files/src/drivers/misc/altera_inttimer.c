@@ -165,23 +165,17 @@ static long hw_ioctl (struct file *filp, unsigned int cmd, unsigned long arg) {
     switch(cmd) {
     case INTTIMER_READ_REG0:
         // printk (KERN_INFO "fgpio/ioctl: returning Data register: %p\n", inttimerp->mapbase);
-        if (access_ok(/*VERIFY_WRITE,*/ (const void *)arg, sizeof(unsigned int))) {
-            *((unsigned int *)arg) = ioread32(inttimerp->mapbase);
-        }
+        *((unsigned int *)arg) = ioread32(inttimerp->mapbase);
         break;
     case INTTIMER_WRITE_FREQL:
         data = (arg & 0x0ffff);
         printk (KERN_INFO "fgpio/ioctl: Writing freq Low Data <%04x, to register: %p\n",data, (inttimerp->mapbase + 0x08));
-        if (access_ok(/*VERIFY_READ, */(const void *)arg, sizeof(unsigned int))) {
-            iowrite32(data, inttimerp->mapbase + 0x08);         // Counter Freq Low
-        }
+        iowrite32(data, inttimerp->mapbase + 0x08);         // Counter Freq Low
         break;
     case INTTIMER_WRITE_FREQH:
         data = (arg & 0x0ffff);
         printk (KERN_INFO "fgpio/ioctl: Writing freq High Data <%04x, to register: %p\n",data, (inttimerp->mapbase + 0x08));
-        if (access_ok(/*VERIFY_READ, */(const void *)arg, sizeof(unsigned int))) {
-            iowrite32(data, inttimerp->mapbase + 0x0c); // Counter Freq Hi
-        }
+        iowrite32(data, inttimerp->mapbase + 0x0c); // Counter Freq Hi
         break;
     default:
         mutex_unlock(&inttimerp->lock);
