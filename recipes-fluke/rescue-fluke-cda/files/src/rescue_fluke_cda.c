@@ -33,7 +33,7 @@ const char * const mount_cmd = "mount -o ro /dev/mmcblk0p1 /mnt/target_boot";
 #define RESCUE_FLUKE_CDA_CONSOLE_BOOTARGS "console=null"
 #define RESCUE_FLUKE_CDA_KEXEC_ERROR_OUT "/dev/null"
 const char * const kexec_load_cmd = "kexec --load /mnt/target_boot/zImage "
-	"--append \"" RESCUE_FLUKE_CDA_CONSOLE_BOOTARGS " vt.global_cursor_default=0 vt.cur_default=1 coherent_pool=256K isolcpus=1 root=/dev/mmcblk0p2 rw rootwait rootfstype=ext4\" "
+	"--append \"" RESCUE_FLUKE_CDA_CONSOLE_BOOTARGS " vt.global_cursor_default=0 vt.cur_default=1 coherent_pool=256K root=/dev/mmcblk0p2 rw rootwait rootfstype=ext4\" "
 	"2>" RESCUE_FLUKE_CDA_KEXEC_ERROR_OUT ;
 const char * const kexec_exec_cmd = "kexec --exec 2>" RESCUE_FLUKE_CDA_KEXEC_ERROR_OUT ;
 const char * const dd_boot_cmd = "dd if=/dev/mmcblk0p3 of=/dev/mmcblk0p1 bs=1M conv=fsync";
