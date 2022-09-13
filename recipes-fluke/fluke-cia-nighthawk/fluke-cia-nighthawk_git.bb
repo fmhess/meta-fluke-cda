@@ -24,6 +24,7 @@ RDEPENDS_${PN} += " \
 	qtquickcontrols2-qmlplugins \
 	systemd \
 	bash \
+	python3-core \
 "
 
 SRC_URI = "git://github.com/FlukeCorp/nighthawk-sw-src.git;protocol=https;branch=develop;destsuffix=git/;name=nighthawksrc \
