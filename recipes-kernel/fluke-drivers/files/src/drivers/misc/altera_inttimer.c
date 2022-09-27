@@ -169,12 +169,12 @@ static long hw_ioctl (struct file *filp, unsigned int cmd, unsigned long arg) {
         break;
     case INTTIMER_WRITE_FREQL:
         data = (arg & 0x0ffff);
-        printk (KERN_INFO "fgpio/ioctl: Writing freq Low Data <%04x, to register: %p\n",data, (inttimerp->mapbase + 0x08));
+//         printk (KERN_INFO "fgpio/ioctl: Writing freq Low Data <%04x, to register: %p\n",data, (inttimerp->mapbase + 0x08));
         iowrite32(data, inttimerp->mapbase + 0x08);         // Counter Freq Low
         break;
     case INTTIMER_WRITE_FREQH:
         data = (arg & 0x0ffff);
-        printk (KERN_INFO "fgpio/ioctl: Writing freq High Data <%04x, to register: %p\n",data, (inttimerp->mapbase + 0x08));
+//         printk (KERN_INFO "fgpio/ioctl: Writing freq High Data <%04x, to register: %p\n",data, (inttimerp->mapbase + 0x08));
         iowrite32(data, inttimerp->mapbase + 0x0c); // Counter Freq Hi
         break;
     default:
