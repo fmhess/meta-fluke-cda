@@ -6,6 +6,7 @@ DEPENDS_append_fluke-cda-nighthawk = " \
 	noto-sans-cjk-light \
 	customization-${MACHINE} \
 	fluke-run-once \
+	rescue-fluke-cda-bootfiles \
 "
 DEPENDS_append_fluke-cda-caldera = " \
 	customization-${MACHINE} \
@@ -27,6 +28,7 @@ IMAGE_INSTALL_append_fluke-cda-nighthawk = " \
 	kernel-devicetree \
 	fluke-run-once \
 	fluke-cia-nighthawk \
+	rescue-fluke-cda-bootfiles \
 "
 IMAGE_INSTALL_append_fluke-cda-caldera = " \
 	customization-${MACHINE} \

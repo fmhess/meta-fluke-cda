@@ -28,13 +28,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 const char * const mount_cmd = "mount -o ro /dev/mmcblk0p1 /mnt/target_boot";
 
-//#define RESCUE_FLUKE_CDA_CONSOLE_BOOTARGS "console=ttyS0,115200"
-// #define RESCUE_FLUKE_CDA_KEXEC_ERROR_OUT "/dev/console"
-#define RESCUE_FLUKE_CDA_CONSOLE_BOOTARGS "console=null"
-#define RESCUE_FLUKE_CDA_KEXEC_ERROR_OUT "/dev/null"
-const char * const kexec_load_cmd = "kexec --load /mnt/target_boot/zImage "
-	"--append \"" RESCUE_FLUKE_CDA_CONSOLE_BOOTARGS " vt.global_cursor_default=0 vt.cur_default=1 coherent_pool=256K root=/dev/mmcblk0p2 rw rootwait rootfstype=ext4\" "
+#define RESCUE_FLUKE_CDA_KEXEC_ERROR_OUT "/dev/console"
+const char * const fallback_kexec_load_cmd = "kexec --load /mnt/target_boot/zImage-5.4.13-altera "
+	"--append \"console=null vt.global_cursor_default=0 vt.cur_default=1 coherent_pool=256K isolcpus=1 root=/dev/mmcblk0p2 rw rootwait rootfstype=ext4\" "
 	"2>" RESCUE_FLUKE_CDA_KEXEC_ERROR_OUT ;
+const char * const kexec_load_cmd = "cd /mnt/target_boot;/bin/sh ./kexec_load.sh";
+const char * const kexec_load_alternate_cmd = "cd /mnt/target_boot;/bin/sh ./kexec_load_alternate.sh";
 const char * const kexec_exec_cmd = "kexec --exec 2>" RESCUE_FLUKE_CDA_KEXEC_ERROR_OUT ;
 const char * const dd_boot_cmd = "dd if=/dev/mmcblk0p3 of=/dev/mmcblk0p1 bs=1M conv=fsync";
 const char * const dd_root_cmd = "dd if=/dev/mmcblk0p4 of=/dev/mmcblk0p2 bs=1M conv=fsync";
@@ -61,6 +60,7 @@ const char * const main_menu_options[] =
 	"Restore U-Boot with SPL to factory state",
 	"Restore U-Boot environment to factory state",
 	"Restore rescue kernel and initrd to factory state",
+	"Boot with alternate kernel",
 	NULL
 };
 
@@ -77,6 +77,7 @@ int system_wrapper(const char *command, int verbose, int dry_run)
 		result = system(command);
 		if(result)
 		{
+			fprintf(stderr, "Error executing \"%s\"\n", command);
 			fprintf(stderr, "Error code = %d\n", result);
 		}
 	}else
@@ -114,7 +115,7 @@ int system_flashcp_tmp_to_mtd(int destination_mtd_partition, int verbose, int dr
 	return result;
 }
 
-int do_boot(int verbose, int dry_run)
+int do_boot(int verbose, int dry_run, int use_alternate)
 {
 	int result;
 	
@@ -124,10 +125,16 @@ int do_boot(int verbose, int dry_run)
 		return result;
 	}
 	
-	result = system_wrapper(kexec_load_cmd, verbose, dry_run);
+	if (!use_alternate)
+		result = system_wrapper(kexec_load_cmd, verbose, dry_run);
+	else
+		result = system_wrapper(kexec_load_alternate_cmd, verbose, dry_run);
 	if(result)
 	{
-		return result;
+		fprintf(stderr, "Using fallback kexec load.\n"); 
+		result = system_wrapper(fallback_kexec_load_cmd, verbose, dry_run);
+		if (result)
+			return result;
 	}
 
 	result = system_wrapper(kexec_exec_cmd, verbose, dry_run);
@@ -280,7 +287,7 @@ int confirm_selection(int *confirmed)
 	return 0;
 }
 
-int do_interactive_boot()
+int do_interactive_boot(int use_alternate)
 {
 	int confirmed;
 	int retval;
@@ -291,7 +298,7 @@ int do_interactive_boot()
 		return retval;
 	} else if (confirmed) 
 	{
-		return do_boot(0, 0);
+		return do_boot(0, 0, use_alternate);
 	} else 
 	{
 		return 0;
@@ -411,7 +418,7 @@ int prompt_interactively()
 			switch(selection)
 			{
 				case 1:
-					do_interactive_boot();
+					do_interactive_boot(0);
 					break;
 				case 2:
 					do_interactive_restore_filesystems();
@@ -430,6 +437,9 @@ int prompt_interactively()
 					break;
 				case 7:
 					do_interactive_restore_rescue();
+					break;
+				case 8:
+					do_interactive_boot(1);
 					break;
 				default:
 					printf("Invalid selection.\n");
@@ -459,7 +469,7 @@ int main()
 	}
 	if(timed_out)
 	{
-		return do_boot(0, 0);
+		return do_boot(0, 0, 0);
 	}
 	
 	/* reset the terminal now that we are past the initial wait for the 
