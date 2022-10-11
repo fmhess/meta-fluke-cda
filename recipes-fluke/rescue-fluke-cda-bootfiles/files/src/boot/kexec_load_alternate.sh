@@ -12,4 +12,4 @@
 # option to "console=ttyS0,115200".
 kexec --load zImage-5.4.13-altera \
 	--append "console=null vt.global_cursor_default=0 vt.cur_default=1 coherent_pool=256K isolcpus=1 root=/dev/mmcblk0p2 rw rootwait rootfstype=ext4" \
-	2> /dev/console;
+	2> /dev/null;

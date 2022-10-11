@@ -28,7 +28,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 const char * const mount_cmd = "mount -o ro /dev/mmcblk0p1 /mnt/target_boot";
 
-#define RESCUE_FLUKE_CDA_KEXEC_ERROR_OUT "/dev/console"
+#define RESCUE_FLUKE_CDA_KEXEC_ERROR_OUT "/dev/null"
 const char * const fallback_kexec_load_cmd = "kexec --load /mnt/target_boot/zImage-5.4.13-altera "
 	"--append \"console=null vt.global_cursor_default=0 vt.cur_default=1 coherent_pool=256K isolcpus=1 root=/dev/mmcblk0p2 rw rootwait rootfstype=ext4\" "
 	"2>" RESCUE_FLUKE_CDA_KEXEC_ERROR_OUT ;
