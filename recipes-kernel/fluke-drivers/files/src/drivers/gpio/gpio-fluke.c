@@ -65,14 +65,14 @@ struct kobj_attribute fgpio_attr = __ATTR(*fgpio_value, 0660, sysfs_show, sysfs_
 /* Read the sysfs file */
 static ssize_t sysfs_show(struct kobject *kobj, struct kobj_attribute *attr, char * buf) 
 {
-    pr_info("Sysfs - Read!!\n");
+    // printk(KERN_INFO "sysfs - Read\n");
     return sprintf(buf, "%s", fgpio_value);
 }
 
 /* Write the sysfs file */
 static ssize_t sysfs_store(struct kobject *kobj, struct kobj_attribute *attr, const char * buf, size_t count) 
 {
-    pr_info("Sysfs - Write!!\n");
+    // printk(KERN_INFO "sysfs - write\n");
     sscanf(buf, "%s", fgpio_value);
     return count;
 }
@@ -512,7 +512,7 @@ static int __init fgpio_init(void) {
     kobj_ref = kobject_create_and_add("fgpio_sysfs", kernel_kobj);
 
     if (sysfs_create_file(kobj_ref, &fgpio_attr.attr)){
-        pr_err("Cannot create sysfs file....\n";
+        printk (KERN_INFO "Cannot create sysfs file..\n");
         goto r_sysfs;
     }
 
