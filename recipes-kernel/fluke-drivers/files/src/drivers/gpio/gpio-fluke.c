@@ -480,7 +480,7 @@ static struct platform_driver fgpio_platform_driver = {
               },
 };
 
-static int __init fgpio_init (void) {
+static int __init fgpio_init(void) {
     int result;
     dev_t dev;
 
@@ -521,6 +521,7 @@ static int __init fgpio_init (void) {
     r_sysfs:
         kobject_put(kobj_ref);
         sysfs_remove_file(kernel_kobj, &fgpio_attr.attr);
+        return -1;
 }
 
 static void __exit fgpio_exit(void) {
