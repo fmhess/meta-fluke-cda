@@ -66,7 +66,7 @@ struct kobj_attribute fgpio_attr = __ATTR(*fgpio_value, 0660, sysfs_show, sysfs_
 static ssize_t sysfs_show(struct kobject *kobj, struct kobj_attribute *attr, char * buf) 
 {
     pr_info("Sysfs - Read!!\n");
-    return sprintf(buf, "%s", *fgpio_value);
+    return sprintf(buf, "%s", fgpio_value);
 }
 
 /* Write the sysfs file */
