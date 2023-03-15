@@ -22,6 +22,7 @@
 #include <linux/module.h>
 
 #include <linux/kernel.h>	/* printk() */
+#include <linux/init.h>
 #include <linux/fs.h>		/* everything... */
 #include <linux/errno.h>	/* error codes */
 #include <linux/ioport.h>
@@ -36,7 +37,10 @@
 #include <linux/interrupt.h>
 #include <linux/signal.h>
 #include <linux/uaccess.h>
+#include <linux/sysfs.h>
+#include <linux/kobject.h>
 #include <linux/io.h>
+#include <linux/err.h>
 #include "fgpio-dev.h"
 #include "gpio-fluke.h"
 
@@ -50,6 +54,29 @@ MODULE_LICENSE("GPL");
 static struct class *fluke_gpio_class;
 static unsigned fgpio_major;
 static DEFINE_IDA(minor_allocator);
+
+struct kobject *kobj_ref;
+volatile char *fgpio_value = "Dev_noname";
+
+static ssize_t sysfs_show(struct kobject *kobj, struct kobj_attribute *attr, char * buf); 
+static ssize_t sysfs_store(struct kobject *kobj, struct kobj_attribute *attr, const char * buf, size_t count); 
+struct kobj_attribute fgpio_attr = __ATTR(*fgpio_value, 0660, sysfs_show, sysfs_store);
+
+/* Read the sysfs file */
+static ssize_t sysfs_show(struct kobject *kobj, struct kobj_attribute *attr, char * buf) 
+{
+    pr_info("Sysfs - Read!!\n");
+    return sprintf(buf, "%s", *fgpio_value);
+}
+
+/* Write the sysfs file */
+static ssize_t sysfs_store(struct kobject *kobj, struct kobj_attribute *attr, const char * buf, size_t count) 
+{
+    pr_info("Sysfs - Write!!\n");
+    scanf(buf, "%s", fgpio_value);
+    return count;
+}
+
 
 static int q_full(struct Queue *Q) {
     // printk(KERN_INFO "q_full: Size = %d, Capacity = %d\n", Q->Size, Q->Capacity);
@@ -464,7 +491,7 @@ static int __init fgpio_init (void) {
     }
     printk (KERN_INFO "fgpio: registered fluke_gpio_class.\n");
 
-    /* First, let's get the devices we need /dev/fgpio0 - /dev/fgpio7 */
+    /* First, let's get the devices we need /dev/fgpio0 - /dev/fgpioN */
     result = alloc_chrdev_region(&dev, 0, NR_DEVICES, "fgpio");
     if (result < 0) {
         printk (KERN_INFO "fgpio: can't register FGPIO devices /dev/fgpioX\n");
@@ -481,10 +508,24 @@ static int __init fgpio_init (void) {
         return result;
     }
 
+    /* Create a directory in /sys/kernel/ */
+    kobj_ref = kobject_create_and_add("fgpio_sysfs", kernel_kobj);
+
+    if (sysfs_create_file(kobj_ref, &fgpio_attr.attr)){
+        pr_err("Cannot create sysfs file....\n";
+        goto r_sysfs;
+    }
+
     return 0;
+
+    r_sysfs:
+        kobject_put(kobj_ref);
+        sysfs_remove_file(kernel_kobj, &fgpio_attr.attr);
 }
 
 static void __exit fgpio_exit(void) {
+    kobject_put(kobj_ref);
+    sysfs_remove_file(kernel_kobj, &fgpio_attr.attr);'
     platform_driver_unregister(&fgpio_platform_driver);
     unregister_chrdev_region(MKDEV(fgpio_major, 0), NR_DEVICES);
     class_destroy(fluke_gpio_class);
