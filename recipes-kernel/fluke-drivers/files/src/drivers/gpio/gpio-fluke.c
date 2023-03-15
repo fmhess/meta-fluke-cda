@@ -526,7 +526,7 @@ static int __init fgpio_init(void) {
 
 static void __exit fgpio_exit(void) {
     kobject_put(kobj_ref);
-    sysfs_remove_file(kernel_kobj, &fgpio_attr.attr);'
+    sysfs_remove_file(kernel_kobj, &fgpio_attr.attr);
     platform_driver_unregister(&fgpio_platform_driver);
     unregister_chrdev_region(MKDEV(fgpio_major, 0), NR_DEVICES);
     class_destroy(fluke_gpio_class);
