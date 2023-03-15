@@ -73,7 +73,7 @@ static ssize_t sysfs_show(struct kobject *kobj, struct kobj_attribute *attr, cha
 static ssize_t sysfs_store(struct kobject *kobj, struct kobj_attribute *attr, const char * buf, size_t count) 
 {
     pr_info("Sysfs - Write!!\n");
-    scanf(buf, "%s", fgpio_value);
+    sscanf(buf, "%s", fgpio_value);
     return count;
 }
 
